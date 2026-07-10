@@ -40,8 +40,9 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
-        changeOrigin: true
+        target: 'https://shah-abdul-mazid-portfolio.onrender.com',
+        changeOrigin: true,
+        secure: true
       }
     }
   }
