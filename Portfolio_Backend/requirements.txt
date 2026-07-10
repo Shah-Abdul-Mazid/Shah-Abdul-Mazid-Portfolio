@@ -1,0 +1,14 @@
+# 🚀 Portfolio & AI Agent FastAPI Requirements (Production Optimized)
+fastapi
+uvicorn[standard]
+gunicorn
+motor
+cloudinary
+python-dotenv
+pydantic-settings
+python-multipart
+python-jose[cryptography]
+bcrypt
+httpx
+pydantic
+
