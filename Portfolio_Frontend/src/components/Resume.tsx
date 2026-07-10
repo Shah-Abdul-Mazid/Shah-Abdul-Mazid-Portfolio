@@ -153,7 +153,7 @@ const Resume = () => {
                                 <p className="rv-role">{data.hero.title}</p>
                             </div>
                             <div className="rv-hd-right">
-                                <div className="rv-contact-row"><a href="http://shah-abdul-mazid-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer" className="rv-link">Portfolio: shahabdulmazid.vercel.app</a></div>
+                                <div className="rv-contact-row"><a href="http://shah-abdul-mazid-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer" className="rv-link">Portfolio: http://shah-abdul-mazid-portfolio.vercel.app/</a></div>
                                 <div className="rv-contact-row"><a href={data.contact.github} target="_blank" rel="noopener noreferrer" className="rv-link">GitHub: github.com/Shah-Abdul-Mazid</a></div>
                                 <div className="rv-contact-row"><a href={data.contact.linkedin} target="_blank" rel="noopener noreferrer" className="rv-link">LinkedIn: linkedin.com/in/shahabdulmazid</a></div>
                             </div>
