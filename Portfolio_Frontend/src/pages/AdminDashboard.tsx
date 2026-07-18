@@ -1275,7 +1275,7 @@ const AdminDashboard = () => {
                                                             {/* Auto list */}
                                                             {(() => {
                                                                 const autoList = (editData.projects || []).filter((p: any) => 
-                                                                    (p.tags || []).some((t: string) => t.toLowerCase() === item.toLowerCase())
+                                                                    (p.tags || []).some((t: string) => matchSkillWithTag(item, t))
                                                                 ).map((p: any) => p.title);
                                                                 
                                                                 if (autoList.length === 0) return null;
@@ -2002,6 +2002,34 @@ const AdminDashboard = () => {
             `}</style>
         </div>
     );
+};
+
+// Token matcher to match skills inside complex project tags
+const matchSkillWithTag = (skillName: string, tag: string): boolean => {
+    const cleanSkill = skillName.trim().toLowerCase();
+    const cleanTag = tag.trim().toLowerCase();
+    
+    if (!cleanSkill || !cleanTag) return false;
+    if (cleanSkill === cleanTag) return true;
+    
+    // Split tag by common separators: comma, colon, slash, semicolons, brackets
+    const tokens = cleanTag.split(/[\s,:\/;\(\)\[\]]+/).map(t => t.trim()).filter(Boolean);
+    if (tokens.includes(cleanSkill)) return true;
+    
+    // Sub-token match for compound skills like "C/C++", "AWS/GCP"
+    const skillTokens = cleanSkill.split(/[\s\-\/&]+/).map(t => t.trim()).filter(t => t.length > 1);
+    if (skillTokens.length > 0 && skillTokens.every(st => tokens.includes(st))) {
+        return true;
+    }
+    
+    // Fallback word boundary check for alphanumeric skills
+    if (/^[a-z0-9+#]+$/i.test(cleanSkill)) {
+        const escaped = cleanSkill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+        if (regex.test(cleanTag)) return true;
+    }
+    
+    return false;
 };
 
 export default AdminDashboard;

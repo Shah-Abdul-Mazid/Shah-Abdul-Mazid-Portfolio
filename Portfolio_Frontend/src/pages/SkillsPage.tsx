@@ -22,7 +22,7 @@ const SkillsPage = () => {
 
     // 2. Get auto-detected projects
     const autoProjects = projects.filter(proj => 
-      proj.tags.some(tag => tag.trim().toLowerCase() === skillName.trim().toLowerCase())
+      proj.tags.some(tag => matchSkillWithTag(skillName, tag))
     );
 
     // Combine lists, avoiding duplicates by title
@@ -64,7 +64,7 @@ const SkillsPage = () => {
                     <span className="skill-card-index">{String(ci + 1).padStart(2, '0')}</span>
                     <h3 className="skill-card-category">{cat.name}</h3>
                   </div>
-                  <div className="skill-card-body">
+                  <div className={`skill-card-body ${cat.items.length > 5 ? 'grid-layout' : ''}`}>
                     {cat.items.filter(Boolean).map((item, ii) => {
                       const proficiency = cat.proficiencies && cat.proficiencies[item] !== undefined
                         ? cat.proficiencies[item]
@@ -159,11 +159,11 @@ const SkillsPage = () => {
           max-width: 600px;
         }
 
-        /* Skills Grid */
+        /* Skills Grid (Masonry Columns to avoid vertical gaps) */
         .skills-page-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-          gap: 28px;
+          column-count: 2;
+          column-gap: 28px;
+          width: 100%;
         }
 
         .skill-page-card {
@@ -176,8 +176,10 @@ const SkillsPage = () => {
           -webkit-backdrop-filter: blur(20px);
           position: relative;
           overflow: hidden;
-          display: flex;
-          flex-direction: column;
+          display: inline-block;
+          width: 100%;
+          break-inside: avoid;
+          margin-bottom: 28px;
         }
 
         .skill-page-card::before {
@@ -233,6 +235,12 @@ const SkillsPage = () => {
           display: flex;
           flex-direction: column;
           gap: 22px;
+        }
+
+        .skill-card-body.grid-layout {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px 28px;
         }
 
         .skill-proficiency-item {
@@ -319,10 +327,24 @@ const SkillsPage = () => {
           transform: translateY(-1px);
         }
 
+        @media (max-width: 992px) {
+          .skills-page-grid {
+            column-count: 2;
+          }
+          .skill-card-body.grid-layout {
+            grid-template-columns: 1fr;
+            gap: 22px;
+          }
+        }
+
         @media (max-width: 768px) {
           .skills-page-title { font-size: 2.2rem; }
-          .skills-page-grid { grid-template-columns: 1fr; }
-          .skill-page-card { padding: 24px; border-radius: 16px; }
+          .skills-page-grid { column-count: 1; }
+          .skill-page-card { padding: 24px; border-radius: 16px; margin-bottom: 20px; }
+          .skill-card-body.grid-layout {
+            grid-template-columns: 1fr;
+            gap: 22px;
+          }
         }
       `}</style>
     </div>
@@ -341,5 +363,33 @@ function getThemeColor(index: number) {
   ];
   return colors[index % colors.length];
 }
+
+// Token matcher to match skills inside complex project tags
+export const matchSkillWithTag = (skillName: string, tag: string): boolean => {
+  const cleanSkill = skillName.trim().toLowerCase();
+  const cleanTag = tag.trim().toLowerCase();
+  
+  if (!cleanSkill || !cleanTag) return false;
+  if (cleanSkill === cleanTag) return true;
+  
+  // Split tag by common separators: comma, colon, slash, semicolons, brackets
+  const tokens = cleanTag.split(/[\s,:\/;\(\)\[\]]+/).map(t => t.trim()).filter(Boolean);
+  if (tokens.includes(cleanSkill)) return true;
+  
+  // Sub-token match for compound skills like "C/C++", "AWS/GCP"
+  const skillTokens = cleanSkill.split(/[\s\-\/&]+/).map(t => t.trim()).filter(t => t.length > 1);
+  if (skillTokens.length > 0 && skillTokens.every(st => tokens.includes(st))) {
+      return true;
+  }
+  
+  // Fallback word boundary check for alphanumeric skills
+  if (/^[a-z0-9+#]+$/i.test(cleanSkill)) {
+      const escaped = cleanSkill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+      if (regex.test(cleanTag)) return true;
+  }
+  
+  return false;
+};
 
 export default SkillsPage;

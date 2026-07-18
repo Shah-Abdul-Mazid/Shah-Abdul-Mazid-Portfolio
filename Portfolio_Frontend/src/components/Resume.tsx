@@ -510,7 +510,9 @@ const Resume = () => {
             {showAts && (
                 <div className="ats-overlay" onClick={() => setShowAts(false)}>
                     <div className="ats-panel" onClick={e => e.stopPropagation()}>
+
                         <div className="ats-hd">
+
                             <div className="ats-hd-txt"><h3>ATS Insight Analyzer</h3><p>Real-time professional score</p></div>
                             <button className="ats-close" onClick={() => setShowAts(false)}><X size={20} /></button>
                         </div>
@@ -630,11 +632,214 @@ const Resume = () => {
                 .ep-cert-name { font-size: 11.5px; font-weight: bold; color: #003399; margin-bottom: 2px; }
                 .ep-cert-mode, .ep-cert-link { font-size: 10.5px; color: #555; }
                 .ep-cert-link a { color: #003399; text-decoration: none; word-break: break-all; }
+
+                /* ATS Overlay & Popup Modal Styles */
+                .ats-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(15, 23, 42, 0.75);
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 9999;
+                    padding: 20px;
+                    animation: atsFadeIn 0.2s ease-out;
+                }
+
+                .ats-panel {
+                    background: #1e293b;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 20px;
+                    width: 100%;
+                    max-width: 500px;
+                    padding: 30px;
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+                    color: #f8fafc;
+                    animation: atsScaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                    position: relative;
+                }
+
+                @keyframes atsFadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+
+                @keyframes atsScaleIn {
+                    from { transform: scale(0.95); opacity: 0; }
+                    to { transform: scale(1); opacity: 1; }
+                }
+
+                .ats-hd {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 24px;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    padding-bottom: 16px;
+                }
+
+                .ats-hd-txt h3 {
+                    margin: 0;
+                    font-size: 1.4rem;
+                    font-weight: 700;
+                    color: #38bdf8;
+                }
+
+                .ats-hd-txt p {
+                    margin: 4px 0 0;
+                    font-size: 0.85rem;
+                    color: #94a3b8;
+                }
+
+                .ats-close {
+                    background: none;
+                    border: none;
+                    color: #94a3b8 !important;
+                    cursor: pointer;
+                    padding: 8px;
+                    border-radius: 50%;
+                    transition: all 0.2s;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .ats-close:hover {
+                    background: rgba(255, 255, 255, 0.05);
+                    color: #f8fafc !important;
+                }
+
+                .ats-score-box {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 12px;
+                    margin-bottom: 24px;
+                }
+
+                .ats-circle {
+                    width: 100px;
+                    height: 100px;
+                    border-radius: 50%;
+                    border: 4px solid #10b981;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: rgba(16, 185, 129, 0.05);
+                }
+
+                .ats-num {
+                    font-size: 2.2rem;
+                    font-weight: 800;
+                    color: #10b981;
+                }
+
+                .ats-pct {
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                    color: #10b981;
+                    margin-top: 6px;
+                }
+
+                .ats-label {
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                    color: #f8fafc;
+                }
+
+                .ats-tips {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                    max-height: 250px;
+                    overflow-y: auto;
+                    margin-bottom: 24px;
+                    padding-right: 4px;
+                }
+
+                .ats-tips::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .ats-tips::-webkit-scrollbar-track {
+                    background: rgba(255, 255, 255, 0.02);
+                }
+                .ats-tips::-webkit-scrollbar-thumb {
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: 100px;
+                }
+
+                .ats-tip {
+                    display: flex;
+                    gap: 12px;
+                    padding: 12px;
+                    border-radius: 10px;
+                    font-size: 0.9rem;
+                    line-height: 1.4;
+                    align-items: flex-start;
+                    text-align: left;
+                }
+
+                .ats-plus {
+                    background: rgba(16, 185, 129, 0.1) !important;
+                    border: 1px solid rgba(16, 185, 129, 0.2) !important;
+                    color: #a7f3d0 !important;
+                }
+
+                .ats-tip.ats-plus svg {
+                    color: #10b981 !important;
+                    flex-shrink: 0;
+                    margin-top: 2px;
+                }
+
+                .ats-minus {
+                    background: rgba(239, 68, 68, 0.1) !important;
+                    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+                    color: #fecaca !important;
+                }
+
+                .ats-tip.ats-minus svg {
+                    color: #ef4444 !important;
+                    flex-shrink: 0;
+                    margin-top: 2px;
+                }
+
+                .ats-tip.ats-tip {
+                    background: rgba(56, 189, 248, 0.1) !important;
+                    border: 1px solid rgba(56, 189, 248, 0.2) !important;
+                    color: #bae6fd !important;
+                }
+
+                .ats-tip.ats-tip svg {
+                    color: #38bdf8 !important;
+                    flex-shrink: 0;
+                    margin-top: 2px;
+                }
+
+                .ats-footer {
+                    border-top: 1px solid rgba(255, 255, 255, 0.1);
+                    padding-top: 16px;
+                    text-align: center;
+                }
+
+                .ats-footer p {
+                    margin: 0;
+                    font-size: 0.78rem;
+                    color: #64748b !important;
+                }
                 
                 @media print { 
                     @page { size: A4; margin: 0.75in 0.5in; }
                     .rv-page { background: white !important; padding: 0 !important; margin: 0 !important; width: 100% !important; } 
-                    .rv-toolbar, .ats-overlay, .rv-print-tip { display: none !important; } 
+                    .rv-toolbar, .rv-print-tip { display: none !important; } 
+                    /* Hide ATS overlay in printed/exported CV */
+                    .ats-overlay, .ats-panel, .ats-score-box, .ats-hd, .ats-tips, .ats-footer,
+                    .ats-close { display: none !important; }
+
                     .rv-sheet { box-shadow: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; overflow: visible !important; border: none !important; }
                     .rv-content { padding: 0 !important; width: 100% !important; }
                     .rv-hd { grid-template-columns: 1.4fr 2fr 1.4fr !important; gap: 10px !important; }
