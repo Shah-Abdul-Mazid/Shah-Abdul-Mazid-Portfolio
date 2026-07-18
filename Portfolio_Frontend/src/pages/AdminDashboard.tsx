@@ -23,10 +23,18 @@ const AdminDashboard = () => {
 
     const handleParseBibtex = (index: number) => {
         const str = bibtexInputs[index] || '';
-        const extract = (key: string) => {
-            const re = new RegExp(`${key}\\s*=\\s*\\{([^\\}]+)\\}`, 'i');
+        // Helper: extract value from BibTeX field
+        const extract = (key: string): string => {
+            const re = new RegExp(key + '\\s*=\\s*\\{([^}]+)\\}', 'i');
             const match = str.match(re);
             return match ? match[1].replace(/[\r\n]+/g, ' ').trim() : '';
+        };
+        // Auto-detect type from BibTeX entry prefix
+        const detectType = (): 'journal' | 'conference' | 'book-chapter' => {
+            const prefix = (str.match(/^\s*@(\w+)/i)?.[1] || '').toLowerCase();
+            if (prefix === 'inproceedings' || prefix === 'proceedings') return 'conference';
+            if (prefix === 'incollection' || prefix === 'inbook' || prefix === 'chapter') return 'book-chapter';
+            return 'journal'; // @article, @misc, fallback
         };
         setEditData(prev => {
             const papers = [...prev.papers];
@@ -34,7 +42,7 @@ const AdminDashboard = () => {
             if (title) papers[index].title = title;
             const authors = extract('author');
             if (authors) papers[index].authors = authors;
-            const venue = extract('booktitle') || extract('journal');
+            const venue = extract('booktitle') || extract('journal') || extract('series');
             if (venue) papers[index].venue = venue;
             const year = extract('year');
             if (year) papers[index].year = year;
@@ -42,6 +50,12 @@ const AdminDashboard = () => {
             if (keywords) papers[index].keywords = keywords;
             const doi = extract('doi');
             if (doi) papers[index].doi = doi;
+            const publisher = extract('organization') || extract('publisher');
+            if (publisher) papers[index].publisher = publisher;
+            const link = extract('url') || extract('link');
+            if (link) papers[index].link = link;
+            // Always auto-set type from entry prefix
+            papers[index].type = detectType();
             return { ...prev, papers };
         });
         setSaveStatus('BibTeX Extracted!');
@@ -775,6 +789,84 @@ const AdminDashboard = () => {
                                         onChange={e => handleAboutChange('bio', e.target.value)}
                                         className="enhanced-textarea" />
                                 </div>
+
+                                {/* ── BIOGRAPHY LINKS ─────────────────────────────── */}
+                                <div className="form-group" style={{ marginTop: '20px' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <span>Biography Links <span style={{ fontWeight: 400, fontSize: '0.8rem', opacity: 0.6 }}>(shown below bio on Profile page)</span></span>
+                                        <button
+                                            type="button"
+                                            className="add-inline-btn"
+                                            style={{ marginLeft: 'auto' }}
+                                            onClick={() => {
+                                                const current = editData.about.bioLinks || [];
+                                                setEditData((prev: any) => ({
+                                                    ...prev,
+                                                    about: {
+                                                        ...prev.about,
+                                                        bioLinks: [...current, { label: '', url: '', icon: 'link' }]
+                                                    }
+                                                }));
+                                            }}
+                                        >
+                                            <Plus size={14} /> Add Link
+                                        </button>
+                                    </label>
+                                    {(editData.about.bioLinks || []).map((link: { label: string; url: string; icon?: string }, li: number) => (
+                                        <div key={li} className="detail-row" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '10px' }}>
+                                            <input
+                                                type="text"
+                                                value={link.label}
+                                                placeholder="Label (e.g. GitHub Profile)"
+                                                style={{ flex: 2 }}
+                                                onChange={e => {
+                                                    const updated = [...(editData.about.bioLinks || [])];
+                                                    updated[li] = { ...updated[li], label: e.target.value };
+                                                    setEditData((prev: any) => ({ ...prev, about: { ...prev.about, bioLinks: updated } }));
+                                                }}
+                                            />
+                                            <input
+                                                type="text"
+                                                value={link.url}
+                                                placeholder="URL (e.g. https://github.com/...)"
+                                                style={{ flex: 3 }}
+                                                onChange={e => {
+                                                    const updated = [...(editData.about.bioLinks || [])];
+                                                    updated[li] = { ...updated[li], url: e.target.value };
+                                                    setEditData((prev: any) => ({ ...prev, about: { ...prev.about, bioLinks: updated } }));
+                                                }}
+                                            />
+                                            <select
+                                                value={link.icon || 'link'}
+                                                style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--card-bg)', color: 'var(--text-color)', fontSize: '0.85rem' }}
+                                                onChange={e => {
+                                                    const updated = [...(editData.about.bioLinks || [])];
+                                                    updated[li] = { ...updated[li], icon: e.target.value };
+                                                    setEditData((prev: any) => ({ ...prev, about: { ...prev.about, bioLinks: updated } }));
+                                                }}
+                                            >
+                                                <option value="github">GitHub</option>
+                                                <option value="scholar">Scholar</option>
+                                                <option value="link">Generic Link</option>
+                                            </select>
+                                            <button
+                                                type="button"
+                                                className="icon-btn danger"
+                                                onClick={() => {
+                                                    const updated = (editData.about.bioLinks || []).filter((_: any, idx: number) => idx !== li);
+                                                    setEditData((prev: any) => ({ ...prev, about: { ...prev.about, bioLinks: updated } }));
+                                                }}
+                                            >
+                                                <Minus size={14} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {(!editData.about.bioLinks || editData.about.bioLinks.length === 0) && (
+                                        <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', opacity: 0.6, marginTop: '8px' }}>
+                                            No links added yet. Click "Add Link" to add GitHub, Scholar, or any custom URL.
+                                        </p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="form-section mt-8">
@@ -1126,6 +1218,46 @@ const AdminDashboard = () => {
                                         <label>Description</label>
                                         <textarea rows={3} value={project.desc} onChange={e => updateListItem('projects', i, 'desc', e.target.value)} />
                                     </div>
+                                    <div className="flex-group">
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <label>Category</label>
+                                            <select 
+                                                value={project.category || 'active'} 
+                                                onChange={e => updateListItem('projects', i, 'category', e.target.value)}
+                                                className="form-control"
+                                                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--card-bg)', color: 'var(--text-color)' }}
+                                            >
+                                                <option value="active">Active Projects</option>
+                                                <option value="past">Past & EU-Funded Projects</option>
+                                            </select>
+                                        </div>
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <label>Period / Date Range</label>
+                                            <input type="text" value={project.period || ''} onChange={e => updateListItem('projects', i, 'period', e.target.value)} placeholder="e.g. 2025 - Present" />
+                                        </div>
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <label>Status Badge Text</label>
+                                            <input type="text" value={project.status || ''} onChange={e => updateListItem('projects', i, 'status', e.target.value)} placeholder="e.g. ACTIVE or EU H2020" />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <label>Institution (Acronym)</label>
+                                            <input type="text" value={project.institution || ''} onChange={e => updateListItem('projects', i, 'institution', e.target.value)} placeholder="e.g. EWUCRT" />
+                                        </div>
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <label>Funding Organization</label>
+                                            <input type="text" value={project.fundingOrg || ''} onChange={e => updateListItem('projects', i, 'fundingOrg', e.target.value)} placeholder="e.g. East West University CRT" />
+                                        </div>
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <label>Reference Code</label>
+                                            <input type="text" value={project.refCode || ''} onChange={e => updateListItem('projects', i, 'refCode', e.target.value)} placeholder="e.g. Ref: EWUCRT-RG-17(14)/2025(5)" />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Key Research Components / Extra Details</label>
+                                        <textarea rows={2} value={project.details || ''} onChange={e => updateListItem('projects', i, 'details', e.target.value)} placeholder="Key research components or secondary details shown when expanded..." />
+                                    </div>
                                     <div className="form-group">
                                         <label>Tags (one per row)</label>
                                         {project.tags.map((tag, ti) => (
@@ -1173,7 +1305,7 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                             ))}
-                            <button type="button" className="add-btn" onClick={() => addListItem('projects', { title: '', desc: '', tags: [''], showcase: editData.projects.length + 1, projectUrl: '', githubUrl: '', certificateUrl: '', thumbnailUrl: '' })}>
+                            <button type="button" className="add-btn" onClick={() => addListItem('projects', { title: '', desc: '', tags: [''], showcase: editData.projects.length + 1, projectUrl: '', githubUrl: '', certificateUrl: '', thumbnailUrl: '', category: 'active', period: '', status: '', institution: '', fundingOrg: '', refCode: '', details: '' })}>
                                 <Plus size={16} /> Add Project
                             </button>
                         </div>
@@ -1211,12 +1343,26 @@ const AdminDashboard = () => {
                                     </div>
                                     <div className="flex-group">
                                         <div className="form-group w-50">
-                                            <label>Venue (Journal / Conf)</label>
+                                            <label>Venue (Journal / Conf / Book)</label>
                                             <input type="text" value={paper.venue} onChange={e => updateListItem('papers', i, 'venue', e.target.value)} />
                                         </div>
                                         <div className="form-group w-50">
                                             <label>Year</label>
                                             <input type="text" value={paper.year} onChange={e => updateListItem('papers', i, 'year', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Publication Type</label>
+                                            <select value={paper.type || 'journal'} onChange={e => updateListItem('papers', i, 'type', e.target.value)} style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--card-bg)', color: 'var(--text-color)', fontSize: '0.9rem' }}>
+                                                <option value="journal">📰 Journal Article</option>
+                                                <option value="conference">🎤 Conference Paper</option>
+                                                <option value="book-chapter">📖 Book Chapter</option>
+                                            </select>
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Publisher / Organization</label>
+                                            <input type="text" value={paper.publisher || ''} onChange={e => updateListItem('papers', i, 'publisher', e.target.value)} placeholder="e.g. IEEE, Elsevier, Springer" />
                                         </div>
                                     </div>
                                     <div className="flex-group">
@@ -1249,7 +1395,7 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                             ))}
-                            <button type="button" className="add-btn" onClick={() => addListItem('papers', { title: '', authors: '', venue: '', year: '', keywords: '', doi: '', documentUrl: '', certificateUrl: '' })}>
+                            <button type="button" className="add-btn" onClick={() => addListItem('papers', { title: '', authors: '', venue: '', year: '', keywords: '', doi: '', type: 'journal', publisher: '', documentUrl: '', certificateUrl: '' })}>
                                 <Plus size={16} /> Add Research Paper
                             </button>
                         </div>

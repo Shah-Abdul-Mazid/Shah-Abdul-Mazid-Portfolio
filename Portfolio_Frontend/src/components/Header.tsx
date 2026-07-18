@@ -3,29 +3,14 @@ import { Link, useLocation } from 'react-router-dom';
 import avtarImg from '../assets/avtar.png';
 
 const Header = () => {
-    const professionalLinks = [
-        { to: '/about', label: 'Profile' },
-        { to: '/education', label: 'Education' },
-        { to: '/certifications', label: 'Certificates' },
-        { to: '/experience', label: 'Experience' },
-        { to: '/achievements', label: 'Achievements' },
-        { to: '/activities', label: 'Activities' },
-        { to: '/resume', label: 'Resume' },
-    ];
-
-    const portfolioLinks = [
-        { to: '/skills', label: 'Tech Stack' },
+    // Compact, professional navigation (less clutter)
+    const compactLinks = [
+        { to: '/home', label: 'Home' },
+        { to: '/profile', label: 'Profile' },
+        { to: '/publications', label: 'Publications' },
         { to: '/projects', label: 'Projects' },
-        { to: '/papers', label: 'Research' },
-        { to: '/blogs', label: 'Blog' },
+        { to: '/contacts', label: 'Contacts' },
     ];
-
-    const contactLinks = [
-        { to: '/references', label: 'References' },
-        { to: '/contact', label: 'Contact' },
-    ];
-
-    const allLinks = [...professionalLinks, ...portfolioLinks, ...contactLinks];
 
     const [scrolled, setScrolled] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -100,9 +85,9 @@ const Header = () => {
                         <span style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'var(--text-color)', whiteSpace: 'nowrap' }}>Shah Abdul Mazid</span>
                     </Link>
 
-                    {/* Desktop Nav - Flat side by side (Full Width) */}
+                    {/* Desktop Nav - Compact */}
                     <div className="nav-links-desktop">
-                        {allLinks.map(link => (
+                        {compactLinks.map(link => (
                             <Link
                                 key={link.to}
                                 to={link.to}
@@ -162,7 +147,7 @@ const Header = () => {
 
                 <nav className="mobile-nav">
                     <ul>
-                        {allLinks.map((link) => (
+                        {compactLinks.map((link) => (
                             <li key={link.to}>
                                 <Link
                                     to={link.to}

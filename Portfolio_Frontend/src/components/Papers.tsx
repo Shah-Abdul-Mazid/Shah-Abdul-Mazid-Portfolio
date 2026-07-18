@@ -1,241 +1,444 @@
-import { useState } from 'react';
-import type { MouseEvent } from 'react';
-import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
-import { ExternalLink, ChevronDown, ChevronUp, FileText } from 'lucide-react';
-import { isImageUrl, isPdfUrl, getPdfViewerUrl } from '../utils/filePreview';
+import { useState, useMemo } from 'react';
+import { usePortfolio } from '../context/PortfolioContext';
+import { Search, BookOpen, ExternalLink } from 'lucide-react';
+
+type FilterType = 'journal' | 'conference' | 'book-chapter' | null;
+
+
+
+const SCHOLAR_URL = 'https://scholar.google.com/citations?user=TYkiwUgAAAAJ';
 
 const Papers = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
     const papers = data.papers || [];
-    const [showAll, setShowAll] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<string | null>(null);
 
-    const closeModal = (e: MouseEvent<HTMLDivElement>) => {
-        if (e.target === e.currentTarget) {
-            setSelectedFile(null);
+    const [filter, setFilter] = useState<FilterType>(null);
+    const [search, setSearch] = useState('');
+
+    const counts = useMemo(() => ({
+        journal: papers.filter(p => p.type === 'journal').length,
+        conference: papers.filter(p => p.type === 'conference').length,
+        'book-chapter': papers.filter(p => p.type === 'book-chapter').length,
+    }), [papers]);
+
+    const filtered = useMemo(() => {
+        let list = filter ? papers.filter(p => p.type === filter) : papers;
+        if (search.trim()) {
+            const q = search.toLowerCase();
+            list = list.filter(p =>
+                p.title.toLowerCase().includes(q) ||
+                p.authors.toLowerCase().includes(q) ||
+                (p.venue || '').toLowerCase().includes(q)
+            );
         }
+        return list;
+    }, [papers, filter, search]);
+
+    // Group by type label for section headings
+    const grouped = useMemo(() => {
+        if (filter) return { [filter]: filtered };
+        const groups: Record<string, typeof filtered> = {};
+        filtered.forEach(p => {
+            const key = p.type || 'journal';
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(p);
+        });
+        return groups;
+    }, [filtered, filter]);
+
+    const TYPE_LABELS: Record<string, string> = {
+        journal: 'Journal Articles',
+        conference: 'Conference Papers',
+        'book-chapter': 'Book Chapters',
     };
 
     if (papers.length === 0) return null;
 
-    const displayedPapers = showAll ? papers : papers.slice(0, 8);
-
     return (
-        <section id="papers" className="section alt-bg">
-            <div className="container">
-                <div className="section-title fade-in" ref={addToRefs}>
-                    <span className="subtitle">{data.sections?.papers?.subtitle || 'Publications'}</span>
-                    <h2>
-                        {data.sections?.papers?.title ? (
-                            <span dangerouslySetInnerHTML={{ __html: data.sections.papers.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
-                        ) : (
-                            <>Research <span className="gradient-text">Papers</span></>
-                        )}
-                    </h2>
+        <section id="papers" className="pub-section">
+            <div className="pub-container" ref={addToRefs}>
+                {/* Page Header */}
+                <div className="pub-header">
+                    <h1 className="pub-page-title">Publications</h1>
+                    <p className="pub-page-sub">Journal articles, book chapters, and conference papers.</p>
                 </div>
-                <div className="papers-grid">
-                    {displayedPapers.map((paper, index) => (
-                        <div key={index} className="paper-card fade-in" ref={addToRefs}>
-                            <div className="paper-content">
-                                <div className="paper-header">
-                                    <h3 className="paper-title">{paper.title}</h3>
-                                    <div className="paper-meta">
-                                        <span className="year">{paper.year}</span>
-                                        {paper.venue && <span className="venue">{paper.venue}</span>}
-                                    </div>
-                                </div>
-                                <p className="paper-authors"><strong>Authors:</strong> {paper.authors}</p>
-                                
-                                {paper.keywords && (
-                                    <div className="paper-keywords">
-                                        {paper.keywords.split(';').map((kw, i) => kw.trim() ? (
-                                            <span key={i} className="keyword-tag">{kw.trim()}</span>
-                                        ) : null).slice(0, 4)}
-                                    </div>
-                                )}
+
+                {/* Google Scholar Banner */}
+                <a href={SCHOLAR_URL} target="_blank" rel="noopener noreferrer" className="scholar-banner">
+                    <BookOpen size={18} className="scholar-icon" />
+                    <span>Full citation list on</span>
+                    <span className="scholar-link-text">Google Scholar</span>
+                </a>
+
+                {/* Search Bar */}
+                <div className="pub-search-wrap">
+                    <Search size={16} className="pub-search-icon" />
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder="Search publications by title, author, or journal ..."
+                        className="pub-search-input"
+                    />
+                </div>
+
+                {/* Filter Tabs */}
+                <div className="pub-tabs">
+                    <button
+                        className={`pub-tab ${filter === 'journal' ? 'active' : ''}`}
+                        onClick={() => setFilter('journal')}
+                    >
+                        Journal <span className="tab-count">{counts.journal}</span>
+                    </button>
+                    <button
+                        className={`pub-tab ${filter === 'book-chapter' ? 'active' : ''}`}
+                        onClick={() => setFilter('book-chapter')}
+                    >
+                        Book Chapters <span className="tab-count">{counts['book-chapter']}</span>
+                    </button>
+                    <button
+                        className={`pub-tab ${filter === 'conference' ? 'active' : ''}`}
+                        onClick={() => setFilter('conference')}
+                    >
+                        Conference <span className="tab-count">{counts.conference}</span>
+                    </button>
+                </div>
+
+                {/* Publication Groups */}
+                {filtered.length === 0 ? (
+                    <div className="pub-empty">No publications found matching your search.</div>
+                ) : (
+                    Object.entries(grouped).map(([type, items]) => (
+                        <div key={type} className="pub-group">
+                            <div className="pub-group-header">
+                                <span className="pub-group-badge">{items.length}</span>
+                                <span className="pub-group-label">{TYPE_LABELS[type] || type}</span>
                             </div>
-                            <div className="paper-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', flex: 1 }}>
-                                    {paper.doi && (
-                                        <a href={paper.doi.startsWith('http') ? paper.doi : `https://doi.org/${paper.doi}`} 
-                                           target="_blank" rel="noreferrer" className="attachment-link">
-                                            <ExternalLink size={14} style={{ marginRight: '6px' }} />
-                                            Read
-                                        </a>
-                                    )}
-                                    {paper.documentUrl && (
-                                        <button onClick={() => setSelectedFile(resolveUrl(paper.documentUrl as string))} className="attachment-link">
-                                            <FileText size={14} style={{ marginRight: '6px' }} />
-                                            PDF
-                                        </button>
-                                    )}
-                                </div>
-                                {paper.certificateUrl && (
-                                    <div className="card-previews" style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-                                        <div className="mini-thumbnail" onClick={() => setSelectedFile(resolveUrl(paper.certificateUrl as string))}>
-                                            {isImageUrl(paper.certificateUrl as string) ? (
-                                                <img src={resolveUrl(paper.certificateUrl as string)} alt="Certificate" />
-                                            ) : (
-                                                <div className="mini-pdf-tag"><FileText size={16} /></div>
-                                            )}
-                                            <div className="thumbnail-overlay"><ExternalLink size={14} /></div>
+                            <div className="pub-list">
+                                {items.map((paper, idx) => {
+                                    const href = paper.link ||
+                                        (paper.doi
+                                            ? (paper.doi.startsWith('http') ? paper.doi : `https://doi.org/${paper.doi}`)
+                                            : undefined);
+                                    return (
+                                        <div key={idx} className="pub-row">
+                                            <div className="pub-year-col">
+                                                <span className="pub-year">{paper.year}</span>
+                                            </div>
+                                            <div className="pub-details-col">
+                                                {href ? (
+                                                    <a
+                                                        href={href}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="pub-title-link"
+                                                    >
+                                                        {paper.title}
+                                                        <ExternalLink size={13} className="pub-ext-icon" />
+                                                    </a>
+                                                ) : (
+                                                    <span className="pub-title-link no-link">{paper.title}</span>
+                                                )}
+
+                                                <p className="pub-venue">
+                                                    <em>{paper.venue}</em>
+                                                    {paper.publisher && (
+                                                        <span className="pub-publisher">, {paper.publisher}</span>
+                                                    )}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    );
+                                })}
                             </div>
                         </div>
-                    ))}
-                </div>
-                {papers.length > 8 && (
-                    <div className="fade-in" style={{ textAlign: 'center', marginTop: '40px' }} ref={addToRefs}>
-                        <button 
-                            className="btn btn-secondary" 
-                            onClick={() => setShowAll(!showAll)} 
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 24px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', borderRadius: '100px', cursor: 'pointer', transition: 'var(--transition)' }}
-                        >
-                            {showAll ? 'Show Less Papers' : `View All ${papers.length} Papers`}
-                            {showAll ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                        </button>
-                    </div>
+                    ))
                 )}
             </div>
 
-            {selectedFile && (
-                <div className="image-modal-overlay" onClick={closeModal}>
-                    <div className="image-modal-content">
-                        <button className="close-modal-btn" onClick={() => setSelectedFile(null)}>✖</button>
-                        {isPdfUrl(selectedFile) ? (
-                            <iframe src={getPdfViewerUrl(selectedFile)} className="pdf-viewer" title="Document Viewer" />
-                        ) : (
-                            <img src={selectedFile} alt="Fullscreen View" className="fullscreen-image" />
-                        )}
-                    </div>
-                </div>
-            )}
-
             <style>{`
-                .papers-grid { 
-                    display: grid; 
-                    grid-template-columns: repeat(4, 1fr); 
-                    gap: 16px; 
-                }
-                .paper-card { 
-                    background: var(--card-bg); 
-                    border: 1px solid var(--border-color); 
-                    border-radius: 12px; 
+                .pub-section {
+                    min-height: 100vh;
+                    padding-top: 140px;
+                    padding-bottom: 80px;
                     display: flex;
-                    flex-direction: column;
-                    justify-content: space-between;
-                    overflow: hidden; 
-                    transition: var(--transition); 
-                    position: relative;
+                    justify-content: center;
+                    width: 100%;
                 }
-                .paper-card:hover { 
-                    transform: translateY(-6px); 
-                    border-color: var(--primary); 
-                    box-shadow: 0 10px 30px rgba(59,130,246,0.1);
+
+                .pub-container {
+                    max-width: 900px;
+                    width: 100%;
+                    padding: 0 24px;
+                    margin: 0 auto;
                 }
-                .paper-content { 
-                    padding: 16px; 
+
+                /* Page header */
+                .pub-header {
+                    margin-bottom: 32px;
                 }
-                .paper-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-start;
-                    gap: 16px;
-                    margin-bottom: 12px;
-                }
-                .paper-meta {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: flex-end;
-                    gap: 4px;
-                    flex-shrink: 0;
-                    text-align: right;
-                }
-                .paper-meta .year {
-                    background: rgba(139,92,246,0.08);
-                    color: var(--primary);
-                    padding: 2px 12px;
-                    border-radius: 100px;
-                    font-size: 0.75rem;
+                .pub-page-title {
+                    font-family: 'Lora', 'Playfair Display', serif;
+                    font-size: 2.6rem;
                     font-weight: 700;
-                    border: 1px solid rgba(139,92,246,0.2);
-                }
-                .paper-meta .venue {
-                    font-size: 0.65rem;
-                    color: var(--text-muted);
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
-                    max-width: 140px;
+                    color: var(--text-color);
+                    margin-bottom: 10px;
                     line-height: 1.2;
                 }
-                .paper-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.05); }
-                .attachment-link { display: inline-flex; align-items: center; background: rgba(139, 92, 246, 0.08); color: var(--primary); padding: 6px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(139, 92, 246, 0.15); transition: all 0.3s ease; cursor: pointer; }
-                .attachment-link:hover { background: var(--primary); color: white; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
-                
-                .paper-title { 
-                    font-size: 0.95rem; 
-                    line-height: 1.3;
-                    margin: 0; 
-                    color: #fff;
-                    font-weight: 700;
-                    flex: 1;
+                .pub-page-sub {
+                    font-size: 1rem;
+                    color: var(--text-secondary);
+                    line-height: 1.5;
                 }
-                .paper-authors { 
-                    font-size: 0.8rem; 
-                    color: var(--text-secondary); 
-                    margin-bottom: 12px;
-                }
-                .paper-keywords {
+
+                /* Scholar Banner */
+                .scholar-banner {
                     display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 14px 20px;
+                    border-radius: 12px;
+                    background: rgba(249, 115, 22, 0.06);
+                    border: 1px solid rgba(249, 115, 22, 0.25);
+                    text-decoration: none;
+                    color: var(--text-secondary);
+                    font-size: 0.92rem;
+                    margin-bottom: 24px;
+                    transition: var(--transition);
+                }
+                .scholar-banner:hover {
+                    background: rgba(249, 115, 22, 0.1);
+                    border-color: rgba(249, 115, 22, 0.5);
+                }
+                .scholar-icon {
+                    color: #f97316;
+                    flex-shrink: 0;
+                }
+                .scholar-link-text {
+                    color: #f97316;
+                    font-weight: 700;
+                    text-decoration: underline;
+                    text-underline-offset: 3px;
+                }
+
+                /* Search */
+                .pub-search-wrap {
+                    position: relative;
+                    margin-bottom: 20px;
+                }
+                .pub-search-icon {
+                    position: absolute;
+                    left: 14px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: var(--text-secondary);
+                    opacity: 0.6;
+                }
+                .pub-search-input {
+                    width: 100%;
+                    padding: 12px 16px 12px 42px;
+                    border: 1px solid var(--border-color);
+                    border-radius: 10px;
+                    background: var(--card-bg);
+                    color: var(--text-color);
+                    font-size: 0.92rem;
+                    outline: none;
+                    transition: var(--transition);
+                    box-sizing: border-box;
+                }
+                .pub-search-input:focus {
+                    border-color: var(--primary);
+                    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+                }
+                .pub-search-input::placeholder {
+                    color: var(--text-secondary);
+                    opacity: 0.6;
+                }
+
+                /* Filter Tabs */
+                .pub-tabs {
+                    display: flex;
+                    gap: 8px;
                     flex-wrap: wrap;
-                    gap: 4px;
-                    margin-bottom: 12px;
+                    margin-bottom: 40px;
                 }
-                .keyword-tag {
-                    font-size: 0.65rem;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.1);
-                    padding: 2px 6px;
+                .pub-tab {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 7px 16px;
+                    border-radius: 8px;
+                    border: 1px solid var(--border-color);
+                    background: transparent;
+                    color: var(--text-secondary);
+                    font-size: 0.88rem;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: var(--transition);
+                }
+                .pub-tab:hover {
+                    border-color: var(--primary);
+                    color: var(--primary);
+                    background: rgba(56, 189, 248, 0.04);
+                }
+                .pub-tab.active {
+                    background: rgba(56, 189, 248, 0.08);
+                    border-color: var(--primary);
+                    color: var(--primary);
+                    font-weight: 600;
+                }
+                .tab-count {
+                    background: var(--primary);
+                    color: #fff;
+                    font-size: 0.72rem;
+                    font-weight: 700;
+                    padding: 1px 7px;
                     border-radius: 100px;
-                    color: var(--text-muted);
+                    min-width: 20px;
+                    text-align: center;
+                }
+                .pub-tab:not(.active) .tab-count {
+                    background: rgba(255, 255, 255, 0.1);
+                    color: var(--text-secondary);
                 }
 
-                .mini-thumbnail { 
-                    position: relative; 
-                    width: 48px; height: 60px; 
-                    border-radius: 8px; 
-                    overflow: hidden; 
-                    border: 1px solid var(--border-color); 
-                    background: rgba(0,0,0,0.3); 
-                    cursor: pointer; 
-                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
+                /* Group header */
+                .pub-group {
+                    margin-bottom: 48px;
                 }
-                .mini-thumbnail img { width: 100%; height: 100%; object-fit: cover; }
-                .mini-pdf-tag { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #ef4444; color: white; font-weight: 700; font-size: 0.7rem; }
-                .thumbnail-overlay { position: absolute; inset: 0; background: var(--gradient); opacity: 0; display: flex; align-items: center; justify-content: center; transition: 0.3s; color: white; }
-                .mini-thumbnail:hover { border-color: var(--primary); scale: 1.1; transform: translateY(-2px); box-shadow: 0 8px 16px rgba(139,92,246,0.3); }
-                .mini-thumbnail:hover .thumbnail-overlay { opacity: 0.9; }
+                .pub-group-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 20px;
+                    padding-bottom: 10px;
+                    border-bottom: 1px solid var(--border-color);
+                }
+                .pub-group-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 50%;
+                    background: #f97316;
+                    color: #fff;
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    flex-shrink: 0;
+                }
+                .pub-group-label {
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    color: var(--text-secondary);
+                    letter-spacing: 0.02em;
+                    text-transform: lowercase;
+                }
 
-                .image-modal-overlay { position: fixed; inset: 0; background: rgba(3,7,18,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 40px; animation: modalFadeIn 0.3s ease-out; }
-                .image-modal-content { position: relative; max-width: 1200px; width: 100%; max-height: 90vh; background: #0f172a; border-radius: 16px; padding: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-                .close-modal-btn { position: absolute; top: -16px; right: -16px; width: 32px; height: 32px; background: #ef4444; color: white; border: none; border-radius: 50%; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-                .fullscreen-image { width: 100%; height: 100%; max-height: calc(90vh - 24px); object-fit: contain; }
-                .pdf-viewer { width: 100%; height: calc(90vh - 24px); border: none; border-radius: 8px; background: white; }
-                @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
-                
-                @media (max-width: 1200px) {
-                    .papers-grid { grid-template-columns: repeat(3, 1fr); }
+                /* Publication list */
+                .pub-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0;
                 }
-                @media (max-width: 900px) {
-                    .papers-grid { grid-template-columns: repeat(2, 1fr); }
+
+                .pub-row {
+                    display: flex;
+                    gap: 20px;
+                    padding: 20px 0;
+                    border-bottom: 1px solid var(--border-color);
+                    transition: background 0.2s;
                 }
-                @media (max-width: 600px) {
-                    .papers-grid { grid-template-columns: 1fr; }
-                    .image-modal-overlay { padding: 16px; }
+                .pub-row:last-child {
+                    border-bottom: none;
+                }
+                .pub-row:hover {
+                    background: rgba(255, 255, 255, 0.01);
+                }
+
+                /* Year column */
+                .pub-year-col {
+                    flex-shrink: 0;
+                    width: 48px;
+                    padding-top: 2px;
+                }
+                .pub-year {
+                    font-size: 0.82rem;
+                    font-weight: 700;
+                    color: var(--text-secondary);
+                    opacity: 0.75;
+                }
+
+                /* Details column */
+                .pub-details-col {
+                    flex: 1;
+                    min-width: 0;
+                }
+
+                .pub-title-link {
+                    display: inline;
+                    font-size: 1.02rem;
+                    font-weight: 600;
+                    color: #f97316;
+                    text-decoration: none;
+                    line-height: 1.4;
+                    transition: color 0.2s;
+                    word-break: break-word;
+                }
+                .pub-title-link:hover {
+                    color: #ea580c;
+                    text-decoration: underline;
+                    text-underline-offset: 3px;
+                }
+                .pub-title-link.no-link {
+                    color: var(--text-color);
+                    cursor: default;
+                }
+                .pub-ext-icon {
+                    display: inline;
+                    margin-left: 5px;
+                    vertical-align: middle;
+                    opacity: 0.7;
+                    flex-shrink: 0;
+                }
+
+                .pub-authors {
+                    font-size: 0.875rem;
+                    color: var(--text-secondary);
+                    margin: 5px 0 4px;
+                    line-height: 1.5;
+                }
+
+                .pub-venue {
+                    font-size: 0.85rem;
+                    color: #38bdf8;
+                    margin: 0;
+                    line-height: 1.4;
+                }
+                .pub-venue em {
+                    font-style: italic;
+                    font-weight: 500;
+                }
+                .pub-publisher {
+                    color: var(--text-secondary);
+                    font-style: normal;
+                    font-size: 0.82rem;
+                }
+
+                /* Empty state */
+                .pub-empty {
+                    text-align: center;
+                    padding: 60px 20px;
+                    color: var(--text-secondary);
+                    font-size: 1rem;
+                }
+
+                @media (max-width: 640px) {
+                    .pub-page-title { font-size: 2rem; }
+                    .pub-row { gap: 12px; }
+                    .pub-year-col { width: 40px; }
+                    .pub-tabs { gap: 6px; }
+                    .pub-tab { padding: 6px 12px; font-size: 0.82rem; }
                 }
             `}</style>
         </section>

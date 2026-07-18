@@ -2,7 +2,7 @@ import { usePortfolio } from '../context/PortfolioContext';
 
 const Skills = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
-    const categories = data.skills;
+    const categories = data.skills || [];
 
     return (
         <section id="skills" className="section alt-bg">
@@ -18,57 +18,76 @@ const Skills = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) 
                     </h2>
                 </div>
                 
-                <div className="skills-marquee-container">
-                    <div className="skills-marquee">
-                        {[...categories, ...categories].map((cat, index) => (
-                            <div key={index} className="skills-group">
-                                <h3>{cat.name}</h3>
-                                <ul className="skill-list">
-                                    {cat.items.map((item, i) => (
-                                        <li key={i}>{item}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
+                <div className="skills-grid fade-in" ref={addToRefs}>
+                    {categories.map((cat, index) => (
+                        <div key={index} className="skills-group">
+                            <h3>{cat.name}</h3>
+                            <ul className="skill-list">
+                                {cat.items.map((item, i) => (
+                                    <li key={i}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
                 </div>
             </div>
             <style>{`
-                .skills-marquee-container { 
-                    margin-top: 20px; 
-                    padding: 20px 0;
-                    position: relative;
-                }
-                .skills-marquee { 
-                    display: flex; 
-                    gap: 24px; 
-                    animation: slide 40s linear infinite; 
-                    width: max-content;
+                .skills-grid { 
+                    display: grid; 
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+                    gap: 30px; 
+                    margin-top: 40px;
+                    width: 100%;
                 }
                 .skills-group { 
                     background: var(--card-bg); 
                     border: 1px solid var(--border-color); 
                     padding: 32px; 
-                    border-radius: 28px; 
-                    min-width: 280px;
-                    max-width: 320px;
+                    border-radius: 24px; 
                     transition: var(--transition);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
                 }
-                .skills-group:hover { border-color: var(--primary); transform: translateY(-10px); }
-                .skills-group h3 { font-size: 1rem; color: var(--primary); margin-bottom: 20px; font-weight: 700; }
-                .skill-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-                .skill-list li { color: var(--text-secondary); font-weight: 500; display: flex; align-items: center; gap: 8px; font-size: 0.9375rem; }
-                .skill-list li::before { content: '•'; color: var(--primary); font-size: 1.5rem; line-height: 0; }
-                @keyframes slide {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
+                .skills-group:hover { 
+                    border-color: var(--primary); 
+                    transform: translateY(-5px); 
+                    box-shadow: 0 12px 30px rgba(56, 189, 248, 0.15);
                 }
-                .skills-marquee:hover { animation-play-state: paused; }
+                .skills-group h3 { 
+                    font-size: 1.15rem; 
+                    color: var(--primary); 
+                    margin-bottom: 20px; 
+                    font-weight: 700; 
+                    border-bottom: 1px solid var(--border-color);
+                    padding-bottom: 10px;
+                }
+                .skill-list { 
+                    list-style: none; 
+                    display: flex; 
+                    flex-direction: column; 
+                    gap: 12px; 
+                }
+                .skill-list li { 
+                    color: var(--text-color); 
+                    font-weight: 500; 
+                    display: flex; 
+                    align-items: center; 
+                    gap: 10px; 
+                    font-size: 0.95rem; 
+                    opacity: 0.9;
+                }
+                .skill-list li::before { 
+                    content: '→'; 
+                    color: var(--primary); 
+                    font-weight: bold; 
+                }
 
                 @media (max-width: 600px) {
-                    .skills-group { min-width: 220px; padding: 24px 20px; border-radius: 20px; }
-                    .skills-marquee { gap: 16px; }
-                    .skills-marquee-container { margin-top: 40px; padding: 30px 0; }
+                    .skills-grid {
+                        grid-template-columns: 1fr;
+                        gap: 20px;
+                    }
+                    .skills-group { padding: 24px 20px; border-radius: 20px; }
                 }
             `}</style>
         </section>

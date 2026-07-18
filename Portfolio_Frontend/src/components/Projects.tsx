@@ -1,126 +1,202 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
-import { ExternalLink, Search, Github } from 'lucide-react';
+import type { ProjectItem } from '../context/PortfolioContext';
+import { ExternalLink, Search, Github, Calendar, Briefcase, ChevronDown, FileText, Award } from 'lucide-react';
 import { isPdfUrl, getPdfViewerUrl } from '../utils/filePreview';
 
 const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
-    const projects = data.projects;
+    const projects = data.projects || [];
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
-    
-    const [currentIndex, setCurrentIndex] = useState(projects.length - 1); // Start at showcase 6 as per screenshot
+    const [expanded, setExpanded] = useState<Record<string, boolean>>({
+        'active-0': true // Open the first active project by default as in the screenshot
+    });
 
-    const nextProject = useCallback(() => {
-        setCurrentIndex((prev) => (prev + 1) % projects.length);
-    }, [projects.length]);
+    const toggleExpand = (key: string) => {
+        setExpanded(prev => ({
+            ...prev,
+            [key]: !prev[key]
+        }));
+    };
 
-    const prevProject = useCallback(() => {
-        setCurrentIndex((prev) => (prev - 1 + projects.length) % projects.length);
-    }, [projects.length]);
+    // Filter projects into active and past/funded categories
+    const activeProjects = projects.filter(p => p.category !== 'past');
+    const pastProjects = projects.filter(p => p.category === 'past');
 
-    useEffect(() => {
-        const timer = setInterval(nextProject, 6000);
-        return () => clearInterval(timer);
-    }, [nextProject]);
+    // Helper to generate dynamic colors for tags
+    const getDotColor = (tag: string) => {
+        const colors = ['#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
+        let hash = 0;
+        for (let i = 0; i < tag.length; i++) {
+            hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return colors[Math.abs(hash) % colors.length];
+    };
 
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'ArrowRight') nextProject();
-            if (e.key === 'ArrowLeft') prevProject();
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [nextProject, prevProject]);
+    const renderProjectList = (projectList: ProjectItem[], prefix: string) => {
+        return projectList.map((project, index) => {
+            const key = `${prefix}-${index}`;
+            const isExpanded = !!expanded[key];
+            const isProjectActive = project.category !== 'past';
+            const statusLabel = project.status || (isProjectActive ? 'ACTIVE' : 'COMPLETED');
+            const statusClass = statusLabel.toUpperCase() === 'ACTIVE' ? 'active' : 'past';
+
+            return (
+                <div 
+                    key={key} 
+                    className={`project-item-card ${isExpanded ? 'expanded' : ''}`}
+                >
+                    {/* Header: Always visible */}
+                    <div 
+                        className="project-item-header" 
+                        onClick={() => toggleExpand(key)}
+                    >
+                        <div className="project-header-left">
+                            <h3 className="project-item-title">{project.title}</h3>
+                            <div className="project-meta-row">
+                                {project.period && (
+                                    <div className="project-meta-item">
+                                        <Calendar size={13} className="meta-icon" />
+                                        <span>{project.period}</span>
+                                    </div>
+                                )}
+                                {project.institution && (
+                                    <div className="project-meta-item">
+                                        <Briefcase size={13} className="meta-icon" />
+                                        <span>{project.institution}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="project-header-right">
+                            <span className={`status-badge ${statusClass}`}>
+                                {statusClass === 'active' && <span className="status-dot"></span>}
+                                {statusLabel}
+                            </span>
+                            <ChevronDown size={18} className="chevron-icon" />
+                        </div>
+                    </div>
+
+                    {/* Content: Visible when expanded */}
+                    <div className="project-item-content">
+                        <div className="project-content-inner">
+                            {/* Main description */}
+                            <p className="project-desc-text">{project.desc}</p>
+                            
+                            {/* Detailed key research components / details */}
+                            {project.details && (
+                                <p className="project-details-text">{project.details}</p>
+                            )}
+
+                            {/* Metadata row: Ref, Funding Org & Tags */}
+                            <div className="project-expanded-metadata">
+                                {project.refCode && (
+                                    <div className="metadata-badge ref-code">
+                                        <FileText size={12} />
+                                        <span>{project.refCode}</span>
+                                    </div>
+                                )}
+                                {project.fundingOrg && (
+                                    <div className="metadata-badge funding-org">
+                                        <Award size={12} />
+                                        <span>{project.fundingOrg}</span>
+                                    </div>
+                                )}
+                                <div className="project-expanded-tags">
+                                    {project.tags.map((tag, tIdx) => (
+                                        <span key={tIdx} className="dot-tag">
+                                            <span className="tag-dot" style={{ backgroundColor: getDotColor(tag) }}></span>
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Links/Actions */}
+                            <div className="project-actions-row">
+                                {project.githubUrl && (
+                                    <a 
+                                        href={resolveUrl(project.githubUrl)} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="project-action-btn github-btn"
+                                    >
+                                        <Github size={14} />
+                                        GitHub
+                                    </a>
+                                )}
+                                {project.projectUrl && (
+                                    <a 
+                                        href={resolveUrl(project.projectUrl)} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="project-action-btn live-btn"
+                                    >
+                                        <ExternalLink size={14} />
+                                        Live Demo
+                                    </a>
+                                )}
+                                {project.certificateUrl && (
+                                    <button 
+                                        onClick={() => setSelectedFile(resolveUrl(project.certificateUrl))}
+                                        className="project-action-btn cert-btn"
+                                    >
+                                        <Search size={14} />
+                                        Certificate
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        });
+    };
 
     return (
-        <section id="projects" className="section alt-bg" style={{ overflow: 'hidden' }}>
-            <div className="container" style={{ maxWidth: '100%', padding: '0' }}>
-                <div className="section-title fade-in" ref={addToRefs} style={{ textAlign: 'center' }}>
-                    <span className="subtitle">{data.sections?.projects?.subtitle || 'Projects'}</span>
-                    <h2>
+        <section id="projects" className="project-list-section alt-bg">
+            <div className="projects-container">
+                {/* Title and Subtitle */}
+                <div className="projects-header fade-in" ref={addToRefs}>
+                    <h2 className="projects-title">
                         {data.sections?.projects?.title ? (
                             <span dangerouslySetInnerHTML={{ __html: data.sections.projects.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
                         ) : (
-                            <>Featured <span className="gradient-text">Projects</span></>
+                            <>Research <span className="gradient-text">Projects</span></>
                         )}
                     </h2>
+                    <p className="projects-subtitle">
+                        {data.sections?.projects?.subtitle || 'Click any project to expand details. Funded projects and active research initiatives.'}
+                    </p>
                 </div>
-                <div className="showcase-slider fade-in" ref={addToRefs}>
-                    <div className="slider-container">
-                        {projects.map((project, index) => {
-                            let position = index - currentIndex;
-                            if (position < -1) position += projects.length;
-                            if (position > 1) position -= projects.length;
 
-                            const isActive = index === currentIndex;
-                            const isPrev = position === -1;
-                            const isNext = position === 1;
-                            const isVisible = isActive || isPrev || isNext;
-
-                            return (
-                                <div 
-                                    key={index}
-                                    className={`project-slide ${isActive ? 'active' : ''} ${isPrev ? 'prev' : ''} ${isNext ? 'next' : ''}`}
-                                    style={{
-                                        display: isVisible ? 'block' : 'none',
-                                    }}
-                                >
-                                    <div className={`project-card ${project.thumbnailUrl ? 'has-thumbnail' : ''}`} style={project.thumbnailUrl ? { backgroundImage: `url(${resolveUrl(project.thumbnailUrl)})` } : {}}>
-                                        <div className="card-overlay"></div>
-                                        <div className="card-top" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '40px', position: 'relative', zIndex: 2 }}>
-                                            <span className="showcase-badge" style={{ marginBottom: 0 }}>SHOWCASE {project.showcase}</span>
-                                            <div style={{ flex: 1, height: '1px', background: 'rgba(139, 92, 246, 0.2)' }} className="badge-line"></div>
-                                            
-                                            {project.certificateUrl && (
-                                                <div className="mini-thumb-trigger" onClick={() => setSelectedFile(resolveUrl(project.certificateUrl))}>
-                                                    <Search size={14} />
-                                                    <span>Certificate</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <h3 className="project-title-gradient" style={{ position: 'relative', zIndex: 2 }}>{project.title}</h3>
-                                        <p className="project-desc" style={{ position: 'relative', zIndex: 2 }}>{project.desc}</p>
-                                        
-                                            <div className="project-card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '20px', position: 'relative', zIndex: 2 }}>
-                                                <div className="project-tags">
-                                                    {project.tags.map((tag, i) => (
-                                                        <span key={i} className="tag-outline">{tag}</span>
-                                                    ))}
-                                                </div>
-
-                                            <div style={{ display: 'flex', gap: '12px' }}>
-                                                {project.githubUrl && (
-                                                    <a href={resolveUrl(project.githubUrl)} target="_blank" rel="noopener noreferrer" className="project-action-btn github-btn">
-                                                        <Github size={14} />
-                                                        GitHub
-                                                    </a>
-                                                )}
-                                                {project.projectUrl && (
-                                                    <a href={resolveUrl(project.projectUrl)} target="_blank" rel="noopener noreferrer" className="project-action-btn">
-                                                        <ExternalLink size={14} />
-                                                        View Project
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                {/* Active Projects Group */}
+                {activeProjects.length > 0 && (
+                    <div className="project-group fade-in" ref={addToRefs}>
+                        <div className="group-header">
+                            <h3 className="group-title">Active Projects</h3>
+                            <span className="group-date-badge">2025 – Present</span>
+                        </div>
+                        <div className="group-list">
+                            {renderProjectList(activeProjects, 'active')}
+                        </div>
                     </div>
+                )}
 
-                    <div className="pagination-dots">
-                        {projects.map((_, index) => (
-                            <button 
-                                key={index} 
-                                className={`dot ${index === currentIndex ? 'active' : ''}`}
-                                onClick={() => setCurrentIndex(index)}
-                            />
-                        ))}
+                {/* Past & EU-Funded Projects Group */}
+                {pastProjects.length > 0 && (
+                    <div className="project-group fade-in" ref={addToRefs}>
+                        <div className="group-header">
+                            <h3 className="group-title">Past & EU-Funded Projects</h3>
+                        </div>
+                        <div className="group-list">
+                            {renderProjectList(pastProjects, 'past')}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
+            {/* Certificate/Document Lightbox Modal */}
             {selectedFile && (
                 <div className="image-modal-overlay" onClick={() => setSelectedFile(null)}>
                     <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -139,194 +215,372 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
             )}
 
             <style>{`
-                .projects-section { padding: 120px 0; overflow: hidden; position: relative; }
-                .overline { color: #8b5cf6; font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px; }
-                .title { font-size: 3.5rem; font-weight: 800; color: var(--text-color); margin-bottom: 60px; }
-                
-                .showcase-slider { width: 100%; position: relative; min-height: 600px; display: flex; flex-direction: column; align-items: center; }
-                .slider-container { display: flex; align-items: center; justify-content: center; width: 100%; position: relative; height: 600px; perspective: 1500px; }
-                
-                .project-slide { 
-                    position: absolute; 
-                    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-                    width: 700px;
-                    max-height: 100%;
-                    display: flex;
-                    z-index: 1;
-                    opacity: 0;
-                    transform: scale(0.6) translateZ(-400px);
-                    transform-style: preserve-3d;
+                .project-list-section { 
+                    padding: 120px 0; 
+                    background: var(--bg-color); 
+                    min-height: 80vh; 
+                }
+                .projects-container { 
+                    max-width: 960px; 
+                    margin: 0 auto; 
+                    padding: 0 24px; 
+                }
+                .projects-header { 
+                    margin-bottom: 48px; 
+                }
+                .projects-title { 
+                    font-family: 'Lora', 'Playfair Display', serif; 
+                    font-size: 2.8rem; 
+                    font-weight: 600; 
+                    color: var(--text-color); 
+                    margin-bottom: 8px; 
+                }
+                .projects-subtitle { 
+                    font-size: 1.05rem; 
+                    color: var(--text-secondary); 
+                    line-height: 1.5; 
                 }
                 
-                .project-slide.active { opacity: 1; z-index: 10; transform: scale(1) translateZ(0); }
-                .project-slide.prev { 
-                    opacity: 0.4; 
-                    z-index: 5; 
-                    transform: translateX(-80%) scale(0.8) rotateY(25deg); 
-                    filter: blur(2px); 
-                    pointer-events: none; 
+                /* Group Styles */
+                .project-group { 
+                    margin-bottom: 48px; 
                 }
-                .project-slide.next { 
-                    opacity: 0.4; 
-                    z-index: 5; 
-                    transform: translateX(80%) scale(0.8) rotateY(-25deg); 
-                    filter: blur(2px); 
-                    pointer-events: none; 
+                .group-header { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    align-items: center; 
+                    border-bottom: 1px solid var(--border-color); 
+                    padding-bottom: 12px; 
+                    margin-bottom: 24px; 
+                }
+                .group-title { 
+                    font-family: 'Lora', 'Playfair Display', serif; 
+                    font-size: 1.5rem; 
+                    font-weight: 600; 
+                    color: var(--text-color); 
+                    margin: 0;
+                }
+                .group-date-badge { 
+                    font-size: 0.8rem; 
+                    font-weight: 700; 
+                    color: #f97316; 
+                    background: rgba(249, 115, 22, 0.08); 
+                    padding: 4px 12px; 
+                    border-radius: 100px; 
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                }
+                .dark-mode .group-date-badge {
+                    background: rgba(249, 115, 22, 0.15); 
+                }
+                
+                /* Project Cards */
+                .project-item-card { 
+                    background: var(--card-bg); 
+                    border: 1px solid var(--border-color); 
+                    border-radius: 16px; 
+                    margin-bottom: 16px; 
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+                    overflow: hidden; 
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02); 
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
+                }
+                .project-item-card:hover { 
+                    transform: translateY(-2px); 
+                    border-color: var(--primary); 
+                    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.06); 
+                }
+                .project-item-card.expanded {
+                    border-color: var(--primary);
+                    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.08);
                 }
 
-                .project-card { 
-                    background: rgba(15, 23, 42, 0.4); 
-                    border: 1px solid rgba(139, 92, 246, 0.2); 
-                    border-radius: 40px; 
-                    padding: 48px; 
-                    backdrop-filter: blur(40px);
-                    -webkit-backdrop-filter: blur(40px);
-                    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-                    text-align: left;
-                    height: auto;
-                    max-height: 600px;
-                    box-sizing: border-box;
-                    transition: border-color 0.4s, box-shadow 0.4s;
-                    display: flex;
-                    flex-direction: column;
-                    position: relative;
-                    overflow-y: auto;
-                    overflow-x: hidden;
-                    background-size: cover;
-                    background-position: center;
+                .project-item-header { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    align-items: center; 
+                    padding: 24px; 
+                    cursor: pointer; 
+                    user-select: none; 
                 }
-                .project-card.has-thumbnail {
-                    border-color: rgba(255, 255, 255, 0.1);
+                .project-header-left { 
+                    display: flex; 
+                    flex-direction: column; 
+                    gap: 8px; 
+                    flex: 1;
+                    padding-right: 16px;
                 }
-                .card-overlay {
-                    position: absolute;
-                    inset: 0;
-                    background: linear-gradient(to bottom, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.95) 100%);
-                    z-index: 1;
-                    display: none;
+                .project-item-title { 
+                    font-size: 1.25rem; 
+                    font-weight: 700; 
+                    color: var(--text-color); 
+                    line-height: 1.4; 
+                    margin: 0;
+                    transition: color 0.2s; 
                 }
-                .project-card.has-thumbnail .card-overlay {
-                    display: block;
+                .project-item-card:hover .project-item-title { 
+                    color: var(--primary); 
                 }
-                .project-slide.active .project-card {
-                    border: 2px solid #8b5cf6;
-                    box-shadow: 0 20px 60px rgba(139, 92, 246, 0.12);
+                .project-meta-row { 
+                    display: flex; 
+                    gap: 16px; 
+                    align-items: center; 
+                    font-size: 0.85rem; 
+                    color: var(--text-secondary); 
+                    flex-wrap: wrap;
+                }
+                .project-meta-item { 
+                    display: flex; 
+                    align-items: center; 
+                    gap: 6px; 
+                }
+                .meta-icon {
+                    color: var(--text-secondary);
+                    opacity: 0.7;
+                }
+
+                .project-header-right { 
+                    display: flex; 
+                    align-items: center; 
+                    gap: 16px; 
                 }
                 
-                .dark-mode .project-card { background: rgba(15, 23, 42, 0.5); border-color: rgba(255,255,255,0.05); }
-                .dark-mode .project-slide.active .project-card { border-color: #8b5cf6; }
-                .dark-mode .badge-line { background: rgba(139, 92, 246, 0.3) !important; }
-
-                    border: 1px solid rgba(139, 92, 246, 0.2);
+                /* Badges */
+                .status-badge { 
+                    font-size: 0.7rem; 
+                    font-weight: 750; 
+                    text-transform: uppercase; 
+                    letter-spacing: 0.08em; 
+                    padding: 5px 12px; 
+                    border-radius: 100px; 
+                    display: inline-flex; 
+                    align-items: center; 
+                    gap: 5px; 
+                    white-space: nowrap;
+                }
+                .status-badge.active { 
+                    background: rgba(16, 185, 129, 0.08); 
+                    color: #10b981; 
+                }
+                .dark-mode .status-badge.active {
+                    background: rgba(16, 185, 129, 0.15); 
+                }
+                .status-badge.past { 
+                    background: rgba(245, 158, 11, 0.08); 
+                    color: #f59e0b; 
+                }
+                .dark-mode .status-badge.past {
+                    background: rgba(245, 158, 11, 0.15); 
+                }
+                .status-dot {
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    background-color: #10b981;
+                    display: inline-block;
                 }
 
-                .mini-thumb-trigger {
+                .chevron-icon { 
+                    color: var(--text-secondary); 
+                    opacity: 0.8;
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+                }
+                .project-item-card.expanded .chevron-icon { 
+                    transform: rotate(180deg); 
+                    color: var(--primary);
+                }
+
+                /* Expanded Area Accordion */
+                .project-item-content { 
+                    max-height: 0; 
+                    overflow: hidden; 
+                    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+                }
+                .project-item-card.expanded .project-item-content { 
+                    max-height: 800px; 
+                }
+                .project-content-inner { 
+                    padding: 0 24px 24px 24px; 
+                    border-top: 1px solid var(--border-color); 
+                }
+
+                .project-desc-text {
+                    font-size: 1rem;
+                    color: var(--text-color);
+                    opacity: 0.9;
+                    line-height: 1.6;
+                    margin: 20px 0 12px 0;
+                }
+                
+                .project-details-text {
+                    font-size: 0.92rem;
+                    color: var(--text-secondary);
+                    line-height: 1.6;
+                    margin: 0 0 20px 0;
+                }
+
+                /* Metadata badge & tags */
+                .project-expanded-metadata {
                     display: flex;
+                    flex-wrap: wrap;
+                    gap: 12px;
+                    align-items: center;
+                    margin: 20px 0;
+                    padding: 16px 0;
+                    border-top: 1px dashed var(--border-color);
+                    border-bottom: 1px dashed var(--border-color);
+                }
+                .metadata-badge {
+                    display: inline-flex;
                     align-items: center;
                     gap: 6px;
-                    padding: 8px 16px;
-                    background: rgba(255, 255, 255, 0.05);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 12px;
-                    cursor: pointer;
-                    color: #94a3b8;
-                    font-size: 0.75rem;
-                    font-weight: 600;
-                    white-space: nowrap;
-                    transition: 0.3s;
+                    font-size: 0.82rem;
+                    padding: 6px 12px;
+                    border-radius: 8px;
+                    font-weight: 500;
                 }
-                .mini-thumb-trigger:hover {
-                    background: rgba(139, 92, 246, 0.15);
-                    color: #8b5cf6;
-                    border-color: #8b5cf6;
+                .metadata-badge.ref-code {
+                    background: rgba(100, 116, 139, 0.05);
+                    color: var(--text-secondary);
+                    border: 1px solid rgba(100, 116, 139, 0.1);
                 }
-
-                .project-title-gradient { 
-                    font-size: 2.4rem; 
-                    font-weight: 800; 
-                    line-height: 1.2; 
-                    margin-bottom: 24px; 
-                    background: linear-gradient(90deg, #a855f7 0%, #f97316 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
+                .metadata-badge.funding-org {
+                    background: rgba(249, 115, 22, 0.05);
+                    color: #f97316;
+                    border: 1px solid rgba(249, 115, 22, 0.1);
                 }
-
-                .project-desc { font-size: 1.125rem; color: #64748b; line-height: 1.6; margin-bottom: 32px; max-width: 90%; flex-shrink: 0; }
-                .dark-mode .project-desc { color: #ffffff; opacity: 0.8; }
-
-                .project-tags { display: flex; gap: 12px; flex-wrap: wrap; flex: 1; min-width: 0; }
-                .tag-outline { 
-                    padding: 10px 24px; 
-                    border: 1px solid #e2e8f0; 
-                    border-radius: 100px; 
-                    font-size: 0.8125rem; 
-                    font-weight: 700; 
-                    color: #ffffff; 
-                    background: rgba(255, 255, 255, 0.05);
-                    white-space: nowrap;
-                }
-                .dark-mode .tag-outline { border-color: #334155; color: #f1f5f9; }
-
-                .project-action-btn {
+                .project-expanded-tags {
                     display: flex;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                    margin-left: auto;
+                }
+                .dot-tag {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    color: var(--text-secondary);
+                    padding: 4px 10px;
+                    background: rgba(255, 255, 255, 0.02);
+                    border: 1px solid var(--border-color);
+                    border-radius: 100px;
+                    white-space: nowrap;
+                }
+                .tag-dot {
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    display: inline-block;
+                }
+
+                /* Actions/Links row */
+                .project-actions-row {
+                    display: flex;
+                    gap: 12px;
+                    flex-wrap: wrap;
+                }
+                .project-action-btn {
+                    display: inline-flex;
                     align-items: center;
                     gap: 8px;
-                    padding: 12px 24px;
+                    padding: 10px 18px;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    border: 1px solid transparent;
+                }
+                .project-action-btn.github-btn {
+                    background: rgba(255, 255, 255, 0.03);
+                    color: var(--text-color);
+                    border-color: var(--border-color);
+                }
+                .project-action-btn.github-btn:hover {
+                    background: #24292e;
+                    color: white;
+                    border-color: #24292e;
+                }
+                .project-action-btn.live-btn {
                     background: var(--primary);
                     color: white;
-                    border-radius: 100px;
-                    text-decoration: none;
-                    font-weight: 700;
-                    font-size: 0.9rem;
-                    transition: 0.3s;
-                    box-shadow: 0 8px 20px rgba(139,92,246,0.3);
-                    white-space: nowrap;
                 }
-                .project-action-btn:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 12px 24px rgba(139,92,246,0.4);
+                .project-action-btn.live-btn:hover {
                     background: #7c3aed;
                 }
-                
-                .github-btn { 
-                    background: rgba(255,255,255,0.05); 
+                .project-action-btn.cert-btn {
+                    background: rgba(139, 92, 246, 0.05);
+                    color: var(--primary);
+                    border-color: rgba(139, 92, 246, 0.2);
+                }
+                .project-action-btn.cert-btn:hover {
+                    background: rgba(139, 92, 246, 0.1);
+                    border-color: var(--primary);
+                }
+
+                /* Modal styling */
+                .image-modal-overlay { 
+                    position: fixed; 
+                    inset: 0; 
+                    background: rgba(3,7,18,0.9); 
+                    z-index: 9999; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    backdrop-filter: blur(8px); 
+                    padding: 40px; 
+                }
+                .image-modal-content { 
+                    position: relative; 
+                    max-width: 900px; 
+                    width: 100%; 
+                    max-height: 85vh; 
+                    background: #0f172a; 
+                    border-radius: 12px; 
+                    padding: 10px; 
                     border: 1px solid rgba(255,255,255,0.1); 
-                    box-shadow: none;
                 }
-                .github-btn:hover { 
-                    background: #24292e; 
-                    border-color: #24292e;
-                    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+                .close-modal-btn { 
+                    position: absolute; 
+                    top: -12px; 
+                    right: -12px; 
+                    width: 28px; 
+                    height: 28px; 
+                    background: #ef4444; 
+                    color: white; 
+                    border: none; 
+                    border-radius: 50%; 
+                    font-size: 12px; 
+                    cursor: pointer; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    z-index: 10000; 
+                }
+                .fullscreen-image { 
+                    width: 100%; 
+                    height: 100%; 
+                    max-height: calc(85vh - 20px); 
+                    object-fit: contain; 
+                }
+                .pdf-viewer { 
+                    width: 100%; 
+                    height: calc(85vh - 20px); 
+                    border: none; 
+                    border-radius: 6px; 
+                    background: white; 
                 }
 
-                .pagination-dots { display: flex; gap: 8px; margin-top: 60px; align-items: center; }
-                .dot { width: 8px; height: 8px; border-radius: 50%; background: #e2e2e2; border: none; cursor: pointer; transition: 0.4s; padding: 0; }
-                .dot.active { 
-                    width: 32px; 
-                    border-radius: 10px; 
-                    background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 100%); 
-                }
-
-                .image-modal-overlay { position: fixed; inset: 0; background: rgba(3,7,18,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 40px; }
-                .image-modal-content { position: relative; max-width: 900px; width: 100%; max-height: 85vh; background: #0f172a; border-radius: 12px; padding: 10px; border: 1px solid rgba(255,255,255,0.1); }
-                .close-modal-btn { position: absolute; top: -12px; right: -12px; width: 28px; height: 28px; background: #ef4444; color: white; border: none; border-radius: 50%; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-                .fullscreen-image { width: 100%; height: 100%; max-height: calc(85vh - 20px); object-fit: contain; }
-                .pdf-viewer { width: 100%; height: calc(85vh - 20px); border: none; border-radius: 6px; background: white; }
-
-                @media (max-width: 1024px) { 
-                    .project-slide { width: 90%; }
-                    .project-slide.prev, .project-slide.next { display: none !important; }
-                    .project-title-gradient { font-size: 2rem; }
-                    .project-card { padding: 40px 30px; border-radius: 30px; }
-                    .project-desc { font-size: 1rem; margin-bottom: 30px; }
-                }
-
-                @media (max-width: 480px) {
-                    .slider-container { height: 550px; perspective: none; }
-                    .project-slide { width: 100%; transition: opacity 0.4s ease; transform: none !important; position: static; opacity: 1; display: none; }
-                    .project-slide.active { display: block; }
-                    .project-title-gradient { font-size: 1.75rem; }
-                    .tag-outline { padding: 8px 16px; font-size: 0.75rem; }
+                @media (max-width: 768px) {
+                    .projects-title { font-size: 2.2rem; }
+                    .project-item-header { padding: 20px; }
+                    .project-content-inner { padding: 0 20px 20px 20px; }
+                    .project-expanded-metadata { flex-direction: column; align-items: flex-start; }
+                    .project-expanded-tags { margin-left: 0; }
                 }
             `}</style>
         </section>

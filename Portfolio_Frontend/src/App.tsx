@@ -1,6 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
-import Portfolio from './pages/Portfolio';
+import HomePage from './pages/HomePage';
+import ProfilePage from './pages/ProfilePage';
+import PublicationsPage from './pages/PublicationsPage';
+import ProjectsPage from './pages/ProjectsPage';
+import ContactsPage from './pages/ContactsPage';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import ResumeView from './pages/ResumeView';
@@ -22,24 +26,18 @@ function App() {
                         <Route path="/" element={
                             window.matchMedia('(display-mode: standalone)').matches
                                 ? <Navigate to="/login/admin" replace />
-                                : <Portfolio />
+                                : <Navigate to="/home" replace />
                         } />
-                        <Route path="/about" element={<Portfolio />} />
-                        <Route path="/education" element={<Portfolio />} />
-                        <Route path="/experience" element={<Portfolio />} />
-                        <Route path="/achievements" element={<Portfolio />} />
-                        <Route path="/activities" element={<Portfolio />} />
-                        <Route path="/certifications" element={<Portfolio />} />
-                        <Route path="/skills" element={<Portfolio />} />
-                        <Route path="/projects" element={<Portfolio />} />
-                        <Route path="/papers" element={<Portfolio />} />
-                        <Route path="/blogs" element={<Portfolio />} />
-                        <Route path="/references" element={<Portfolio />} />
-                        <Route path="/contact" element={<Portfolio />} />
+                        <Route path="/home" element={<HomePage />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/publications" element={<PublicationsPage />} />
+                        <Route path="/projects" element={<ProjectsPage />} />
+                        <Route path="/contacts" element={<ContactsPage />} />
+
                         <Route path="/resume" element={<ResumeView />} />
                         <Route path="/login/admin" element={<AdminLogin />} />
                         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                        <Route path="*" element={<Navigate to="/" replace />} />
+                        <Route path="*" element={<Navigate to="/home" replace />} />
                     </Routes>
                     <Analytics />
                 </TrackerWrapper>
