@@ -60,6 +60,14 @@ const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =
                         >
                             My GitHub
                         </a>
+                        <a 
+                            href="https://scholar.google.com/citations?user=TYkiwUgAAAAJ"
+                            target="_blank" 
+                            className="btn-glow"
+                            style={{ marginLeft: '20px' }}
+                        >
+                            My Google Scholar
+                        </a>
                     </div>
                 </div>
             </div>
