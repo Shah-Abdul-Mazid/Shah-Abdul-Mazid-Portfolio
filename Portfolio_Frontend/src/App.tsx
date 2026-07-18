@@ -8,6 +8,7 @@ import ContactsPage from './pages/ContactsPage';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import ResumeView from './pages/ResumeView';
+import SkillsPage from './pages/SkillsPage';
 import { PortfolioProvider } from './context/PortfolioContext';
 import { useVisitorTracker } from './hooks/useVisitorTracker';
 
@@ -30,6 +31,7 @@ function App() {
                         } />
                         <Route path="/home" element={<HomePage />} />
                         <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/skills" element={<SkillsPage />} />
                         <Route path="/publications" element={<PublicationsPage />} />
                         <Route path="/projects" element={<ProjectsPage />} />
                         <Route path="/contacts" element={<ContactsPage />} />

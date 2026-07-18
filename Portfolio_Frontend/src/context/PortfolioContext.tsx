@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, type ReactNode }
 export interface SkillCategory {
     name: string;
     items: string[];
+    proficiencies?: Record<string, number>; // skill name -> 0–100
 }
 
 export interface EducationItem {
@@ -209,10 +210,26 @@ const defaultData: PortfolioData = {
         ]
     },
     skills: [
-        { name: 'Core Frameworks', items: ['PyTorch', 'TensorFlow', 'Scikit-Learn', 'NumPy', 'Pandas'] },
-        { name: 'Generative AI & LLMs', items: ['LangChain', 'LlamaIndex', 'Hugging Face', 'Pinecone', 'ChromaDB', 'SentenceTransformers', 'RAG'] },
-        { name: 'Production & MLOps', items: ['Docker', 'Kubernetes', 'FastAPI', 'MLflow', 'Weights & Biases', 'GitHub Actions', 'Streamlit'] },
-        { name: 'Data/Cloud Systems', items: ['AWS/GCP', 'SQL', 'PostgreSQL', 'MongoDB', 'Apache Spark', 'Cloudflare R2'] }
+        { 
+            name: 'Core Frameworks', 
+            items: ['PyTorch', 'TensorFlow', 'Scikit-Learn', 'NumPy', 'Pandas'],
+            proficiencies: { 'PyTorch': 90, 'TensorFlow': 85, 'Scikit-Learn': 85, 'NumPy': 95, 'Pandas': 95 }
+        },
+        { 
+            name: 'Generative AI & LLMs', 
+            items: ['LangChain', 'LlamaIndex', 'Hugging Face', 'Pinecone', 'ChromaDB', 'SentenceTransformers', 'RAG'],
+            proficiencies: { 'LangChain': 85, 'LlamaIndex': 80, 'Hugging Face': 85, 'Pinecone': 80, 'ChromaDB': 80, 'SentenceTransformers': 85, 'RAG': 90 }
+        },
+        { 
+            name: 'Production & MLOps', 
+            items: ['Docker', 'Kubernetes', 'FastAPI', 'MLflow', 'Weights & Biases', 'GitHub Actions', 'Streamlit'],
+            proficiencies: { 'Docker': 80, 'Kubernetes': 75, 'FastAPI': 90, 'MLflow': 80, 'Weights & Biases': 80, 'GitHub Actions': 85, 'Streamlit': 90 }
+        },
+        { 
+            name: 'Data/Cloud Systems', 
+            items: ['AWS/GCP', 'SQL', 'PostgreSQL', 'MongoDB', 'Apache Spark', 'Cloudflare R2'],
+            proficiencies: { 'AWS/GCP': 80, 'SQL': 90, 'PostgreSQL': 85, 'MongoDB': 90, 'Apache Spark': 75, 'Cloudflare R2': 80 }
+        }
     ],
     education: [
         { degree: 'B.Sc. in Computer Science & Engineering', school: 'East West University', year: '2021 – 2026', major: 'Major: Intelligent Systems & Data Science' },

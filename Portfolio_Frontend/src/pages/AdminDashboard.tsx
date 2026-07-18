@@ -342,26 +342,56 @@ const AdminDashboard = () => {
         setEditData(prev => {
             const skills = prev.skills.map((cat, ci) => {
                 if (ci !== catIndex) return cat;
+                const oldName = cat.items[itemIndex];
                 const items = cat.items.map((it, ii) => ii === itemIndex ? value : it);
-                return { ...cat, items };
+                const proficiencies = { ...cat.proficiencies };
+                if (oldName && proficiencies[oldName] !== undefined) {
+                    const oldVal = proficiencies[oldName];
+                    delete proficiencies[oldName];
+                    proficiencies[value] = oldVal;
+                } else {
+                    proficiencies[value] = 80;
+                }
+                return { ...cat, items, proficiencies };
+            });
+            return { ...prev, skills };
+        });
+    };
+    const updateSkillProficiency = (catIndex: number, skillName: string, value: number) => {
+        setEditData(prev => {
+            const skills = prev.skills.map((cat, ci) => {
+                if (ci !== catIndex) return cat;
+                const proficiencies = { ...cat.proficiencies, [skillName]: value };
+                return { ...cat, proficiencies };
             });
             return { ...prev, skills };
         });
     };
     const addSkillItem = (catIndex: number) => {
         setEditData(prev => {
-            const skills = prev.skills.map((cat, ci) =>
-                ci === catIndex ? { ...cat, items: [...cat.items, ''] } : cat
-            );
+            const skills = prev.skills.map((cat, ci) => {
+                if (ci !== catIndex) return cat;
+                const newSkill = '';
+                const items = [...cat.items, newSkill];
+                const proficiencies = { ...cat.proficiencies, [newSkill]: 80 };
+                return { ...cat, items, proficiencies };
+            });
             return { ...prev, skills };
         });
         showNotification('📝 Added skill');
     };
     const removeSkillItem = (catIndex: number, itemIndex: number) => {
         setEditData(prev => {
-            const skills = prev.skills.map((cat, ci) =>
-                ci === catIndex ? { ...cat, items: cat.items.filter((_, ii) => ii !== itemIndex) } : cat
-            );
+            const skills = prev.skills.map((cat, ci) => {
+                if (ci !== catIndex) return cat;
+                const skillName = cat.items[itemIndex];
+                const items = cat.items.filter((_, ii) => ii !== itemIndex);
+                const proficiencies = { ...cat.proficiencies };
+                if (skillName) {
+                    delete proficiencies[skillName];
+                }
+                return { ...cat, items, proficiencies };
+            });
             return { ...prev, skills };
         });
         showNotification('🗑️ Removed skill');
@@ -1175,14 +1205,27 @@ const AdminDashboard = () => {
                                     </div>
                                     <div className="form-group">
                                         <label>Skills (one per row)</label>
-                                        {cat.items.map((item, ii) => (
-                                            <div key={ii} className="detail-row">
-                                                <input type="text" value={item}
-                                                    onChange={e => updateSkillItem(ci, ii, e.target.value)}
-                                                    placeholder={`Skill ${ii + 1}`} />
-                                                <button className="icon-btn danger" onClick={() => removeSkillItem(ci, ii)}><Minus size={14} /></button>
-                                            </div>
-                                        ))}
+                                        {cat.items.map((item, ii) => {
+                                            const proficiency = cat.proficiencies && cat.proficiencies[item] !== undefined
+                                                ? cat.proficiencies[item]
+                                                : 80;
+                                            return (
+                                                <div key={ii} className="detail-row" style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '8px' }}>
+                                                    <input type="text" value={item}
+                                                        onChange={e => updateSkillItem(ci, ii, e.target.value)}
+                                                        placeholder={`Skill ${ii + 1}`}
+                                                        style={{ flex: 2 }} />
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '150px' }}>
+                                                        <input type="range" min="10" max="100" step="5"
+                                                            value={proficiency}
+                                                            onChange={e => updateSkillProficiency(ci, item, parseInt(e.target.value))}
+                                                            style={{ flex: 1, accentColor: 'var(--primary)' }} />
+                                                        <span style={{ minWidth: '40px', fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--primary)' }}>{proficiency}%</span>
+                                                    </div>
+                                                    <button className="icon-btn danger" onClick={() => removeSkillItem(ci, ii)}><Minus size={14} /></button>
+                                                </div>
+                                            );
+                                        })}
                                         <button className="add-inline-btn" onClick={() => addSkillItem(ci)}><Plus size={14} /> Add Skill</button>
                                     </div>
                                 </div>

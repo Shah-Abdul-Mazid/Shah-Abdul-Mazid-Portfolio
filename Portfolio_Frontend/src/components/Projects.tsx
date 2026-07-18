@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import type { ProjectItem } from '../context/PortfolioContext';
 import { ExternalLink, Search, Github, Calendar, Briefcase, ChevronDown, FileText, Award } from 'lucide-react';
@@ -12,16 +13,46 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
         'active-0': true // Open the first active project by default as in the screenshot
     });
 
+    const location = useLocation();
+
+    // Filter projects into active and past/funded categories
+    const activeProjects = projects.filter(p => p.category !== 'past');
+    const pastProjects = projects.filter(p => p.category === 'past');
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const projectTitle = params.get('project');
+        if (projectTitle) {
+            // Check active projects
+            const activeIdx = activeProjects.findIndex(p => p.title.toLowerCase() === projectTitle.toLowerCase());
+            if (activeIdx !== -1) {
+                const key = `active-${activeIdx}`;
+                setExpanded(prev => ({ ...prev, [key]: true }));
+                setTimeout(() => {
+                    const el = document.getElementById(`project-${key}`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+                return;
+            }
+            // Check past projects
+            const pastIdx = pastProjects.findIndex(p => p.title.toLowerCase() === projectTitle.toLowerCase());
+            if (pastIdx !== -1) {
+                const key = `past-${pastIdx}`;
+                setExpanded(prev => ({ ...prev, [key]: true }));
+                setTimeout(() => {
+                    const el = document.getElementById(`project-${key}`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        }
+    }, [location.search, projects]);
+
     const toggleExpand = (key: string) => {
         setExpanded(prev => ({
             ...prev,
             [key]: !prev[key]
         }));
     };
-
-    // Filter projects into active and past/funded categories
-    const activeProjects = projects.filter(p => p.category !== 'past');
-    const pastProjects = projects.filter(p => p.category === 'past');
 
     // Helper to generate dynamic colors for tags
     const getDotColor = (tag: string) => {
@@ -44,6 +75,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
             return (
                 <div 
                     key={key} 
+                    id={`project-${key}`}
                     className={`project-item-card ${isExpanded ? 'expanded' : ''}`}
                 >
                     {/* Header: Always visible */}

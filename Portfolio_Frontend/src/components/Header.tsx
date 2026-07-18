@@ -7,6 +7,7 @@ const Header = () => {
     const compactLinks = [
         { to: '/home', label: 'Home' },
         { to: '/profile', label: 'Profile' },
+        { to: '/skills', label: 'Skills' },
         { to: '/publications', label: 'Publications' },
         { to: '/projects', label: 'Projects' },
         { to: '/contacts', label: 'Contacts' },
