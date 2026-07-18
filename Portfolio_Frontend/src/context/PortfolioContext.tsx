@@ -5,6 +5,7 @@ export interface SkillCategory {
     name: string;
     items: string[];
     proficiencies?: Record<string, number>; // skill name -> 0–100
+    projectAssociations?: Record<string, string[]>; // skill name -> manual project titles
 }
 
 export interface EducationItem {

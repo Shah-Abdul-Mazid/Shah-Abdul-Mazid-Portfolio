@@ -344,6 +344,7 @@ const AdminDashboard = () => {
                 if (ci !== catIndex) return cat;
                 const oldName = cat.items[itemIndex];
                 const items = cat.items.map((it, ii) => ii === itemIndex ? value : it);
+                
                 const proficiencies = { ...cat.proficiencies };
                 if (oldName && proficiencies[oldName] !== undefined) {
                     const oldVal = proficiencies[oldName];
@@ -352,7 +353,15 @@ const AdminDashboard = () => {
                 } else {
                     proficiencies[value] = 80;
                 }
-                return { ...cat, items, proficiencies };
+
+                const projectAssociations = { ...cat.projectAssociations };
+                if (oldName && projectAssociations[oldName] !== undefined) {
+                    const oldAssoc = projectAssociations[oldName];
+                    delete projectAssociations[oldName];
+                    projectAssociations[value] = oldAssoc;
+                }
+
+                return { ...cat, items, proficiencies, projectAssociations };
             });
             return { ...prev, skills };
         });
@@ -390,11 +399,45 @@ const AdminDashboard = () => {
                 if (skillName) {
                     delete proficiencies[skillName];
                 }
-                return { ...cat, items, proficiencies };
+                const projectAssociations = { ...cat.projectAssociations };
+                if (skillName) {
+                    delete projectAssociations[skillName];
+                }
+                return { ...cat, items, proficiencies, projectAssociations };
             });
             return { ...prev, skills };
         });
         showNotification('🗑️ Removed skill');
+    };
+
+    const addManualProject = (catIndex: number, skillName: string, projectTitle: string) => {
+        setEditData((prev: any) => {
+            const skills = prev.skills.map((cat: any, ci: number) => {
+                if (ci !== catIndex) return cat;
+                const projectAssociations = { ...cat.projectAssociations };
+                const list = projectAssociations[skillName] || [];
+                if (!list.includes(projectTitle)) {
+                    projectAssociations[skillName] = [...list, projectTitle];
+                }
+                return { ...cat, projectAssociations };
+            });
+            return { ...prev, skills };
+        });
+        showNotification('🔗 Associated project with skill');
+    };
+
+    const removeManualProject = (catIndex: number, skillName: string, projectTitle: string) => {
+        setEditData((prev: any) => {
+            const skills = prev.skills.map((cat: any, ci: number) => {
+                if (ci !== catIndex) return cat;
+                const projectAssociations = { ...cat.projectAssociations };
+                const list = projectAssociations[skillName] || [];
+                projectAssociations[skillName] = list.filter((t: string) => t !== projectTitle);
+                return { ...cat, projectAssociations };
+            });
+            return { ...prev, skills };
+        });
+        showNotification('🗑️ Removed project association');
     };
 
     const updateProjectTag = (projIndex: number, tagIndex: number, value: string) => {
@@ -1210,19 +1253,86 @@ const AdminDashboard = () => {
                                                 ? cat.proficiencies[item]
                                                 : 80;
                                             return (
-                                                <div key={ii} className="detail-row" style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '8px' }}>
-                                                    <input type="text" value={item}
-                                                        onChange={e => updateSkillItem(ci, ii, e.target.value)}
-                                                        placeholder={`Skill ${ii + 1}`}
-                                                        style={{ flex: 2 }} />
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '150px' }}>
-                                                        <input type="range" min="10" max="100" step="5"
-                                                            value={proficiency}
-                                                            onChange={e => updateSkillProficiency(ci, item, parseInt(e.target.value))}
-                                                            style={{ flex: 1, accentColor: 'var(--primary)' }} />
-                                                        <span style={{ minWidth: '40px', fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--primary)' }}>{proficiency}%</span>
+                                                <div key={ii} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px', marginBottom: '12px' }}>
+                                                    <div className="detail-row" style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '8px' }}>
+                                                        <input type="text" value={item}
+                                                            onChange={e => updateSkillItem(ci, ii, e.target.value)}
+                                                            placeholder={`Skill ${ii + 1}`}
+                                                            style={{ flex: 2 }} />
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '150px' }}>
+                                                            <input type="range" min="10" max="100" step="5"
+                                                                value={proficiency}
+                                                                onChange={e => updateSkillProficiency(ci, item, parseInt(e.target.value))}
+                                                                style={{ flex: 1, accentColor: 'var(--primary)' }} />
+                                                            <span style={{ minWidth: '40px', fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--primary)' }}>{proficiency}%</span>
+                                                        </div>
+                                                        <button className="icon-btn danger" onClick={() => removeSkillItem(ci, ii)}><Minus size={14} /></button>
                                                     </div>
-                                                    <button className="icon-btn danger" onClick={() => removeSkillItem(ci, ii)}><Minus size={14} /></button>
+                                                    
+                                                    {/* Project Linkage Sub-Row */}
+                                                    {item.trim() && (
+                                                        <div style={{ paddingLeft: '4px', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                                            {/* Auto list */}
+                                                            {(() => {
+                                                                const autoList = (editData.projects || []).filter((p: any) => 
+                                                                    (p.tags || []).some((t: string) => t.toLowerCase() === item.toLowerCase())
+                                                                ).map((p: any) => p.title);
+                                                                
+                                                                if (autoList.length === 0) return null;
+                                                                return (
+                                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', opacity: 0.6 }}>
+                                                                        <span style={{ fontWeight: 600 }}>Auto-Linked (via Tags):</span>
+                                                                        {autoList.map((pTitle: string, pIdx: number) => (
+                                                                            <span key={pIdx} style={{ padding: '1px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                                                {pTitle}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
+                                                                );
+                                                            })()}
+
+                                                            {/* Manual List */}
+                                                            {(() => {
+                                                                const manualList = (cat.projectAssociations?.[item]) || [];
+                                                                const allProjects = editData.projects || [];
+                                                                const availableProjects = allProjects.filter((p: any) => !manualList.includes(p.title));
+                                                                
+                                                                return (
+                                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', marginTop: '2px' }}>
+                                                                        <span style={{ fontWeight: 600, opacity: 0.8 }}>Manually Linked:</span>
+                                                                        {manualList.map((pTitle: string, pIdx: number) => (
+                                                                            <span key={pIdx} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '1px 6px', borderRadius: '4px', background: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.3)', color: '#60a5fa' }}>
+                                                                                {pTitle}
+                                                                                <button 
+                                                                                    type="button" 
+                                                                                    onClick={() => removeManualProject(ci, item, pTitle)} 
+                                                                                    style={{ border: 'none', background: 'none', color: '#f87171', cursor: 'pointer', padding: '0 2px', fontSize: '0.85rem', display: 'flex', alignItems: 'center' }}
+                                                                                >
+                                                                                    ×
+                                                                                </button>
+                                                                            </span>
+                                                                        ))}
+                                                                        {availableProjects.length > 0 && (
+                                                                            <select 
+                                                                                value="" 
+                                                                                onChange={e => {
+                                                                                    if (e.target.value) {
+                                                                                        addManualProject(ci, item, e.target.value);
+                                                                                    }
+                                                                                }}
+                                                                                style={{ padding: '2px 8px', borderRadius: '4px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', color: 'var(--text-color)', fontSize: '0.75rem', cursor: 'pointer', outline: 'none' }}
+                                                                            >
+                                                                                <option value="">+ Link Project</option>
+                                                                                {availableProjects.map((p: any, pIdx: number) => (
+                                                                                    <option key={pIdx} value={p.title}>{p.title}</option>
+                                                                                ))}
+                                                                            </select>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })()}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             );
                                         })}

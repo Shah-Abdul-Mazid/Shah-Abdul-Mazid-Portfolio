@@ -12,11 +12,27 @@ const SkillsPage = () => {
   const skills = data.skills || [];
   const projects = data.projects || [];
 
-  // Helper to find projects associated with a skill
-  const getAssociatedProjects = (skillName: string) => {
-    return projects.filter(proj => 
+  // Helper to find projects associated with a skill (combining auto and manual list)
+  const getAssociatedProjects = (skillName: string, cat: any) => {
+    // 1. Get manual project associations
+    const manualList = cat.projectAssociations?.[skillName] || [];
+    const manualProjects = projects.filter(proj => 
+      manualList.some((title: string) => title.toLowerCase() === proj.title.toLowerCase())
+    );
+
+    // 2. Get auto-detected projects
+    const autoProjects = projects.filter(proj => 
       proj.tags.some(tag => tag.trim().toLowerCase() === skillName.trim().toLowerCase())
     );
+
+    // Combine lists, avoiding duplicates by title
+    const combined = [...manualProjects];
+    for (const p of autoProjects) {
+      if (!combined.some(item => item.title.toLowerCase() === p.title.toLowerCase())) {
+        combined.push(p);
+      }
+    }
+    return combined;
   };
 
   return (
@@ -54,7 +70,7 @@ const SkillsPage = () => {
                         ? cat.proficiencies[item]
                         : 80; // fallback default
                       
-                      const associatedProjs = getAssociatedProjects(item);
+                      const associatedProjs = getAssociatedProjects(item, cat);
 
                       return (
                         <div key={ii} className="skill-proficiency-item">
