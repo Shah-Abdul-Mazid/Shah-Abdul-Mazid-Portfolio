@@ -1381,7 +1381,9 @@ const AdminDashboard = () => {
                                                 style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--card-bg)', color: 'var(--text-color)' }}
                                             >
                                                 <option value="active">Active Projects</option>
-                                                <option value="past">Past & EU-Funded Projects</option>
+                                                <option value="past">Complete / Past Projects</option>
+                                                <option value="funded">Funded Projects</option>
+
                                             </select>
                                         </div>
                                         <div className="form-group" style={{ width: '33%' }}>

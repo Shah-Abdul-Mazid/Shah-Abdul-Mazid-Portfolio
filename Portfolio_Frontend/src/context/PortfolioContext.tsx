@@ -56,7 +56,7 @@ export interface ProjectItem {
     problem?: string;
     approach?: string;
     result?: string;
-    category?: 'active' | 'past';
+    category?: 'active' | 'past' | 'funded';
     period?: string;
     status?: string;
     institution?: string;

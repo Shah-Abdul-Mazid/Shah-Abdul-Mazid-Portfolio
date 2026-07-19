@@ -1,60 +1,56 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import type { ProjectItem } from '../context/PortfolioContext';
-import { ExternalLink, Search, Github, Calendar, Briefcase, ChevronDown, FileText, Award } from 'lucide-react';
-import { isPdfUrl, getPdfViewerUrl } from '../utils/filePreview';
+import {
+    ExternalLink,
+    Search,
+    Github,
+    Briefcase,
+    ChevronDown,
+    FileText,
+    Award,
+} from 'lucide-react';
+import { getPdfViewerUrl, isPdfUrl } from '../utils/filePreview';
+
+type BucketPrefix = 'active' | 'complete' | 'funded';
 
 const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
     const projects = data.projects || [];
+
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
     const [expanded, setExpanded] = useState<Record<string, boolean>>({
-        'active-0': true // Open the first active project by default as in the screenshot
+        'active-0': true,
     });
 
     const location = useLocation();
 
-    // Filter projects into active and past/funded categories
-    const activeProjects = projects.filter(p => p.category !== 'past');
-    const pastProjects = projects.filter(p => p.category === 'past');
+    const activeProjects   = projects.filter((p) => p.category === 'active' || !p.category);
+    const completeProjects = projects.filter((p) => p.category === 'past');
+    const fundedProjects   = projects.filter((p) => p.category === 'funded');
 
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const projectTitle = params.get('project');
-        if (projectTitle) {
-            // Check active projects
-            const activeIdx = activeProjects.findIndex(p => p.title.toLowerCase() === projectTitle.toLowerCase());
-            if (activeIdx !== -1) {
-                const key = `active-${activeIdx}`;
-                setExpanded(prev => ({ ...prev, [key]: true }));
-                setTimeout(() => {
-                    const el = document.getElementById(`project-${key}`);
-                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
-                return;
-            }
-            // Check past projects
-            const pastIdx = pastProjects.findIndex(p => p.title.toLowerCase() === projectTitle.toLowerCase());
-            if (pastIdx !== -1) {
-                const key = `past-${pastIdx}`;
-                setExpanded(prev => ({ ...prev, [key]: true }));
-                setTimeout(() => {
-                    const el = document.getElementById(`project-${key}`);
-                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
-            }
-        }
-    }, [location.search, projects]);
 
     const toggleExpand = (key: string) => {
-        setExpanded(prev => ({
+        setExpanded((prev) => ({
             ...prev,
-            [key]: !prev[key]
+            [key]: !prev[key],
         }));
     };
 
-    // Helper to generate dynamic colors for tags
+    const getStatus = (project: ProjectItem, bucket: BucketPrefix): { label: string; className: string } => {
+        if (project.status) {
+            const s = project.status.toUpperCase();
+            if (s === 'ACTIVE')  return { label: 'ACTIVE',  className: 'active' };
+            if (s === 'FUNDED')  return { label: 'FUNDED',  className: 'funded' };
+            if (s === 'COMPLETE' || s === 'COMPLETED' || s === 'PAST') return { label: 'COMPLETE', className: 'past' };
+        }
+
+        if (bucket === 'active')  return { label: 'ACTIVE',  className: 'active' };
+        if (bucket === 'funded')  return { label: 'FUNDED',  className: 'funded' };
+        return { label: 'COMPLETE', className: 'past' };
+    };
+
     const getDotColor = (tag: string) => {
         const colors = ['#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
         let hash = 0;
@@ -64,181 +60,203 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
         return colors[Math.abs(hash) % colors.length];
     };
 
-    const renderProjectList = (projectList: ProjectItem[], prefix: string) => {
-        return projectList.map((project, index) => {
-            const key = `${prefix}-${index}`;
-            const isExpanded = !!expanded[key];
-            const isProjectActive = project.category !== 'past';
-            const statusLabel = project.status || (isProjectActive ? 'ACTIVE' : 'COMPLETED');
-            const statusClass = statusLabel.toUpperCase() === 'ACTIVE' ? 'active' : 'past';
+    const dotColor = (bucket: BucketPrefix) => {
+        if (bucket === 'active')  return { dot: '#10b981', rail: 'rgba(16,185,129,0.4)' };
+        if (bucket === 'funded')  return { dot: '#a78bfa', rail: 'rgba(167,139,250,0.4)' };
+        return { dot: '#f59e0b', rail: 'rgba(245,158,11,0.4)' };
+    };
 
-            return (
-                <div 
-                    key={key} 
-                    id={`project-${key}`}
-                    className={`project-item-card ${isExpanded ? 'expanded' : ''}`}
-                >
-                    {/* Header: Always visible */}
-                    <div 
-                        className="project-item-header" 
-                        onClick={() => toggleExpand(key)}
-                    >
-                        <div className="project-header-left">
-                            <h3 className="project-item-title">{project.title}</h3>
-                            <div className="project-meta-row">
-                                {project.period && (
-                                    <div className="project-meta-item">
-                                        <Calendar size={13} className="meta-icon" />
-                                        <span>{project.period}</span>
-                                    </div>
-                                )}
-                                {project.institution && (
-                                    <div className="project-meta-item">
-                                        <Briefcase size={13} className="meta-icon" />
-                                        <span>{project.institution}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="project-header-right">
-                            <span className={`status-badge ${statusClass}`}>
-                                {statusClass === 'active' && <span className="status-dot"></span>}
-                                {statusLabel}
-                            </span>
-                            <ChevronDown size={18} className="chevron-icon" />
-                        </div>
-                    </div>
+    const renderProjectList = (projectList: ProjectItem[], prefix: BucketPrefix) => {
+        const colors = dotColor(prefix);
+        return (
+            <div className="proj-timeline" style={{ '--dot-color': colors.dot, '--rail-color': colors.rail } as React.CSSProperties}>
+                {projectList.map((project, index) => {
+                    const key = `${prefix}-${index}`;
+                    const isExpanded = !!expanded[key];
+                    const { label: statusLabel, className: statusClass } = getStatus(project, prefix);
 
-                    {/* Content: Visible when expanded */}
-                    <div className="project-item-content">
-                        <div className="project-content-inner">
-                            {/* Main description */}
-                            <p className="project-desc-text">{project.desc}</p>
-                            
-                            {/* Detailed key research components / details */}
-                            {project.details && (
-                                <p className="project-details-text">{project.details}</p>
-                            )}
-
-                            {/* Metadata row: Ref, Funding Org & Tags */}
-                            <div className="project-expanded-metadata">
-                                {project.refCode && (
-                                    <div className="metadata-badge ref-code">
-                                        <FileText size={12} />
-                                        <span>{project.refCode}</span>
-                                    </div>
-                                )}
-                                {project.fundingOrg && (
-                                    <div className="metadata-badge funding-org">
-                                        <Award size={12} />
-                                        <span>{project.fundingOrg}</span>
-                                    </div>
-                                )}
-                                <div className="project-expanded-tags">
-                                    {project.tags.map((tag, tIdx) => (
-                                        <span key={tIdx} className="dot-tag">
-                                            <span className="tag-dot" style={{ backgroundColor: getDotColor(tag) }}></span>
-                                            {tag}
-                                        </span>
-                                    ))}
+                    return (
+                        <div key={key} id={`project-${key}`} className={`proj-entry ${isExpanded ? 'expanded' : ''}`}>
+                            {/* Timeline dot */}
+                            <div className="proj-dot-wrap">
+                                <div className="proj-dot">
+                                    <div className="proj-dot-inner" />
                                 </div>
                             </div>
 
-                            {/* Links/Actions */}
-                            <div className="project-actions-row">
-                                {project.githubUrl && (
-                                    <a 
-                                        href={resolveUrl(project.githubUrl)} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer" 
-                                        className="project-action-btn github-btn"
-                                    >
-                                        <Github size={14} />
-                                        GitHub
-                                    </a>
-                                )}
-                                {project.projectUrl && (
-                                    <a 
-                                        href={resolveUrl(project.projectUrl)} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer" 
-                                        className="project-action-btn live-btn"
-                                    >
-                                        <ExternalLink size={14} />
-                                        Live Demo
-                                    </a>
-                                )}
-                                {project.certificateUrl && (
-                                    <button 
-                                        onClick={() => setSelectedFile(resolveUrl(project.certificateUrl))}
-                                        className="project-action-btn cert-btn"
-                                    >
-                                        <Search size={14} />
-                                        Certificate
-                                    </button>
-                                )}
+                            {/* Card */}
+                            <div className="proj-card">
+                                {/* Clickable header */}
+                                <div className="proj-card-header" onClick={() => toggleExpand(key)}>
+                                    <div className="proj-header-main">
+                                        {project.period && (
+                                            <span className="proj-year">{project.period}</span>
+                                        )}
+                                        <h3 className="proj-title">{project.title}</h3>
+                                        {project.institution && (
+                                            <p className="proj-institution">
+                                                <Briefcase size={12} className="meta-icon" />
+                                                {project.institution}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="proj-header-right">
+                                        <span className={`status-badge ${statusClass}`}>
+                                            {statusClass === 'active' && <span className="status-dot" />}
+                                            {statusLabel}
+                                        </span>
+                                        <ChevronDown size={16} className="chevron-icon" />
+                                    </div>
+                                </div>
+
+                                {/* Expandable detail */}
+                                <div className="proj-card-body">
+                                    <div className="proj-card-inner">
+                                        <p className="project-desc-text">{project.desc}</p>
+                                        {project.details && <p className="project-details-text">{project.details}</p>}
+
+                                        <div className="project-expanded-metadata">
+                                            {project.refCode && (
+                                                <div className="metadata-badge ref-code">
+                                                    <FileText size={12} />
+                                                    <span>{project.refCode}</span>
+                                                </div>
+                                            )}
+                                            {project.fundingOrg && (
+                                                <div className="metadata-badge funding-org">
+                                                    <Award size={12} />
+                                                    <span>{project.fundingOrg}</span>
+                                                </div>
+                                            )}
+                                            <div className="project-expanded-tags">
+                                                {(project.tags || []).map((tag, tIdx) => (
+                                                    <span key={tIdx} className="dot-tag">
+                                                        <span className="tag-dot" style={{ backgroundColor: getDotColor(tag) }} />
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="project-actions-row">
+                                            {project.githubUrl && (
+                                                <a href={resolveUrl(project.githubUrl)} target="_blank" rel="noopener noreferrer" className="project-action-btn github-btn">
+                                                    <Github size={14} /> GitHub
+                                                </a>
+                                            )}
+                                            {project.projectUrl && (
+                                                <a href={resolveUrl(project.projectUrl)} target="_blank" rel="noopener noreferrer" className="project-action-btn live-btn">
+                                                    <ExternalLink size={14} /> Live Demo
+                                                </a>
+                                            )}
+                                            {project.certificateUrl && (
+                                                <button onClick={() => setSelectedFile(resolveUrl(project.certificateUrl))} className="project-action-btn cert-btn">
+                                                    <Search size={14} /> Certificate
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            );
-        });
+                    );
+                })}
+            </div>
+        );
     };
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const projectTitle = params.get('project');
+        if (!projectTitle) return;
+
+  
+        const expandByKeyScheme = (list: ProjectItem[], prefix: BucketPrefix) => {
+            const idx = list.findIndex((p) => p.title.toLowerCase() === projectTitle.toLowerCase());
+            if (idx === -1) return false;
+
+            const key = `${prefix}-${idx}`;
+            setExpanded((prev) => ({ ...prev, [key]: true }));
+
+            setTimeout(() => {
+                const el = document.getElementById(`project-${key}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+
+            return true;
+        };
+
+        if (expandByKeyScheme(activeProjects, 'active')) return;
+        if (expandByKeyScheme(completeProjects, 'complete')) return;
+        expandByKeyScheme(fundedProjects, 'funded');
+    }, [location.search, activeProjects, completeProjects, fundedProjects]);
+
 
     return (
         <section id="projects" className="project-list-section alt-bg">
             <div className="projects-container">
-                {/* Title and Subtitle */}
                 <div className="projects-header fade-in" ref={addToRefs}>
                     <h2 className="projects-title">
                         {data.sections?.projects?.title ? (
-                            <span dangerouslySetInnerHTML={{ __html: data.sections.projects.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
+                            <span
+                                dangerouslySetInnerHTML={{
+                                    __html: data.sections.projects.title.replace(
+                                        /(\S+)$/,
+                                        '<span class="gradient-text">$1</span>'
+                                    ),
+                                }}
+                            />
                         ) : (
-                            <>Research <span className="gradient-text">Projects</span></>
+                            <>
+                                Research <span className="gradient-text">Projects</span>
+                            </>
                         )}
                     </h2>
                     <p className="projects-subtitle">
-                        {data.sections?.projects?.subtitle || 'Click any project to expand details. Funded projects and active research initiatives.'}
+                        {data.sections?.projects?.subtitle ||
+                            'Click any project to expand details. Funded projects and active research initiatives.'}
                     </p>
                 </div>
 
-                {/* Active Projects Group */}
                 {activeProjects.length > 0 && (
-                    <div className="project-group fade-in" ref={addToRefs}>
+                    <div className="project-group">
                         <div className="group-header">
-                            <h3 className="group-title">Active Projects</h3>
-                            <span className="group-date-badge">2025 – Present</span>
+                            <h3 className="group-title">🟢 Active Projects</h3>
+                            <span className="group-date-badge badge-active">{activeProjects.length} Active</span>
                         </div>
-                        <div className="group-list">
-                            {renderProjectList(activeProjects, 'active')}
-                        </div>
+                        {renderProjectList(activeProjects, 'active')}
                     </div>
                 )}
 
-                {/* Past & EU-Funded Projects Group */}
-                {pastProjects.length > 0 && (
-                    <div className="project-group fade-in" ref={addToRefs}>
+                {completeProjects.length > 0 && (
+                    <div className="project-group">
                         <div className="group-header">
-                            <h3 className="group-title">Past & EU-Funded Projects</h3>
+                            <h3 className="group-title">🟡 Complete / Past Projects</h3>
+                            <span className="group-date-badge badge-past">{completeProjects.length} Complete</span>
                         </div>
-                        <div className="group-list">
-                            {renderProjectList(pastProjects, 'past')}
+                        {renderProjectList(completeProjects, 'complete')}
+                    </div>
+                )}
+
+                {fundedProjects.length > 0 && (
+                    <div className="project-group">
+                        <div className="group-header">
+                            <h3 className="group-title">🟣 Funded Projects</h3>
+                            <span className="group-date-badge badge-funded">{fundedProjects.length} Funded</span>
                         </div>
+                        {renderProjectList(fundedProjects, 'funded')}
                     </div>
                 )}
             </div>
 
-            {/* Certificate/Document Lightbox Modal */}
             {selectedFile && (
                 <div className="image-modal-overlay" onClick={() => setSelectedFile(null)}>
                     <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
-                        <button className="close-modal-btn" onClick={() => setSelectedFile(null)}>✖</button>
+                        <button className="close-modal-btn" onClick={() => setSelectedFile(null)}>
+                            ✖
+                        </button>
                         {isPdfUrl(selectedFile) ? (
-                            <iframe 
-                                src={getPdfViewerUrl(selectedFile)} 
-                                className="pdf-viewer" 
-                                title="Document Viewer" 
-                            />
+                            <iframe src={getPdfViewerUrl(selectedFile)} className="pdf-viewer" title="Document Viewer" />
                         ) : (
                             <img src={selectedFile} alt="Full View" className="fullscreen-image" />
                         )}
@@ -272,10 +290,9 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     color: var(--text-secondary); 
                     line-height: 1.5; 
                 }
-                
-                /* Group Styles */
+
                 .project-group { 
-                    margin-bottom: 48px; 
+                    margin-bottom: 56px; 
                 }
                 .group-header { 
                     display: flex; 
@@ -283,7 +300,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     align-items: center; 
                     border-bottom: 1px solid var(--border-color); 
                     padding-bottom: 12px; 
-                    margin-bottom: 24px; 
+                    margin-bottom: 32px; 
                 }
                 .group-title { 
                     font-family: 'Lora', 'Playfair Display', serif; 
@@ -302,11 +319,185 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     text-transform: uppercase;
                     letter-spacing: 0.05em;
                 }
-                .dark-mode .group-date-badge {
+                .dark-mode .group-date-badge { 
                     background: rgba(249, 115, 22, 0.15); 
                 }
-                
-                /* Project Cards */
+                .group-date-badge.badge-active {
+                    color: #10b981;
+                    background: rgba(16, 185, 129, 0.08);
+                }
+                .dark-mode .group-date-badge.badge-active {
+                    background: rgba(16, 185, 129, 0.18);
+                }
+                .group-date-badge.badge-past {
+                    color: #f59e0b;
+                    background: rgba(245, 158, 11, 0.08);
+                }
+                .dark-mode .group-date-badge.badge-past {
+                    background: rgba(245, 158, 11, 0.18);
+                }
+                .group-date-badge.badge-funded {
+                    color: #a78bfa;
+                    background: rgba(139, 92, 246, 0.1);
+                }
+                .dark-mode .group-date-badge.badge-funded {
+                    background: rgba(139, 92, 246, 0.2);
+                }
+
+                /* ===== Timeline ===== */
+                .proj-timeline {
+                    position: relative;
+                    padding-left: 44px;
+                }
+                .proj-timeline::before {
+                    content: '';
+                    position: absolute;
+                    left: 10px;
+                    top: 8px;
+                    bottom: 0;
+                    width: 2px;
+                    background: linear-gradient(to bottom, var(--rail-color, rgba(139,92,246,0.4)), transparent);
+                    border-radius: 2px;
+                }
+
+                /* Entry row */
+                .proj-entry {
+                    position: relative;
+                    margin-bottom: 20px;
+                }
+                .proj-entry:last-child { margin-bottom: 0; }
+
+                /* Dot */
+                .proj-dot-wrap {
+                    position: absolute;
+                    left: -44px;
+                    top: 18px;
+                    width: 22px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 2;
+                }
+                .proj-dot {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    border: 2px solid var(--dot-color, #a78bfa);
+                    background: rgba(139,92,246,0.1);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                }
+                .proj-entry.expanded .proj-dot {
+                    transform: scale(1.25);
+                    box-shadow: 0 0 0 4px rgba(139,92,246,0.15);
+                }
+                .proj-dot-inner {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background: var(--dot-color, #a78bfa);
+                    transition: transform 0.2s;
+                }
+
+                /* Card */
+                .proj-card {
+                    background: var(--card-bg);
+                    border: 1px solid var(--border-color);
+                    border-radius: 16px;
+                    overflow: hidden;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
+                }
+                .proj-card:hover {
+                    border-color: var(--dot-color, var(--primary));
+                    transform: translateX(4px);
+                    box-shadow: 0 8px 28px rgba(139,92,246,0.08);
+                }
+                .proj-entry.expanded .proj-card {
+                    border-color: var(--dot-color, var(--primary));
+                    box-shadow: 0 8px 28px rgba(139,92,246,0.1);
+                }
+
+                /* Card header (always visible) */
+                .proj-card-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    padding: 20px 24px;
+                    cursor: pointer;
+                    user-select: none;
+                    gap: 16px;
+                }
+                .proj-header-main {
+                    flex: 1;
+                    min-width: 0;
+                }
+                .proj-year {
+                    display: inline-block;
+                    font-size: 0.78rem;
+                    font-weight: 800;
+                    color: var(--dot-color, var(--primary));
+                    letter-spacing: 0.06em;
+                    text-transform: uppercase;
+                    margin-bottom: 6px;
+                }
+                .proj-title {
+                    font-size: 1.15rem;
+                    font-weight: 700;
+                    color: var(--text-color);
+                    margin: 0 0 5px 0;
+                    line-height: 1.35;
+                    transition: color 0.2s;
+                }
+                .proj-card:hover .proj-title { color: var(--dot-color, var(--primary)); }
+                .proj-entry.expanded .proj-title { color: var(--dot-color, var(--primary)); }
+
+                .proj-institution {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 0.85rem;
+                    color: var(--text-secondary);
+                    margin: 0;
+                }
+                .proj-header-right {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    flex-shrink: 0;
+                    padding-top: 2px;
+                }
+
+                /* Collapsible body */
+                .proj-card-body {
+                    max-height: 0;
+                    overflow: hidden;
+                    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                .proj-entry.expanded .proj-card-body {
+                    max-height: 900px;
+                }
+                .proj-card-inner {
+                    padding: 0 24px 24px 24px;
+                    border-top: 1px solid var(--border-color);
+                }
+
+                /* chevron */
+                .chevron-icon {
+                    color: var(--text-secondary);
+                    opacity: 0.8;
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    flex-shrink: 0;
+                }
+                .proj-entry.expanded .chevron-icon {
+                    transform: rotate(180deg);
+                    color: var(--dot-color, var(--primary));
+                    opacity: 1;
+                }
+
                 .project-item-card { 
                     background: var(--card-bg); 
                     border: 1px solid var(--border-color); 
@@ -377,8 +568,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     align-items: center; 
                     gap: 16px; 
                 }
-                
-                /* Badges */
+
                 .status-badge { 
                     font-size: 0.7rem; 
                     font-weight: 750; 
@@ -395,15 +585,22 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     background: rgba(16, 185, 129, 0.08); 
                     color: #10b981; 
                 }
-                .dark-mode .status-badge.active {
+                .dark-mode .status-badge.active { 
                     background: rgba(16, 185, 129, 0.15); 
                 }
                 .status-badge.past { 
                     background: rgba(245, 158, 11, 0.08); 
                     color: #f59e0b; 
                 }
-                .dark-mode .status-badge.past {
+                .dark-mode .status-badge.past { 
                     background: rgba(245, 158, 11, 0.15); 
+                }
+                .status-badge.funded {
+                    background: rgba(139, 92, 246, 0.1);
+                    color: #a78bfa;
+                }
+                .dark-mode .status-badge.funded {
+                    background: rgba(139, 92, 246, 0.2);
                 }
                 .status-dot {
                     width: 6px;
@@ -423,7 +620,6 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     color: var(--primary);
                 }
 
-                /* Expanded Area Accordion */
                 .project-item-content { 
                     max-height: 0; 
                     overflow: hidden; 
@@ -444,7 +640,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     line-height: 1.6;
                     margin: 20px 0 12px 0;
                 }
-                
+
                 .project-details-text {
                     font-size: 0.92rem;
                     color: var(--text-secondary);
@@ -452,7 +648,6 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     margin: 0 0 20px 0;
                 }
 
-                /* Metadata badge & tags */
                 .project-expanded-metadata {
                     display: flex;
                     flex-wrap: wrap;
@@ -508,7 +703,6 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     display: inline-block;
                 }
 
-                /* Actions/Links row */
                 .project-actions-row {
                     display: flex;
                     gap: 12px;
@@ -554,7 +748,6 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     border-color: var(--primary);
                 }
 
-                /* Modal styling */
                 .image-modal-overlay { 
                     position: fixed; 
                     inset: 0; 
@@ -620,3 +813,4 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
 };
 
 export default Projects;
+
