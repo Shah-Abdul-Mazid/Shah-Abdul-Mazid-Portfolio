@@ -1515,11 +1515,6 @@ const AdminDashboard = () => {
                                     </div>
 
                                     <div className="form-group">
-                                        <label>Goal / Objective</label>
-                                        <textarea rows={2} value={project.goal || ''} onChange={e => updateListItem('projects', i, 'goal', e.target.value)} placeholder="What were you trying to achieve? (e.g., Reduce response time by 50%)" />
-                                    </div>
-
-                                    <div className="form-group">
                                         <label>High-Level Solution</label>
                                         <textarea rows={2} value={project.solution || ''} onChange={e => updateListItem('projects', i, 'solution', e.target.value)} placeholder="Explain your solution at a high level." />
                                     </div>
@@ -1614,7 +1609,7 @@ const AdminDashboard = () => {
                                     <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>🔗 Project Assets & Links</h5>
                                     
                                     <div className="flex-group" style={{ flexWrap: 'wrap' }}>
-                                        <div className="form-group" style={{ width: '25%' }}>
+                                        <div className="form-group" style={{ width: '33%' }}>
                                             <FileUploadInput 
                                                 label="Project Thumbnail" 
                                                 value={project.thumbnailUrl || ''} 
@@ -1622,7 +1617,7 @@ const AdminDashboard = () => {
                                                 onUpload={(url) => updateListItem('projects', i, 'thumbnailUrl', url)} 
                                             />
                                         </div>
-                                        <div className="form-group" style={{ width: '25%' }}>
+                                        <div className="form-group" style={{ width: '33%' }}>
                                             <FileUploadInput 
                                                 label="Live Demo Link / URL" 
                                                 value={project.projectUrl || ''} 
@@ -1630,7 +1625,7 @@ const AdminDashboard = () => {
                                                 onUpload={(url) => updateListItem('projects', i, 'projectUrl', url)} 
                                             />
                                         </div>
-                                        <div className="form-group" style={{ width: '25%' }}>
+                                        <div className="form-group" style={{ width: '34%' }}>
                                             <FileUploadInput 
                                                 label="GitHub Repository" 
                                                 value={project.githubUrl || ''} 
@@ -1639,15 +1634,7 @@ const AdminDashboard = () => {
                                                 placeholder="https://github.com/..."
                                             />
                                         </div>
-                                        <div className="form-group" style={{ width: '25%' }}>
-                                            <FileUploadInput 
-                                                label="Project Certificate" 
-                                                value={project.certificateUrl || ''} 
-                                                id={`project-cert-${i}`}
-                                                onUpload={(url) => updateListItem('projects', i, 'certificateUrl', url)} 
-                                            />
-                                        </div>
-                                        <div className="form-group" style={{ width: '33%' }}>
+                                        <div className="form-group" style={{ width: '50%' }}>
                                             <FileUploadInput 
                                                 label="Documentation Link" 
                                                 value={project.docsUrl || ''} 
@@ -1655,15 +1642,7 @@ const AdminDashboard = () => {
                                                 onUpload={(url) => updateListItem('projects', i, 'docsUrl', url)} 
                                             />
                                         </div>
-                                        <div className="form-group" style={{ width: '33%' }}>
-                                            <FileUploadInput 
-                                                label="API Docs Link" 
-                                                value={project.apiDocsUrl || ''} 
-                                                id={`project-api-docs-${i}`}
-                                                onUpload={(url) => updateListItem('projects', i, 'apiDocsUrl', url)} 
-                                            />
-                                        </div>
-                                        <div className="form-group" style={{ width: '33%' }}>
+                                        <div className="form-group" style={{ width: '50%' }}>
                                             <label>Screenshots (Comma-separated URLs)</label>
                                             <input type="text" value={project.screenshots || ''} onChange={e => updateListItem('projects', i, 'screenshots', e.target.value)} placeholder="e.g. /uploads/s1.png, /uploads/s2.png" />
                                         </div>

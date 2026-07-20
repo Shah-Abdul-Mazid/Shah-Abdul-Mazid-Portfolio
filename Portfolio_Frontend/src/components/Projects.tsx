@@ -4,7 +4,6 @@ import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import type { ProjectItem } from '../context/PortfolioContext';
 import {
     ExternalLink,
-    Search,
     Github,
     ChevronDown,
     FileText,
@@ -72,7 +71,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
         return val.split(',').map(s => s.trim()).filter(Boolean);
     };
 
-    const renderBulletList = (text?: string | string[]) => {
+    const renderBulletList = (text?: string | string[], maxItems?: number) => {
         if (!text) return null;
         
         let lines: string[] = [];
@@ -84,6 +83,10 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
             return null;
         }
 
+        if (typeof maxItems === 'number') {
+            lines = lines.slice(0, maxItems);
+        }
+
         return (
             <ul className="recruiter-bullet-list">
                 {lines.map((line, idx) => {
@@ -91,6 +94,28 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     return <li key={idx}>{cleanLine}</li>;
                 })}
             </ul>
+        );
+    };
+
+    const renderFeatureTags = (featuresText?: string | string[]) => {
+        if (!featuresText) return null;
+        let list: string[] = [];
+        if (Array.isArray(featuresText)) {
+            list = featuresText;
+        } else if (typeof featuresText === 'string') {
+            list = featuresText.split('\n').map(f => f.trim()).filter(f => f.length > 0);
+        }
+        
+        const cleanList = list.map(f => f.replace(/^[-\*\•\s]+/, '')).slice(0, 5); // display 3-5 tags
+        if (cleanList.length === 0) return null;
+        
+        return (
+            <div className="project-feature-tags">
+                <span className="feature-tags-label">Key Features:</span>
+                {cleanList.map((feat, idx) => (
+                    <span key={idx} className="feature-tag-pill">{feat}</span>
+                ))}
+            </div>
         );
     };
 
@@ -154,106 +179,95 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                 {/* Expandable detail */}
                                 <div className="proj-card-body">
                                     <div className="proj-card-inner">
-                                        {/* Business Problem, Goal, Solution Grid */}
+                                        {/* Business Problem & Solution */}
                                         <div className="recruiter-grid">
                                             {project.problem && (
                                                 <div className="recruiter-box problem-box">
                                                     <h4>🎯 Business Problem</h4>
-                                                    <p>{project.problem}</p>
-                                                </div>
-                                            )}
-                                            {project.goal && (
-                                                <div className="recruiter-box goal-box">
-                                                    <h4>🏁 Goal / Objective</h4>
-                                                    <p>{project.goal}</p>
+                                                    <p className="line-clamp-2">{project.problem}</p>
                                                 </div>
                                             )}
                                             {project.solution && (
                                                 <div className="recruiter-box solution-box">
                                                     <h4>💡 Solution</h4>
-                                                    <p>{project.solution}</p>
+                                                    <p className="line-clamp-2">{project.solution}</p>
                                                 </div>
                                             )}
                                         </div>
 
+                                        {/* Key Features (display only 3–5 feature tags) */}
+                                        {renderFeatureTags(project.features)}
+
                                         {/* Contributions */}
                                         {project.contributions && (
                                             <div className="recruiter-section contributions-section">
-                                                <h4>🛠️ Your Contributions</h4>
-                                                {renderBulletList(project.contributions)}
+                                                <h4>🛠️ My Contributions</h4>
+                                                {renderBulletList(project.contributions, 2)}
                                             </div>
                                         )}
 
-                                        {/* Challenges & Solutions */}
+                                        {/* Technical Challenges & Solutions (always visible) */}
                                         {(project.challenges || project.solutions) && (
                                             <div className="recruiter-section challenges-section">
-                                                <h4>⚡ Technical Challenges & Solutions</h4>
+                                                <h4>⚡ Technical Challenge & Solution</h4>
                                                 <div className="challenges-grid">
                                                     {project.challenges && (
                                                         <div className="challenge-sub-box challenge">
                                                             <h5>The Challenge</h5>
-                                                            {Array.isArray(project.challenges) ? (
-                                                                renderBulletList(project.challenges)
-                                                            ) : (
-                                                                <p>{project.challenges}</p>
-                                                            )}
+                                                            {renderBulletList(project.challenges, 1)}
                                                         </div>
                                                     )}
                                                     {project.solutions && (
                                                         <div className="challenge-sub-box engineering-sol">
                                                             <h5>Engineering Solution</h5>
-                                                            {Array.isArray(project.solutions) ? (
-                                                                renderBulletList(project.solutions)
-                                                            ) : (
-                                                                <p>{project.solutions}</p>
-                                                            )}
+                                                            {renderBulletList(project.solutions, 1)}
                                                         </div>
                                                     )}
                                                 </div>
                                             </div>
                                         )}
 
-                                        {/* Impact & Results */}
+                                        {/* Results & Impact */}
                                         {project.impact && (
                                             <div className="recruiter-section impact-section">
                                                 <h4>📈 Results & Impact</h4>
-                                                {renderBulletList(project.impact)}
+                                                {renderBulletList(project.impact, 2)}
                                             </div>
                                         )}
 
                                         {/* Tech Stack organized by category */}
                                         {(project.backendStack || project.aiStack || project.databaseStack || project.cloudStack) ? (
                                             <div className="recruiter-section tech-stack-section">
-                                                <h4>💻 Categorized Tech Stack</h4>
-                                                <div className="tech-stack-categories">
+                                                <h4>💻 Tech Stack</h4>
+                                                <div className="tech-stack-compact">
                                                     {project.aiStack && (
-                                                        <div className="tech-cat-box">
-                                                            <span className="cat-title">AI / ML</span>
-                                                            <div className="cat-tags">
+                                                        <div className="tech-compact-row">
+                                                            <span className="tech-compact-label ai">AI / ML</span>
+                                                            <div className="tech-compact-tags">
                                                                 {safeSplit(project.aiStack).map((s, idx) => <span key={idx} className="cat-tag-pill ai">{s}</span>)}
                                                             </div>
                                                         </div>
                                                     )}
                                                     {project.backendStack && (
-                                                        <div className="tech-cat-box">
-                                                            <span className="cat-title">Backend</span>
-                                                            <div className="cat-tags">
+                                                        <div className="tech-compact-row">
+                                                            <span className="tech-compact-label backend">Backend</span>
+                                                            <div className="tech-compact-tags">
                                                                 {safeSplit(project.backendStack).map((s, idx) => <span key={idx} className="cat-tag-pill backend">{s}</span>)}
                                                             </div>
                                                         </div>
                                                     )}
                                                     {project.databaseStack && (
-                                                        <div className="tech-cat-box">
-                                                            <span className="cat-title">Database</span>
-                                                            <div className="cat-tags">
+                                                        <div className="tech-compact-row">
+                                                            <span className="tech-compact-label db">Database</span>
+                                                            <div className="tech-compact-tags">
                                                                 {safeSplit(project.databaseStack).map((s, idx) => <span key={idx} className="cat-tag-pill db">{s}</span>)}
                                                             </div>
                                                         </div>
                                                     )}
                                                     {project.cloudStack && (
-                                                        <div className="tech-cat-box">
-                                                            <span className="cat-title">Cloud / DevOps</span>
-                                                            <div className="cat-tags">
+                                                        <div className="tech-compact-row">
+                                                            <span className="tech-compact-label cloud">Cloud / DevOps</span>
+                                                            <div className="tech-compact-tags">
                                                                 {safeSplit(project.cloudStack).map((s, idx) => <span key={idx} className="cat-tag-pill cloud">{s}</span>)}
                                                             </div>
                                                         </div>
@@ -277,87 +291,66 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                             )
                                         )}
 
-                                        {/* Deep-Dive Expandable Accordion sections */}
+                                        {/* Technical Deep Dive accordion sections */}
                                         <div className="deep-dive-section">
-                                            {/* Architecture */}
-                                            {(project.architectureDesc || project.architectureUrl) && (
-                                                <div className="deep-dive-item">
-                                                    <details className="deep-dive-details">
-                                                        <summary className="deep-dive-summary">📐 System Architecture & Data Flow</summary>
-                                                        <div className="deep-dive-content">
-                                                            {project.architectureUrl && (
-                                                                <div className="architecture-img-wrap" onClick={(e) => { e.stopPropagation(); setSelectedFile(resolveUrl(project.architectureUrl)); }}>
-                                                                    <img src={resolveUrl(project.architectureUrl)} alt="System Architecture Diagram" className="architecture-img" />
-                                                                    <span className="zoom-hint">🔍 Click to enlarge diagram</span>
-                                                                </div>
-                                                            )}
-                                                            {project.architectureDesc && <p className="architecture-desc">{project.architectureDesc}</p>}
-                                                        </div>
-                                                    </details>
-                                                </div>
-                                            )}
-
-                                            {/* Key Features */}
-                                            {project.features && (
-                                                <div className="deep-dive-item">
-                                                    <details className="deep-dive-details">
-                                                        <summary className="deep-dive-summary">🔑 Key Features</summary>
-                                                        <div className="deep-dive-content">
-                                                            {renderBulletList(project.features)}
-                                                        </div>
-                                                    </details>
-                                                </div>
-                                            )}
-
-                                            {/* Lessons Learned */}
-                                            {project.lessons && (
-                                                <div className="deep-dive-item">
-                                                    <details className="deep-dive-details">
-                                                        <summary className="deep-dive-summary">📝 Lessons Learned</summary>
-                                                        <div className="deep-dive-content">
-                                                            <p className="lessons-text">{project.lessons}</p>
-                                                        </div>
-                                                    </details>
-                                                </div>
-                                            )}
-
-                                            {/* Future Improvements */}
-                                            {project.future && (
-                                                <div className="deep-dive-item">
-                                                    <details className="deep-dive-details">
-                                                        <summary className="deep-dive-summary">🚀 Future Improvements</summary>
-                                                        <div className="deep-dive-content">
-                                                            {renderBulletList(project.future)}
-                                                        </div>
-                                                    </details>
-                                                </div>
-                                            )}
-
-                                            {/* Screenshots */}
-                                            {project.screenshots && (
-                                                <div className="deep-dive-item">
-                                                    <details className="deep-dive-details">
-                                                        <summary className="deep-dive-summary">📸 Screenshots & Interface Gallery</summary>
-                                                        <div className="deep-dive-content">
-                                                            <div className="screenshots-gallery">
-                                                                {safeSplit(project.screenshots).map((url, sIdx) => {
-                                                                    const cleanUrl = url.trim();
-                                                                    if (!cleanUrl) return null;
-                                                                    return (
-                                                                        <div key={sIdx} className="gallery-img-wrap" onClick={(e) => { e.stopPropagation(); setSelectedFile(resolveUrl(cleanUrl)); }}>
-                                                                            <img src={resolveUrl(cleanUrl)} alt={`Screenshot ${sIdx + 1}`} className="gallery-img" />
-                                                                        </div>
-                                                                    );
-                                                                })}
+                                            <div className="deep-dive-item">
+                                                <details className="deep-dive-details">
+                                                    <summary className="deep-dive-summary">⚙️ Technical Deep Dive</summary>
+                                                    <div className="deep-dive-content" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '12px' }}>
+                                                        {/* System Architecture */}
+                                                        {(project.architectureDesc || project.architectureUrl) && (
+                                                            <div className="deep-dive-inner-section">
+                                                                <h5 className="deep-dive-subheading">📐 System Architecture & Data Flow</h5>
+                                                                {project.architectureUrl && (
+                                                                    <div className="architecture-img-wrap" onClick={(e) => { e.stopPropagation(); setSelectedFile(resolveUrl(project.architectureUrl)); }}>
+                                                                        <img src={resolveUrl(project.architectureUrl)} alt="System Architecture Diagram" className="architecture-img" />
+                                                                        <span className="zoom-hint">🔍 Click to enlarge diagram</span>
+                                                                    </div>
+                                                                )}
+                                                                {project.architectureDesc && <p className="architecture-desc">{project.architectureDesc}</p>}
                                                             </div>
-                                                        </div>
-                                                    </details>
-                                                </div>
-                                            )}
+                                                        )}
+
+                                                        {/* Screenshots */}
+                                                        {project.screenshots && (
+                                                            <div className="deep-dive-inner-section">
+                                                                <h5 className="deep-dive-subheading">📸 Screenshots & Interface Gallery</h5>
+                                                                <div className="screenshots-gallery">
+                                                                    {safeSplit(project.screenshots).map((url, sIdx) => {
+                                                                        const cleanUrl = url.trim();
+                                                                        if (!cleanUrl) return null;
+                                                                        return (
+                                                                            <div key={sIdx} className="gallery-img-wrap" onClick={(e) => { e.stopPropagation(); setSelectedFile(resolveUrl(cleanUrl)); }}>
+                                                                                <img src={resolveUrl(cleanUrl)} alt={`Screenshot ${sIdx + 1}`} className="gallery-img" />
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Lessons Learned */}
+                                                        {project.lessons && (
+                                                            <div className="deep-dive-inner-section">
+                                                                <h5 className="deep-dive-subheading">📝 Lessons Learned</h5>
+                                                                <p className="lessons-text">{project.lessons}</p>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Future Improvements */}
+                                                        {project.future && (
+                                                            <div className="deep-dive-inner-section">
+                                                                <h5 className="deep-dive-subheading">🚀 Future Improvements</h5>
+                                                                {renderBulletList(project.future)}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </details>
+                                            </div>
                                         </div>
 
                                         {/* Action buttons row */}
-                                        <div className="project-actions-row" style={{ marginTop: '24px' }}>
+                                        <div className="project-actions-row" style={{ marginTop: '20px' }}>
                                             {project.githubUrl && (
                                                 <a href={resolveUrl(project.githubUrl)} target="_blank" rel="noopener noreferrer" className="project-action-btn github-btn">
                                                     <Github size={14} /> GitHub
@@ -372,16 +365,6 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                                 <a href={resolveUrl(project.docsUrl)} target="_blank" rel="noopener noreferrer" className="project-action-btn docs-btn">
                                                     <FileText size={14} /> Documentation
                                                 </a>
-                                            )}
-                                            {project.apiDocsUrl && (
-                                                <a href={resolveUrl(project.apiDocsUrl)} target="_blank" rel="noopener noreferrer" className="project-action-btn api-btn">
-                                                    <ExternalLink size={14} /> API Docs
-                                                </a>
-                                            )}
-                                            {project.certificateUrl && (
-                                                <button onClick={() => setSelectedFile(resolveUrl(project.certificateUrl))} className="project-action-btn cert-btn">
-                                                    <Search size={14} /> Certificate
-                                                </button>
                                             )}
                                         </div>
                                     </div>
@@ -762,87 +745,115 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                 .recruiter-grid {
                     display: grid;
                     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-                    gap: 16px;
-                    margin: 20px 0;
+                    gap: 12px;
+                    margin: 12px 0;
                 }
                 .recruiter-box {
-                    padding: 16px;
-                    border-radius: 12px;
+                    padding: 12px 14px;
+                    border-radius: 8px;
                     border: 1px solid var(--border-color);
-                    background: rgba(255, 255, 255, 0.01);
+                    background: rgba(255, 255, 255, 0.015);
+                    transition: border-color 0.2s;
+                }
+                .recruiter-box:hover {
+                    border-color: rgba(255, 255, 255, 0.1);
                 }
                 .problem-box {
-                    border-left: 3px solid #ef4444;
-                    background: rgba(239, 68, 68, 0.02);
-                }
-                .goal-box {
-                    border-left: 3px solid #3b82f6;
-                    background: rgba(59, 130, 246, 0.02);
+                    border-left: 2px solid #ef4444;
+                    background: rgba(239, 68, 68, 0.01);
                 }
                 .solution-box {
-                    border-left: 3px solid #10b981;
-                    background: rgba(16, 185, 129, 0.02);
+                    border-left: 2px solid #10b981;
+                    background: rgba(16, 185, 129, 0.01);
                 }
                 .recruiter-box h4 {
-                    font-size: 0.95rem;
+                    font-size: 0.8rem;
                     font-weight: 700;
-                    margin: 0 0 8px 0;
+                    margin: 0 0 6px 0;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
                     color: var(--text-color);
                 }
                 .recruiter-box p {
-                    font-size: 0.9rem;
+                    font-size: 0.88rem;
                     color: var(--text-secondary);
-                    line-height: 1.5;
+                    line-height: 1.4;
                     margin: 0;
+                }
+
+                /* Key Feature Tags */
+                .project-feature-tags {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                    margin: 12px 0;
+                }
+                .feature-tags-label {
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    color: var(--text-secondary);
+                }
+                .feature-tag-pill {
+                    font-size: 0.75rem;
+                    font-weight: 500;
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                    background: rgba(255, 255, 255, 0.03);
+                    border: 1px solid var(--border-color);
+                    color: var(--text-color);
                 }
 
                 /* Recruiter Sections */
                 .recruiter-section {
-                    margin-top: 24px;
+                    margin-top: 14px;
                     border-top: 1px solid var(--border-color);
-                    padding-top: 20px;
+                    padding-top: 12px;
                 }
                 .recruiter-section h4 {
-                    font-size: 1.05rem;
+                    font-size: 0.82rem;
                     font-weight: 700;
                     color: var(--text-color);
-                    margin: 0 0 12px 0;
+                    margin: 0 0 8px 0;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
                 }
                 
                 .recruiter-bullet-list {
                     margin: 0;
-                    padding-left: 20px;
-                    list-style-type: square;
+                    padding-left: 16px;
+                    list-style-type: disc;
                 }
                 .recruiter-bullet-list li {
-                    font-size: 0.92rem;
+                    font-size: 0.88rem;
                     color: var(--text-secondary);
-                    line-height: 1.6;
-                    margin-bottom: 6px;
+                    line-height: 1.45;
+                    margin-bottom: 4px;
                 }
                 
                 /* Challenges Grid */
                 .challenges-grid {
                     display: grid;
                     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-                    gap: 16px;
+                    gap: 12px;
                 }
                 .challenge-sub-box {
-                    padding: 14px;
-                    border-radius: 10px;
+                    padding: 12px;
+                    border-radius: 8px;
                     border: 1px dashed var(--border-color);
+                    background: rgba(255, 255, 255, 0.01);
                 }
                 .challenge-sub-box.challenge {
-                    border-left: 3px solid #f59e0b;
+                    border-left: 2px solid #f59e0b;
                     background: rgba(245, 158, 11, 0.01);
                 }
                 .challenge-sub-box.engineering-sol {
-                    border-left: 3px solid #8b5cf6;
+                    border-left: 2px solid #8b5cf6;
                     background: rgba(139, 92, 246, 0.01);
                 }
                 .challenge-sub-box h5 {
-                    font-size: 0.85rem;
-                    font-weight: 750;
+                    font-size: 0.78rem;
+                    font-weight: 700;
                     margin: 0 0 6px 0;
                     text-transform: uppercase;
                     letter-spacing: 0.05em;
@@ -850,36 +861,50 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                 .challenge-sub-box.challenge h5 { color: #f59e0b; }
                 .challenge-sub-box.engineering-sol h5 { color: #a78bfa; }
                 .challenge-sub-box p {
-                    font-size: 0.9rem;
+                    font-size: 0.88rem;
                     color: var(--text-secondary);
-                    line-height: 1.5;
+                    line-height: 1.4;
                     margin: 0;
                 }
 
-                /* Categorized Tech Stack */
-                .tech-stack-categories {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-                    gap: 14px;
+                /* Compact Tech Stack */
+                .tech-stack-compact {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
                 }
-                .tech-cat-box {
-                    background: rgba(255, 255, 255, 0.01);
-                    border: 1px solid var(--border-color);
-                    border-radius: 10px;
-                    padding: 12px;
+                .tech-compact-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
                 }
-                .cat-title {
-                    display: block;
-                    font-size: 0.78rem;
+                .tech-compact-label {
+                    font-size: 0.72rem;
                     font-weight: 750;
-                    color: var(--text-secondary);
                     text-transform: uppercase;
                     letter-spacing: 0.06em;
-                    margin-bottom: 8px;
-                    border-bottom: 1px solid var(--border-color);
-                    padding-bottom: 4px;
+                    min-width: 100px;
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    text-align: right;
                 }
-                .cat-tags {
+                .tech-compact-label.ai {
+                    color: #a78bfa;
+                    background: rgba(167, 139, 250, 0.05);
+                }
+                .tech-compact-label.backend {
+                    color: #60a5fa;
+                    background: rgba(96, 165, 250, 0.05);
+                }
+                .tech-compact-label.db {
+                    color: #34d399;
+                    background: rgba(52, 211, 153, 0.05);
+                }
+                .tech-compact-label.cloud {
+                    color: #f472b6;
+                    background: rgba(244, 114, 182, 0.05);
+                }
+                .tech-compact-tags {
                     display: flex;
                     flex-wrap: wrap;
                     gap: 6px;
@@ -887,37 +912,37 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                 .cat-tag-pill {
                     font-size: 0.72rem;
                     font-weight: 650;
-                    padding: 3px 8px;
-                    border-radius: 6px;
+                    padding: 2px 6px;
+                    border-radius: 4px;
                     background: rgba(255, 255, 255, 0.03);
                     border: 1px solid var(--border-color);
                 }
-                .cat-tag-pill.ai { color: #a78bfa; border-color: rgba(167, 139, 250, 0.3); }
-                .cat-tag-pill.backend { color: #60a5fa; border-color: rgba(96, 165, 250, 0.3); }
-                .cat-tag-pill.db { color: #34d399; border-color: rgba(52, 211, 153, 0.3); }
-                .cat-tag-pill.cloud { color: #f472b6; border-color: rgba(244, 114, 182, 0.3); }
+                .cat-tag-pill.ai { color: #a78bfa; border-color: rgba(167, 139, 250, 0.2); }
+                .cat-tag-pill.backend { color: #60a5fa; border-color: rgba(96, 165, 250, 0.2); }
+                .cat-tag-pill.db { color: #34d399; border-color: rgba(52, 211, 153, 0.2); }
+                .cat-tag-pill.cloud { color: #f472b6; border-color: rgba(244, 114, 182, 0.2); }
 
                 /* Deep Dive Expandable Accordions */
                 .deep-dive-section {
-                    margin-top: 24px;
+                    margin-top: 16px;
                     border-top: 1px solid var(--border-color);
-                    padding-top: 20px;
+                    padding-top: 14px;
                     display: flex;
                     flex-direction: column;
                     gap: 10px;
                 }
                 .deep-dive-item {
                     border: 1px solid var(--border-color);
-                    border-radius: 10px;
-                    background: rgba(255, 255, 255, 0.01);
+                    border-radius: 8px;
+                    background: rgba(255, 255, 255, 0.005);
                     overflow: hidden;
                 }
                 .deep-dive-details {
                     width: 100%;
                 }
                 .deep-dive-summary {
-                    padding: 14px 18px;
-                    font-size: 0.92rem;
+                    padding: 10px 14px;
+                    font-size: 0.88rem;
                     font-weight: 600;
                     color: var(--text-color);
                     cursor: pointer;
@@ -926,12 +951,49 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     transition: background 0.2s;
                 }
                 .deep-dive-summary:hover {
-                    background: rgba(255, 255, 255, 0.03);
+                    background: rgba(255, 255, 255, 0.02);
                 }
                 .deep-dive-content {
-                    padding: 18px;
+                    padding: 14px;
                     border-top: 1px solid var(--border-color);
-                    background: rgba(0, 0, 0, 0.05);
+                    background: rgba(0, 0, 0, 0.1);
+                }
+                .deep-dive-subheading {
+                    font-size: 0.8rem;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    color: var(--text-secondary);
+                    margin: 0 0 8px 0;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                    padding-bottom: 4px;
+                }
+                .deep-dive-inner-section {
+                    margin-bottom: 14px;
+                }
+                .deep-dive-inner-section:last-child {
+                    margin-bottom: 0;
+                }
+
+                /* Line clamping for uniform height */
+                .line-clamp-2 {
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                @media (max-width: 600px) {
+                    .tech-compact-row {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 4px;
+                    }
+                    .tech-compact-label {
+                        min-width: auto;
+                        text-align: left;
+                    }
                 }
                 .architecture-img-wrap {
                     position: relative;
