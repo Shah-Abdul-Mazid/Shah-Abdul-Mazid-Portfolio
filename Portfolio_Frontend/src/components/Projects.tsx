@@ -24,9 +24,9 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
 
     const location = useLocation();
 
-    const activeProjects   = projects.filter((p) => p.category === 'active' || !p.category);
-    const completeProjects = projects.filter((p) => p.category === 'past');
-    const fundedProjects   = projects.filter((p) => p.category === 'funded');
+    const activeProjects   = projects.filter((p) => p && (p.category === 'active' || !p.category));
+    const completeProjects = projects.filter((p) => p && p.category === 'past');
+    const fundedProjects   = projects.filter((p) => p && p.category === 'funded');
 
 
     const toggleExpand = (key: string) => {
@@ -37,7 +37,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
     };
 
     const getStatus = (project: ProjectItem, bucket: BucketPrefix): { label: string; className: string } => {
-        if (project.status) {
+        if (project && project.status && typeof project.status === 'string') {
             const s = project.status.toUpperCase();
             if (s === 'ACTIVE')  return { label: 'ACTIVE',  className: 'active' };
             if (s === 'FUNDED')  return { label: 'FUNDED',  className: 'funded' };
@@ -50,6 +50,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
     };
 
     const getDotColor = (tag: string) => {
+        if (!tag || typeof tag !== 'string') return '#3b82f6';
         const colors = ['#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
         let hash = 0;
         for (let i = 0; i < tag.length; i++) {
@@ -82,6 +83,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
         return (
             <div className="proj-timeline" style={{ '--dot-color': colors.dot, '--rail-color': colors.rail } as React.CSSProperties}>
                 {projectList.map((project, index) => {
+                    if (!project) return null;
                     const key = `${prefix}-${index}`;
                     const isExpanded = !!expanded[key];
                     const { label: statusLabel, className: statusClass } = getStatus(project, prefix);
@@ -375,7 +377,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
 
   
         const expandByKeyScheme = (list: ProjectItem[], prefix: BucketPrefix) => {
-            const idx = list.findIndex((p) => p.title.toLowerCase() === projectTitle.toLowerCase());
+            const idx = list.findIndex((p) => p && p.title && p.title.toLowerCase() === projectTitle.toLowerCase());
             if (idx === -1) return false;
 
             const key = `${prefix}-${idx}`;
