@@ -540,20 +540,17 @@ async def ai_chat_agent(
 
     # Build context once
     context = build_context(portfolio_data)
-    is_production = (settings.ENVIRONMENT or "local").lower() == "production"
+    # ── CHAT: Always use Groq (fast, always online) ──────────────────────
+    if settings.GROQ_API_KEY:
+        response = await call_groq(query, context)
+        if response:
+            return {"success": True, "response": response, "engine": "groq"}
 
-    if is_production:
-        # ── PRODUCTION: Groq ─────────────────────────────────────────────────
-        if settings.GROQ_API_KEY:
-            response = await call_groq(query, context)
-            if response:
-                return {"success": True, "response": response, "engine": "groq"}
-    else:
-        # ── LOCAL: Ollama ────────────────────────────────────────────────────
-        if settings.USE_OLLAMA:
-            response = await call_ollama(query, context)
-            if response:
-                return {"success": True, "response": response, "engine": "ollama"}
+    # ── CHAT FALLBACK: Try Ollama if Groq fails ─────────────────────────
+    if settings.USE_OLLAMA:
+        response = await call_ollama(query, context)
+        if response:
+            return {"success": True, "response": response, "engine": "ollama"}
 
     # ── FALLBACK: Keyword matching ────────────────────────────────────────────
     result = keyword_match(query.lower(), portfolio_data)
