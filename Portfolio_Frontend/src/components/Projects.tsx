@@ -65,9 +65,25 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
         return { dot: '#f59e0b', rail: 'rgba(245,158,11,0.4)' };
     };
 
-    const renderBulletList = (text?: string) => {
+    const safeSplit = (val?: string | string[]): string[] => {
+        if (!val) return [];
+        if (Array.isArray(val)) return val.map(s => s.trim()).filter(Boolean);
+        if (typeof val !== 'string') return [];
+        return val.split(',').map(s => s.trim()).filter(Boolean);
+    };
+
+    const renderBulletList = (text?: string | string[]) => {
         if (!text) return null;
-        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        
+        let lines: string[] = [];
+        if (Array.isArray(text)) {
+            lines = text.map(l => l.trim()).filter(l => l.length > 0);
+        } else if (typeof text === 'string') {
+            lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        } else {
+            return null;
+        }
+
         return (
             <ul className="recruiter-bullet-list">
                 {lines.map((line, idx) => {
@@ -113,7 +129,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                         <h3 className="proj-title">{project.title}</h3>
                                         <p className="proj-collapsed-desc">{project.desc}</p>
                                         
-                                        {!isExpanded && project.tags && project.tags.length > 0 && (
+                                        {!isExpanded && Array.isArray(project.tags) && project.tags.length > 0 && (
                                             <div className="proj-collapsed-tags">
                                                 {project.tags.slice(0, 5).map((tag, tIdx) => (
                                                     <span key={tIdx} className="collapsed-tag-pill" style={{ borderColor: getDotColor(tag) }}>
@@ -176,13 +192,21 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                                     {project.challenges && (
                                                         <div className="challenge-sub-box challenge">
                                                             <h5>The Challenge</h5>
-                                                            <p>{project.challenges}</p>
+                                                            {Array.isArray(project.challenges) ? (
+                                                                renderBulletList(project.challenges)
+                                                            ) : (
+                                                                <p>{project.challenges}</p>
+                                                            )}
                                                         </div>
                                                     )}
                                                     {project.solutions && (
                                                         <div className="challenge-sub-box engineering-sol">
                                                             <h5>Engineering Solution</h5>
-                                                            <p>{project.solutions}</p>
+                                                            {Array.isArray(project.solutions) ? (
+                                                                renderBulletList(project.solutions)
+                                                            ) : (
+                                                                <p>{project.solutions}</p>
+                                                            )}
                                                         </div>
                                                     )}
                                                 </div>
@@ -206,7 +230,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                                         <div className="tech-cat-box">
                                                             <span className="cat-title">AI / ML</span>
                                                             <div className="cat-tags">
-                                                                {project.aiStack.split(',').map((s, idx) => <span key={idx} className="cat-tag-pill ai">{s.trim()}</span>)}
+                                                                {safeSplit(project.aiStack).map((s, idx) => <span key={idx} className="cat-tag-pill ai">{s}</span>)}
                                                             </div>
                                                         </div>
                                                     )}
@@ -214,7 +238,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                                         <div className="tech-cat-box">
                                                             <span className="cat-title">Backend</span>
                                                             <div className="cat-tags">
-                                                                {project.backendStack.split(',').map((s, idx) => <span key={idx} className="cat-tag-pill backend">{s.trim()}</span>)}
+                                                                {safeSplit(project.backendStack).map((s, idx) => <span key={idx} className="cat-tag-pill backend">{s}</span>)}
                                                             </div>
                                                         </div>
                                                     )}
@@ -222,7 +246,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                                         <div className="tech-cat-box">
                                                             <span className="cat-title">Database</span>
                                                             <div className="cat-tags">
-                                                                {project.databaseStack.split(',').map((s, idx) => <span key={idx} className="cat-tag-pill db">{s.trim()}</span>)}
+                                                                {safeSplit(project.databaseStack).map((s, idx) => <span key={idx} className="cat-tag-pill db">{s}</span>)}
                                                             </div>
                                                         </div>
                                                     )}
@@ -230,7 +254,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                                         <div className="tech-cat-box">
                                                             <span className="cat-title">Cloud / DevOps</span>
                                                             <div className="cat-tags">
-                                                                {project.cloudStack.split(',').map((s, idx) => <span key={idx} className="cat-tag-pill cloud">{s.trim()}</span>)}
+                                                                {safeSplit(project.cloudStack).map((s, idx) => <span key={idx} className="cat-tag-pill cloud">{s}</span>)}
                                                             </div>
                                                         </div>
                                                     )}
@@ -238,7 +262,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                             </div>
                                         ) : (
                                             /* Fallback tags */
-                                            project.tags && project.tags.length > 0 && (
+                                            Array.isArray(project.tags) && project.tags.length > 0 && (
                                                 <div className="recruiter-section tech-stack-section">
                                                     <h4>💻 Tech Stack</h4>
                                                     <div className="project-expanded-tags">
@@ -316,7 +340,7 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                                         <summary className="deep-dive-summary">📸 Screenshots & Interface Gallery</summary>
                                                         <div className="deep-dive-content">
                                                             <div className="screenshots-gallery">
-                                                                {project.screenshots.split(',').map((url, sIdx) => {
+                                                                {safeSplit(project.screenshots).map((url, sIdx) => {
                                                                     const cleanUrl = url.trim();
                                                                     if (!cleanUrl) return null;
                                                                     return (
