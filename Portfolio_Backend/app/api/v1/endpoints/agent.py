@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, Body
+from pydantic import BaseModel
+from typing import Optional
 from app.db import get_database
 from app.config import settings
 import logging
@@ -571,19 +573,56 @@ async def ai_chat_agent(
 import json
 
 async def call_llm_json(prompt: str) -> str | None:
-    is_production = (settings.ENVIRONMENT or "local").lower() == "production"
+    use_ollama = str(settings.USE_OLLAMA).lower() in ("true", "1", "yes")
     
-    # 1. Try Groq
+    # If USE_OLLAMA is enabled, try Ollama FIRST (via Ngrok or localhost)
+    if use_ollama:
+        url = settings.OLLAMA_URL or "http://localhost:11434"
+        model = settings.OLLAMA_MODEL or "llama3"
+        logger.info(f"[AI] Calling Ollama at {url} with model {model}")
+        try:
+            # 300s timeout — Ollama on CPU needs time, especially through Ngrok tunnel
+            async with httpx.AsyncClient(timeout=300.0) as client:
+                resp = await client.post(
+                    f"{url}/api/chat",
+                    headers={
+                        "ngrok-skip-browser-warning": "true",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": model,
+                        "messages": [
+                            {"role": "system", "content": "You are an expert technical resume writer. Respond ONLY with raw JSON. No markdown, no code blocks, no explanation."},
+                            {"role": "user",   "content": prompt}
+                        ],
+                        "stream": False,
+                        "options": {
+                            "temperature": 0.2,
+                            "num_predict": 1500  # Cap tokens to prevent slow runaway generation
+                        }
+                    }
+                )
+                if resp.status_code == 200:
+                    content = resp.json().get("message", {}).get("content", "").strip()
+                    logger.info(f"[AI] Ollama responded successfully ({len(content)} chars)")
+                    return content
+                else:
+                    logger.warning(f"[AI] Ollama returned {resp.status_code}: {resp.text[:200]}")
+        except Exception as e:
+            logger.warning(f"[AI] Ollama call failed: {e}")
+    
+    # Fallback: Try Groq (cloud LLM)
     if settings.GROQ_API_KEY:
+        logger.info("[AI] Trying Groq fallback...")
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 resp = await client.post(
                     "https://api.groq.com/openai/v1/chat/completions",
                     headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}", "Content-Type": "application/json"},
                     json={
-                        "model": "llama3-70b-8192",  # Use larger model for JSON structures
+                        "model": "llama3-70b-8192",
                         "messages": [
-                            {"role": "system", "content": "You are an expert technical resume writer. Respond ONLY with raw JSON. Do not include markdown code block formatting like ```json ... ```."},
+                            {"role": "system", "content": "You are an expert technical resume writer. Respond ONLY with raw JSON. No markdown, no code blocks, no explanation."},
                             {"role": "user",   "content": prompt}
                         ],
                         "temperature": 0.2,
@@ -591,38 +630,12 @@ async def call_llm_json(prompt: str) -> str | None:
                     }
                 )
                 if resp.status_code == 200:
-                    return resp.json()["choices"][0]["message"]["content"].strip()
-                logger.warning(f"Groq JSON {resp.status_code}: {resp.text[:200]}")
+                    content = resp.json()["choices"][0]["message"]["content"].strip()
+                    logger.info(f"[AI] Groq responded successfully ({len(content)} chars)")
+                    return content
+                logger.warning(f"[AI] Groq returned {resp.status_code}: {resp.text[:200]}")
         except Exception as e:
-            logger.warning(f"Groq JSON call failed: {e}")
-            
-    # 2. Try Ollama (Local fallback or explicitly enabled)
-    url = settings.OLLAMA_URL or "http://localhost:11434"
-    model = settings.OLLAMA_MODEL or "llama3"
-    try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            resp = await client.post(
-                f"{url}/api/chat",
-                headers={
-                    "ngrok-skip-browser-warning": "true",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": model,
-                    "messages": [
-                        {"role": "system", "content": "You are an expert technical resume writer. Respond ONLY with raw JSON. Do not include markdown code block formatting like ```json ... ```."},
-                        {"role": "user",   "content": prompt}
-                    ],
-                    "stream": False,
-                    "options": {
-                        "temperature": 0.2
-                    }
-                }
-            )
-            if resp.status_code == 200:
-                return resp.json().get("message", {}).get("content", "").strip()
-    except Exception as e:
-        logger.warning(f"Ollama JSON call failed: {e}")
+            logger.warning(f"[AI] Groq call failed: {e}")
         
     return None
 
@@ -631,11 +644,16 @@ def clean_json_string(s: str) -> str:
     s = re.sub(r"```$", "", s, flags=re.IGNORECASE)
     return s.strip()
 
+class ProjectGenerateRequest(BaseModel):
+    title: str
+    desc: Optional[str] = ""
+    role: Optional[str] = "Software Engineer"
+
 @router.post("/generate-project")
-async def generate_project_case_study(payload: dict = Body(...)):
-    title = payload.get("title", "").strip()
-    raw_desc = payload.get("desc", "").strip()
-    role = payload.get("role", "").strip() or "Software Engineer"
+async def generate_project_case_study(payload: ProjectGenerateRequest):
+    title = payload.title.strip()
+    raw_desc = payload.desc.strip()
+    role = payload.role.strip() or "Software Engineer"
     
     if not title:
         return {"success": False, "error": "Project title is required"}
