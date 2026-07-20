@@ -21,8 +21,9 @@ const AdminDashboard = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [bibtexInputs, setBibtexInputs] = useState<{[key:number]:string}>({});
     const [generatingIndex, setGeneratingIndex] = useState<number | null>(null);
+    const [customInstructions, setCustomInstructions] = useState<Record<number, string>>({});
 
-    const handleGenerateProjectAI = async (index: number) => {
+    const handleGenerateProjectAI = async (index: number, customPrompt?: string) => {
         const project = editData.projects[index];
         if (!project.title) {
             alert('Please enter a Project Title first before generating details.');
@@ -45,7 +46,8 @@ const AdminDashboard = () => {
                 body: JSON.stringify({
                     title: project.title,
                     desc: project.desc,
-                    role: project.role || 'AI/ML Engineer'
+                    role: project.role || 'AI/ML Engineer',
+                    instructions: customPrompt || ''
                 })
             });
 
@@ -1477,18 +1479,35 @@ const AdminDashboard = () => {
                                         </div>
                                     </div>
 
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '20px 0 10px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px' }}>
-                                        <h5 style={{ margin: 0, color: 'var(--primary)' }}>⭐ Recruiter Skim Case Study Details</h5>
+                                    <div className="ai-generation-box" style={{ background: 'rgba(139, 92, 246, 0.04)', border: '1px dashed rgba(139, 92, 246, 0.25)', padding: '15px', borderRadius: '8px', margin: '15px 0' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                            <h5 style={{ margin: 0, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                ✨ AI Writer (Ngrok + Ollama / Groq)
+                                            </h5>
+                                            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>GPU Accelerated Case Studies</span>
+                                        </div>
+                                        <div className="form-group" style={{ marginBottom: '10px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-color)' }}>Custom AI Instructions / Guidance (Optional)</label>
+                                            <textarea 
+                                                rows={2}
+                                                style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--card-bg)', color: 'var(--text-color)', fontSize: '13px' }}
+                                                value={customInstructions[i] || ''}
+                                                onChange={e => setCustomInstructions(prev => ({ ...prev, [i]: e.target.value }))}
+                                                placeholder="e.g. Focus on microservices architecture, AWS deployment, and performance optimization."
+                                            />
+                                        </div>
                                         <button
                                             type="button"
                                             className="add-inline-btn"
-                                            onClick={() => handleGenerateProjectAI(i)}
+                                            onClick={() => handleGenerateProjectAI(i, customInstructions[i])}
                                             disabled={generatingIndex === i}
-                                            style={{ margin: 0, background: 'rgba(139, 92, 246, 0.1)', borderColor: 'rgba(139, 92, 246, 0.3)', color: 'var(--primary)', cursor: 'pointer' }}
+                                            style={{ width: '100%', padding: '10px', justifyContent: 'center', background: 'rgba(139, 92, 246, 0.1)', borderColor: 'rgba(139, 92, 246, 0.3)', color: 'var(--primary)', cursor: 'pointer', fontWeight: 'bold' }}
                                         >
-                                            {generatingIndex === i ? '⏳ Generating case study details...' : '✨ Auto-Fill Details with AI'}
+                                            {generatingIndex === i ? '⏳ Generating case study details (usually 30-60s on GPU)...' : '✨ Generate Case Study Details with AI'}
                                         </button>
                                     </div>
+
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>⭐ Recruiter Skim Case Study Details</h5>
 
                                     <div className="form-group">
                                         <label>Business Problem addressed</label>
