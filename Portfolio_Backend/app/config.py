@@ -27,7 +27,7 @@ class Settings(BaseSettings):
 
     # Ollama (Local LLM - Free, zero cost)
     OLLAMA_URL: Optional[str] = "http://localhost:11434"
-    OLLAMA_MODEL: Optional[str] = "llama3"
+    OLLAMA_MODEL: Optional[str] = "openchat"
     USE_OLLAMA: bool = True
 
     # Groq (Free Cloud LLM - fastest option)
