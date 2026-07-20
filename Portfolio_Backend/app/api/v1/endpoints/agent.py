@@ -645,12 +645,14 @@ class ProjectGenerateRequest(BaseModel):
     title: str
     desc: Optional[str] = ""
     role: Optional[str] = "Software Engineer"
+    instructions: Optional[str] = ""
 
 @router.post("/generate-project")
 async def generate_project_case_study(payload: ProjectGenerateRequest):
     title = payload.title.strip()
     raw_desc = payload.desc.strip()
     role = payload.role.strip() or "Software Engineer"
+    instructions = payload.instructions.strip() if payload.instructions else ""
     
     if not title:
         return {"success": False, "error": "Project title is required"}
@@ -659,8 +661,13 @@ async def generate_project_case_study(payload: ProjectGenerateRequest):
         f"Generate a recruiter-friendly project case study in JSON format for the following project:\n"
         f"Project Title: {title}\n"
         f"Role: {role}\n"
-        f"Basic Description: {raw_desc}\n\n"
-        f"You must return a valid JSON object ONLY, with no extra text or markdown code blocks. The JSON keys MUST be exactly:\n"
+        f"Basic Description: {raw_desc}\n"
+    )
+    if instructions:
+        prompt += f"Custom Guidance/Focus Areas (Make sure to highlight/incorporate these): {instructions}\n"
+        
+    prompt += (
+        f"\nYou must return a valid JSON object ONLY, with no extra text or markdown code blocks. The JSON keys MUST be exactly:\n"
         f"- problem (Business problem addressed. Explain what problem existed, who had it, and why it was important. 2-3 sentences)\n"
         f"- goal (Goal/Objective. What were you trying to achieve? 1-2 sentences)\n"
         f"- solution (High-level solution. Explain the architecture/pipeline at a high level. 2-3 sentences)\n"
