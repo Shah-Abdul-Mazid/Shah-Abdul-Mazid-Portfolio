@@ -20,6 +20,79 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [bibtexInputs, setBibtexInputs] = useState<{[key:number]:string}>({});
+    const [generatingIndex, setGeneratingIndex] = useState<number | null>(null);
+
+    const handleGenerateProjectAI = async (index: number) => {
+        const project = editData.projects[index];
+        if (!project.title) {
+            alert('Please enter a Project Title first before generating details.');
+            return;
+        }
+
+        setGeneratingIndex(index);
+        try {
+            const token = localStorage.getItem('admin_token');
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const res = await fetch('/api/agent/generate-project', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    title: project.title,
+                    desc: project.desc,
+                    role: project.role || 'AI/ML Engineer'
+                })
+            });
+
+            const result = await res.json();
+            if (res.ok && result.success && result.data) {
+                const aiData = result.data;
+                
+                // Update projects list
+                const updatedProjects = editData.projects.map((p, idx) => {
+                    if (idx === index) {
+                        return {
+                            ...p,
+                            problem: aiData.problem || p.problem,
+                            goal: aiData.goal || p.goal,
+                            solution: aiData.solution || p.solution,
+                            contributions: aiData.contributions || p.contributions,
+                            challenges: aiData.challenges || p.challenges,
+                            solutions: aiData.solutions || p.solutions,
+                            impact: aiData.impact || p.impact,
+                            aiStack: aiData.aiStack || p.aiStack,
+                            backendStack: aiData.backendStack || p.backendStack,
+                            databaseStack: aiData.databaseStack || p.databaseStack,
+                            cloudStack: aiData.cloudStack || p.cloudStack,
+                            features: aiData.features || p.features,
+                            lessons: aiData.lessons || p.lessons,
+                            future: aiData.future || p.future
+                        };
+                    }
+                    return p;
+                });
+                
+                setEditData({
+                    ...editData,
+                    projects: updatedProjects
+                });
+                
+                alert('✨ AI successfully generated and pre-filled case study fields!');
+            } else {
+                alert(`AI Generation failed: ${result.error || 'Unknown error'}`);
+            }
+        } catch (err) {
+            console.error('AI Generation error:', err);
+            alert('An error occurred during AI Generation.');
+        } finally {
+            setGeneratingIndex(null);
+        }
+    };
 
     const handleParseBibtex = (index: number) => {
         const str = bibtexInputs[index] || '';
@@ -1354,23 +1427,32 @@ const AdminDashboard = () => {
                             {editData.projects.map((project: ProjectItem, i: number) => (
                                 <div key={i} className="form-section item-card">
                                     <div className="item-card-header">
-                                        <h4 className="section-label">Showcase #{project.showcase}</h4>
+                                        <h4 className="section-label">Showcase #{project.showcase} - {project.title || 'Untitled Project'}</h4>
                                         <button type="button" className="remove-btn" onClick={() => removeListItem('projects', i)}><Minus size={14} /> Remove</button>
                                     </div>
+                                    
+                                    <h5 style={{ margin: '15px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>📋 Basic Info</h5>
+                                    
                                     <div className="flex-group">
                                         <div className="form-group w-50">
                                             <label>Project Title</label>
                                             <input type="text" value={project.title} onChange={e => updateListItem('projects', i, 'title', e.target.value)} />
                                         </div>
-                                        <div className="form-group w-50">
+                                        <div className="form-group w-25">
                                             <label>Showcase Number</label>
-                                            <input type="number" value={project.showcase} onChange={e => updateListItem('projects', i, 'showcase', parseInt(e.target.value))} />
+                                            <input type="number" value={project.showcase} onChange={e => updateListItem('projects', i, 'showcase', parseInt(e.target.value) || 0)} />
+                                        </div>
+                                        <div className="form-group w-25">
+                                            <label>Role (e.g. Solo Developer)</label>
+                                            <input type="text" value={project.role || ''} onChange={e => updateListItem('projects', i, 'role', e.target.value)} placeholder="e.g. Solo or Lead AI Engineer" />
                                         </div>
                                     </div>
+                                    
                                     <div className="form-group">
-                                        <label>Description</label>
-                                        <textarea rows={3} value={project.desc} onChange={e => updateListItem('projects', i, 'desc', e.target.value)} />
+                                        <label>One-line Summary (visible when card is collapsed)</label>
+                                        <textarea rows={2} value={project.desc} onChange={e => updateListItem('projects', i, 'desc', e.target.value)} />
                                     </div>
+                                    
                                     <div className="flex-group">
                                         <div className="form-group" style={{ width: '33%' }}>
                                             <label>Category</label>
@@ -1383,7 +1465,6 @@ const AdminDashboard = () => {
                                                 <option value="active">Active Projects</option>
                                                 <option value="past">Complete / Past Projects</option>
                                                 <option value="funded">Funded Projects</option>
-
                                             </select>
                                         </div>
                                         <div className="form-group" style={{ width: '33%' }}>
@@ -1392,29 +1473,82 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className="form-group" style={{ width: '33%' }}>
                                             <label>Status Badge Text</label>
-                                            <input type="text" value={project.status || ''} onChange={e => updateListItem('projects', i, 'status', e.target.value)} placeholder="e.g. ACTIVE or EU H2020" />
+                                            <input type="text" value={project.status || ''} onChange={e => updateListItem('projects', i, 'status', e.target.value)} placeholder="e.g. ACTIVE or COMPLETED" />
                                         </div>
                                     </div>
+
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '20px 0 10px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px' }}>
+                                        <h5 style={{ margin: 0, color: 'var(--primary)' }}>⭐ Recruiter Skim Case Study Details</h5>
+                                        <button
+                                            type="button"
+                                            className="add-inline-btn"
+                                            onClick={() => handleGenerateProjectAI(i)}
+                                            disabled={generatingIndex === i}
+                                            style={{ margin: 0, background: 'rgba(139, 92, 246, 0.1)', borderColor: 'rgba(139, 92, 246, 0.3)', color: 'var(--primary)', cursor: 'pointer' }}
+                                        >
+                                            {generatingIndex === i ? '⏳ Generating case study details...' : '✨ Auto-Fill Details with AI'}
+                                        </button>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Business Problem addressed</label>
+                                        <textarea rows={3} value={project.problem || ''} onChange={e => updateListItem('projects', i, 'problem', e.target.value)} placeholder="What problem existed? Who had this problem? Why was it important?" />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Goal / Objective</label>
+                                        <textarea rows={2} value={project.goal || ''} onChange={e => updateListItem('projects', i, 'goal', e.target.value)} placeholder="What were you trying to achieve? (e.g., Reduce response time by 50%)" />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>High-Level Solution</label>
+                                        <textarea rows={2} value={project.solution || ''} onChange={e => updateListItem('projects', i, 'solution', e.target.value)} placeholder="Explain your solution at a high level." />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Your Contributions (One per line)</label>
+                                        <textarea rows={4} value={project.contributions || ''} onChange={e => updateListItem('projects', i, 'contributions', e.target.value)} placeholder="e.g.&#10;- Designed REST APIs&#10;- Built FastAPI backend&#10;- Optimized response latency by 40%" />
+                                    </div>
+
                                     <div className="flex-group">
-                                        <div className="form-group" style={{ width: '33%' }}>
-                                            <label>Institution (Acronym)</label>
-                                            <input type="text" value={project.institution || ''} onChange={e => updateListItem('projects', i, 'institution', e.target.value)} placeholder="e.g. EWUCRT" />
+                                        <div className="form-group w-50">
+                                            <label>Technical Challenge</label>
+                                            <textarea rows={3} value={project.challenges || ''} onChange={e => updateListItem('projects', i, 'challenges', e.target.value)} placeholder="What was the difficult engineering hurdle?" />
                                         </div>
-                                        <div className="form-group" style={{ width: '33%' }}>
-                                            <label>Funding Organization</label>
-                                            <input type="text" value={project.fundingOrg || ''} onChange={e => updateListItem('projects', i, 'fundingOrg', e.target.value)} placeholder="e.g. East West University CRT" />
-                                        </div>
-                                        <div className="form-group" style={{ width: '33%' }}>
-                                            <label>Reference Code</label>
-                                            <input type="text" value={project.refCode || ''} onChange={e => updateListItem('projects', i, 'refCode', e.target.value)} placeholder="e.g. Ref: EWUCRT-RG-17(14)/2025(5)" />
+                                        <div className="form-group w-50">
+                                            <label>How You Solved It</label>
+                                            <textarea rows={3} value={project.solutions || ''} onChange={e => updateListItem('projects', i, 'solutions', e.target.value)} placeholder="Explain the technical solution you designed." />
                                         </div>
                                     </div>
+
                                     <div className="form-group">
-                                        <label>Key Research Components / Extra Details</label>
-                                        <textarea rows={2} value={project.details || ''} onChange={e => updateListItem('projects', i, 'details', e.target.value)} placeholder="Key research components or secondary details shown when expanded..." />
+                                        <label>Results / Impact (One per line)</label>
+                                        <textarea rows={3} value={project.impact || ''} onChange={e => updateListItem('projects', i, 'impact', e.target.value)} placeholder="Metrics recruiters love:&#10;- Reduced response time from 10s to 2.5s&#10;- Handled 100 concurrent requests" />
                                     </div>
+
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>💻 Tech Stack & Categories</h5>
+                                    
+                                    <div className="flex-group" style={{ flexWrap: 'wrap' }}>
+                                        <div className="form-group w-50">
+                                            <label>AI Stack (comma-separated)</label>
+                                            <input type="text" value={project.aiStack || ''} onChange={e => updateListItem('projects', i, 'aiStack', e.target.value)} placeholder="e.g. OpenAI, LangChain, Whisper" />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Backend Stack (comma-separated)</label>
+                                            <input type="text" value={project.backendStack || ''} onChange={e => updateListItem('projects', i, 'backendStack', e.target.value)} placeholder="e.g. FastAPI, Python, Redis" />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Database Stack (comma-separated)</label>
+                                            <input type="text" value={project.databaseStack || ''} onChange={e => updateListItem('projects', i, 'databaseStack', e.target.value)} placeholder="e.g. PostgreSQL, Pinecone" />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Cloud / DevOps Stack (comma-separated)</label>
+                                            <input type="text" value={project.cloudStack || ''} onChange={e => updateListItem('projects', i, 'cloudStack', e.target.value)} placeholder="e.g. Docker, Azure, GitHub Actions" />
+                                        </div>
+                                    </div>
+
                                     <div className="form-group">
-                                        <label>Tags (one per row)</label>
+                                        <label>Fallback Tech Tags (Legacy tag system - one per row)</label>
                                         {project.tags.map((tag, ti) => (
                                             <div key={ti} className="detail-row">
                                                 <input type="text" value={tag} onChange={e => updateProjectTag(i, ti, e.target.value)} placeholder={`Tag ${ti + 1}`} />
@@ -1423,6 +1557,43 @@ const AdminDashboard = () => {
                                         ))}
                                         <button className="add-inline-btn" onClick={() => addProjectTag(i)}><Plus size={14} /> Add Tag</button>
                                     </div>
+
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>📐 System Architecture</h5>
+                                    
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Architecture Diagram" 
+                                                value={project.architectureUrl || ''} 
+                                                id={`project-arch-${i}`}
+                                                onUpload={(url) => updateListItem('projects', i, 'architectureUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Architecture / Pipeline Description</label>
+                                            <textarea rows={3} value={project.architectureDesc || ''} onChange={e => updateListItem('projects', i, 'architectureDesc', e.target.value)} placeholder="Describe the system structure, data flow, APIs or pipeline orchestration." />
+                                        </div>
+                                    </div>
+
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>🔍 Deep-Dive details (Optional)</h5>
+
+                                    <div className="form-group">
+                                        <label>Key Features (One per line)</label>
+                                        <textarea rows={3} value={project.features || ''} onChange={e => updateListItem('projects', i, 'features', e.target.value)} placeholder="List major features, one per line..." />
+                                    </div>
+                                    
+                                    <div className="form-group">
+                                        <label>Lessons Learned</label>
+                                        <textarea rows={2} value={project.lessons || ''} onChange={e => updateListItem('projects', i, 'lessons', e.target.value)} placeholder="What key insights or architectural lessons did you take away?" />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Future Improvements (One per line)</label>
+                                        <textarea rows={3} value={project.future || ''} onChange={e => updateListItem('projects', i, 'future', e.target.value)} placeholder="What is the future roadmap for this project? One per line..." />
+                                    </div>
+
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>🔗 Project Assets & Links</h5>
+                                    
                                     <div className="flex-group" style={{ flexWrap: 'wrap' }}>
                                         <div className="form-group" style={{ width: '25%' }}>
                                             <FileUploadInput 
@@ -1434,7 +1605,7 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className="form-group" style={{ width: '25%' }}>
                                             <FileUploadInput 
-                                                label="Project Link / App" 
+                                                label="Live Demo Link / URL" 
                                                 value={project.projectUrl || ''} 
                                                 id={`project-link-${i}`}
                                                 onUpload={(url) => updateListItem('projects', i, 'projectUrl', url)} 
@@ -1457,10 +1628,51 @@ const AdminDashboard = () => {
                                                 onUpload={(url) => updateListItem('projects', i, 'certificateUrl', url)} 
                                             />
                                         </div>
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <FileUploadInput 
+                                                label="Documentation Link" 
+                                                value={project.docsUrl || ''} 
+                                                id={`project-docs-${i}`}
+                                                onUpload={(url) => updateListItem('projects', i, 'docsUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <FileUploadInput 
+                                                label="API Docs Link" 
+                                                value={project.apiDocsUrl || ''} 
+                                                id={`project-api-docs-${i}`}
+                                                onUpload={(url) => updateListItem('projects', i, 'apiDocsUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <label>Screenshots (Comma-separated URLs)</label>
+                                            <input type="text" value={project.screenshots || ''} onChange={e => updateListItem('projects', i, 'screenshots', e.target.value)} placeholder="e.g. /uploads/s1.png, /uploads/s2.png" />
+                                        </div>
+                                    </div>
+
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>💼 Academic / Legacy Fields (Optional)</h5>
+                                    
+                                    <div className="flex-group">
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <label>Institution (Acronym)</label>
+                                            <input type="text" value={project.institution || ''} onChange={e => updateListItem('projects', i, 'institution', e.target.value)} placeholder="e.g. EWUCRT" />
+                                        </div>
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <label>Funding Organization</label>
+                                            <input type="text" value={project.fundingOrg || ''} onChange={e => updateListItem('projects', i, 'fundingOrg', e.target.value)} placeholder="e.g. East West University CRT" />
+                                        </div>
+                                        <div className="form-group" style={{ width: '33%' }}>
+                                            <label>Reference Code</label>
+                                            <input type="text" value={project.refCode || ''} onChange={e => updateListItem('projects', i, 'refCode', e.target.value)} placeholder="e.g. Ref: EWUCRT-RG-17(14)/2025(5)" />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Secondary Details / Legacy Approach Info</label>
+                                        <textarea rows={2} value={project.details || ''} onChange={e => updateListItem('projects', i, 'details', e.target.value)} placeholder="Legacy approach or research details..." />
                                     </div>
                                 </div>
                             ))}
-                            <button type="button" className="add-btn" onClick={() => addListItem('projects', { title: '', desc: '', tags: [''], showcase: editData.projects.length + 1, projectUrl: '', githubUrl: '', certificateUrl: '', thumbnailUrl: '', category: 'active', period: '', status: '', institution: '', fundingOrg: '', refCode: '', details: '' })}>
+                            <button type="button" className="add-btn" onClick={() => addListItem('projects', { title: '', desc: '', tags: [''], showcase: editData.projects.length + 1, projectUrl: '', githubUrl: '', certificateUrl: '', thumbnailUrl: '', category: 'active', period: '', status: '', institution: '', fundingOrg: '', refCode: '', details: '', role: '', problem: '', goal: '', solution: '', architectureDesc: '', architectureUrl: '', contributions: '', challenges: '', solutions: '', backendStack: '', aiStack: '', databaseStack: '', cloudStack: '', features: '', impact: '', lessons: '', future: '', screenshots: '', docsUrl: '', apiDocsUrl: '' })}>
                                 <Plus size={16} /> Add Project
                             </button>
                         </div>

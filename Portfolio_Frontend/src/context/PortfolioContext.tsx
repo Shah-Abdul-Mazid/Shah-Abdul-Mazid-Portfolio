@@ -63,6 +63,27 @@ export interface ProjectItem {
     fundingOrg?: string;
     refCode?: string;
     details?: string;
+    
+    // Recruiter-friendly fields
+    role?: string;
+    goal?: string;
+    solution?: string;
+    architectureUrl?: string;
+    architectureDesc?: string;
+    contributions?: string;
+    challenges?: string;
+    solutions?: string;
+    backendStack?: string;
+    aiStack?: string;
+    databaseStack?: string;
+    cloudStack?: string;
+    features?: string;
+    impact?: string;
+    lessons?: string;
+    future?: string;
+    screenshots?: string;
+    docsUrl?: string;
+    apiDocsUrl?: string;
 }
 
 export interface PaperItem {
@@ -268,104 +289,8 @@ const defaultData: PortfolioData = {
             appointmentLetterUrl: '/data/eshikhon-appointment-letter.pdf'
         }
     ],
-    projects: [
-        { 
-            title: 'HR Policies RAG Chatbot', 
-            desc: 'An enterprise-grade Retrieval-Augmented Generation (RAG) system for HR queries with local caching and low inference latency.', 
-            tags: ['RAG', 'LLM', 'FastAPI', 'Streamlit', 'Pinecone', 'Llama2', 'SentenceTransformers', 'Docker', 'Kubernetes'], 
-            showcase: 1,
-            problem: 'Employee onboarding and policy inquiries were overloading the HR support desk, resulting in response latencies of over 24 hours for standard questions.',
-            approach: 'Engineered a RAG pipeline utilizing Llama-2-7B and SentenceTransformers for semantic chunking. Implemented Pinecone vector database for high-velocity embeddings indexing. Built FastAPI backend containerized with Docker and deployed via Kubernetes.',
-            result: 'Reduced HR inquiry resolution times by 85%, achieved a 94.2% retrieval accuracy, and cut question-answering latency to under 120ms (p95) while saving 40% in token costs.',
-            projectUrl: 'https://huggingface.co/spaces/Shah-Abdul-Mazid/HR-RAG-Chatbot',
-            githubUrl: 'https://github.com/Shah-Abdul-Mazid/HR-RAG-Chatbot',
-            category: 'active',
-            period: '2025 - Present',
-            status: 'ACTIVE',
-            institution: 'EWUCRT',
-            fundingOrg: 'East West University CRT',
-            refCode: 'Ref: EWUCRT-RG-17(14)/2025(5)',
-            details: 'Key research components include EEG signal acquisition, preprocessing, real-time intent decoding using machine learning models, and embedded system integration. The system targets low-latency response and practical deployment in real mobility-support scenarios.'
-        },
-        { 
-            title: 'Hate Speech Detection from Live Stream', 
-            desc: 'A real-time toxicity and hate speech classification pipeline for live streaming audio feeds with millisecond inference.', 
-            tags: ['BERT', 'PyAudio', 'TensorFlow', 'PyTorch', 'Deep Learning', 'FastAPI', 'MLflow', 'Docker'], 
-            showcase: 2,
-            problem: 'Live streaming platforms lacked low-latency moderating systems capable of detecting toxic speech or harassment under 100ms, causing brand safety issues.',
-            approach: 'Formulated a pipeline combining PyAudio streaming data ingestion with a fine-tuned BERT transformer model optimized via TensorRT. Handled latency constraints using PyTorch mixed-precision training (AMP) and batching mechanisms. Containerized using FastAPI and tracked experiments with MLflow.',
-            result: 'Realized a 92.4% F1-score for hate speech classification, reduced inference latency from 240ms to 45ms (p95), and successfully scaled to handle 10,000 concurrent streaming feeds.',
-            projectUrl: 'https://huggingface.co/spaces/Shah-Abdul-Mazid/Live-Stream-Hate-Speech',
-            githubUrl: 'https://github.com/Shah-Abdul-Mazid/Live-Stream-Hate-Speech',
-            category: 'active',
-            period: '2025 - Present',
-            status: 'ACTIVE',
-            institution: 'EWU',
-            fundingOrg: 'East West University',
-            refCode: 'Ref: EWU-CSE-2025-01',
-            details: 'Includes audio feed ingestion, acoustic feature extraction, and real-time inference using a quantized transformer model. Integrates with existing RTMP streaming servers.'
-        },
-        { 
-            title: 'WhatsUpIn AI Agent Automation', 
-            desc: 'Self-correcting autonomous AI agents orchestrating business competitive intelligence and scraping pipelines.', 
-            tags: ['n8n', 'OpenAI API', 'LangChain', 'LlamaIndex', 'Supabase', 'Weights & Biases', 'AI Agents'], 
-            showcase: 3,
-            problem: 'E-commerce competitors used manual competitor monitoring and inventory scraping workflows, costing hundreds of analyst hours weekly.',
-            approach: 'Developed self-correcting AI agents built on LangChain and LlamaIndex to orchestrate scraping pipelines, evaluate product matches via embeddings, and automate updates. Utilized n8n for agent orchestration, Supabase for state storage, and Weights & Biases to track prompt evaluation runs.',
-            result: 'Automated 95% of competitor monitoring tasks, reduced workflow execution costs by 60%, and processed over 50,000 competitor listings daily with a data drift detection trigger in production.',
-            projectUrl: 'https://huggingface.co/spaces/Shah-Abdul-Mazid/WhatsUpIn-Agent',
-            githubUrl: 'https://github.com/Shah-Abdul-Mazid/WhatsUpIn-Agent',
-            category: 'past',
-            period: '2018 - 2021',
-            status: 'EU H2020',
-            institution: 'LINKS Foundation, Italy',
-            fundingOrg: 'European Union Horizon 2020 Research and Innovation Programme',
-            refCode: 'Grant Agreement No. 825123',
-            details: 'Research and deployment of decentralized, model-based orchestration frameworks for intelligent IoT systems. Focused on dependability, self-healing architectures, and low-footprint scraping pipelines.'
-        },
-        { 
-            title: 'TrackMyBus System', 
-            desc: 'Real-time bus tracking application and spatial analysis system for university transport fleet management.', 
-            tags: ['Flutter', 'Firebase', 'Firestore', 'Geolocation', 'Google Maps API', 'FastAPI'], 
-            showcase: 4,
-            problem: 'University transport fleets suffered from irregular arrival schedules and lack of visibility, causing students to miss transit.',
-            approach: 'Developed a real-time GPS tracking solution with Flutter frontend and Firebase Firestore for fast spatial queries. Built a FastAPI administration portal monitoring route deviations and calculating average transit delays across time frames.',
-            result: 'Reduced student wait times by average of 18 minutes, tracked 100% of university transit buses, and generated analytics reports on route bottlenecks for fleet scheduling.',
-            projectUrl: 'https://huggingface.co/spaces/Shah-Abdul-Mazid/TrackMyBus-Spaces',
-            githubUrl: 'https://github.com/Shah-Abdul-Mazid/TrackMyBus',
-            category: 'past',
-            period: '2017 - 2018',
-            status: 'EU SPIRE',
-            institution: 'LINKS Foundation, Italy',
-            fundingOrg: 'European Union Sustainable Process Industry through Resource and Energy Efficiency',
-            refCode: 'Grant Agreement No. 768783',
-            details: 'Spatial analytics and optimization for public and private transport fleets. Addressed resource efficiency, latency, and real-time geofencing scheduling.'
-        }
-    ],
-    papers: [
-        {
-            title: 'BDFlower: Growth stage flower image dataset for precision agriculture and floriculture',
-            authors: 'Aritra Das, Mohammad Rifat Ahmmad Rashid, Md. Rakibul Hasan, Karib Shams, Raihan Ul Islam',
-            venue: 'Data in Brief',
-            publisher: 'Elsevier',
-            year: '2026',
-            keywords: 'BDFlower;Flower growth stage;Data augmentation;Image dataset;Floriculture',
-            type: 'journal',
-            doi: 'https://doi.org/10.1016/j.dib.2026.112745',
-            link: 'https://www.sciencedirect.com/science/article/pii/S2352340926002982'
-        },
-        {
-            title: 'MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis',
-            authors: 'Raiyan Gani, Yusuf Salehin, Md Shakil Bhuiyan, Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Shamim Ripon',
-            venue: '2025 28th International Conference on Computer and Information Technology (ICCIT)',
-            publisher: 'IEEE',
-            year: '2025',
-            keywords: 'Mango Disease;Ensemble Learning;Interpretable AI;Plant Pathology',
-            type: 'conference',
-            doi: '',
-            link: ''
-        }
-    ],
+    projects: [],
+    papers: [],
 
     activities: [
         { role: 'Event Organizer', organization: 'EWU Computer Club', period: '2022 - 2023', desc: 'Organized national programming contests and technical workshops for over 500 participants.' }

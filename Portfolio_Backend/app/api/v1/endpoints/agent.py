@@ -233,6 +233,10 @@ async def call_ollama(query: str, context: str) -> str | None:
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post(
                 f"{url}/api/chat",
+                headers={
+                    "ngrok-skip-browser-warning": "true",
+                    "Content-Type": "application/json",
+                },
                 json={
                     "model": model,
                     "messages": [
@@ -563,6 +567,113 @@ async def ai_chat_agent(
             "Type 'exit' to open the contact form and reach Shah Abdul Mazid directly."
         )
     }
+
+import json
+
+async def call_llm_json(prompt: str) -> str | None:
+    is_production = (settings.ENVIRONMENT or "local").lower() == "production"
+    
+    # 1. Try Groq
+    if settings.GROQ_API_KEY:
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                resp = await client.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}", "Content-Type": "application/json"},
+                    json={
+                        "model": "llama3-70b-8192",  # Use larger model for JSON structures
+                        "messages": [
+                            {"role": "system", "content": "You are an expert technical resume writer. Respond ONLY with raw JSON. Do not include markdown code block formatting like ```json ... ```."},
+                            {"role": "user",   "content": prompt}
+                        ],
+                        "temperature": 0.2,
+                        "max_tokens": 1500,
+                    }
+                )
+                if resp.status_code == 200:
+                    return resp.json()["choices"][0]["message"]["content"].strip()
+                logger.warning(f"Groq JSON {resp.status_code}: {resp.text[:200]}")
+        except Exception as e:
+            logger.warning(f"Groq JSON call failed: {e}")
+            
+    # 2. Try Ollama (Local fallback or explicitly enabled)
+    url = settings.OLLAMA_URL or "http://localhost:11434"
+    model = settings.OLLAMA_MODEL or "llama3"
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(
+                f"{url}/api/chat",
+                headers={
+                    "ngrok-skip-browser-warning": "true",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": model,
+                    "messages": [
+                        {"role": "system", "content": "You are an expert technical resume writer. Respond ONLY with raw JSON. Do not include markdown code block formatting like ```json ... ```."},
+                        {"role": "user",   "content": prompt}
+                    ],
+                    "stream": False,
+                    "options": {
+                        "temperature": 0.2
+                    }
+                }
+            )
+            if resp.status_code == 200:
+                return resp.json().get("message", {}).get("content", "").strip()
+    except Exception as e:
+        logger.warning(f"Ollama JSON call failed: {e}")
+        
+    return None
+
+def clean_json_string(s: str) -> str:
+    s = re.sub(r"^```(?:json)?", "", s, flags=re.IGNORECASE)
+    s = re.sub(r"```$", "", s, flags=re.IGNORECASE)
+    return s.strip()
+
+@router.post("/generate-project")
+async def generate_project_case_study(payload: dict = Body(...)):
+    title = payload.get("title", "").strip()
+    raw_desc = payload.get("desc", "").strip()
+    role = payload.get("role", "").strip() or "Software Engineer"
+    
+    if not title:
+        return {"success": False, "error": "Project title is required"}
+        
+    prompt = (
+        f"Generate a recruiter-friendly project case study in JSON format for the following project:\n"
+        f"Project Title: {title}\n"
+        f"Role: {role}\n"
+        f"Basic Description: {raw_desc}\n\n"
+        f"You must return a valid JSON object ONLY, with no extra text or markdown code blocks. The JSON keys MUST be exactly:\n"
+        f"- problem (Business problem addressed. Explain what problem existed, who had it, and why it was important. 2-3 sentences)\n"
+        f"- goal (Goal/Objective. What were you trying to achieve? 1-2 sentences)\n"
+        f"- solution (High-level solution. Explain the architecture/pipeline at a high level. 2-3 sentences)\n"
+        f"- contributions (Bullet points of key contributions. 4-6 items, each starting with an action verb, highlighting specific engineering contributions, with realistic metrics like 'Optimized latency by 30%')\n"
+        f"- challenges (Technical challenge. Describe a difficult engineering hurdle like latency, concurrency, memory, database performance, etc.)\n"
+        f"- solutions (How you solved it. Describe the engineering solution to the challenge)\n"
+        f"- impact (Results/Impact metrics. 3-4 bullet points containing concrete metrics/numbers, e.g., 'Reduced response time from 10s to 2.5s', '95% accuracy', 'Supports 100 concurrent users')\n"
+        f"- aiStack (Comma-separated AI/ML stack, e.g., 'OpenAI, LangChain, SentenceTransformers')\n"
+        f"- backendStack (Comma-separated Backend stack, e.g., 'FastAPI, Python, Redis')\n"
+        f"- databaseStack (Comma-separated Database stack, e.g., 'PostgreSQL, Pinecone')\n"
+        f"- cloudStack (Comma-separated Cloud/DevOps stack, e.g., 'Docker, Azure, GitHub Actions')\n"
+        f"- features (Key features of the project, 3-4 items, one per line)\n"
+        f"- lessons (Lessons learned from system design, deployment, or optimization. 2-3 sentences)\n"
+        f"- future (Future roadmap or improvements, 2-3 items, one per line)\n\n"
+        f"Ensure all values are strings (use newline character \\n for multiline strings like contributions, impact, features, future)."
+    )
+    
+    raw_response = await call_llm_json(prompt)
+    if not raw_response:
+        return {"success": False, "error": "AI model did not respond or is unreachable."}
+        
+    cleaned = clean_json_string(raw_response)
+    try:
+        parsed_data = json.loads(cleaned)
+        return {"success": True, "data": parsed_data}
+    except Exception as e:
+        logger.error(f"Failed to parse LLM JSON response: {e}. Raw response was: {raw_response}")
+        return {"success": False, "error": "AI response was not valid JSON", "raw": raw_response}
 
 
 @router.post("/summarize")

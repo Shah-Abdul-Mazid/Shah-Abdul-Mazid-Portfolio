@@ -6,10 +6,8 @@ import {
     ExternalLink,
     Search,
     Github,
-    Briefcase,
     ChevronDown,
     FileText,
-    Award,
 } from 'lucide-react';
 import { getPdfViewerUrl, isPdfUrl } from '../utils/filePreview';
 
@@ -66,6 +64,19 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
         return { dot: '#f59e0b', rail: 'rgba(245,158,11,0.4)' };
     };
 
+    const renderBulletList = (text?: string) => {
+        if (!text) return null;
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        return (
+            <ul className="recruiter-bullet-list">
+                {lines.map((line, idx) => {
+                    const cleanLine = line.replace(/^[-\*\•\s]+/, '');
+                    return <li key={idx}>{cleanLine}</li>;
+                })}
+            </ul>
+        );
+    };
+
     const renderProjectList = (projectList: ProjectItem[], prefix: BucketPrefix) => {
         const colors = dotColor(prefix);
         return (
@@ -89,15 +100,28 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                 {/* Clickable header */}
                                 <div className="proj-card-header" onClick={() => toggleExpand(key)}>
                                     <div className="proj-header-main">
-                                        {project.period && (
-                                            <span className="proj-year">{project.period}</span>
-                                        )}
+                                        <div className="proj-meta-top">
+                                            {project.period && (
+                                                <span className="proj-year">{project.period}</span>
+                                            )}
+                                            {project.role && (
+                                                <span className="proj-role-badge">👤 {project.role}</span>
+                                            )}
+                                        </div>
                                         <h3 className="proj-title">{project.title}</h3>
-                                        {project.institution && (
-                                            <p className="proj-institution">
-                                                <Briefcase size={12} className="meta-icon" />
-                                                {project.institution}
-                                            </p>
+                                        <p className="proj-collapsed-desc">{project.desc}</p>
+                                        
+                                        {!isExpanded && project.tags && project.tags.length > 0 && (
+                                            <div className="proj-collapsed-tags">
+                                                {project.tags.slice(0, 5).map((tag, tIdx) => (
+                                                    <span key={tIdx} className="collapsed-tag-pill" style={{ borderColor: getDotColor(tag) }}>
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                                {project.tags.length > 5 && (
+                                                    <span className="collapsed-tag-more">+{project.tags.length - 5} more</span>
+                                                )}
+                                            </div>
                                         )}
                                     </div>
                                     <div className="proj-header-right">
@@ -112,33 +136,202 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                 {/* Expandable detail */}
                                 <div className="proj-card-body">
                                     <div className="proj-card-inner">
-                                        <p className="project-desc-text">{project.desc}</p>
-                                        {project.details && <p className="project-details-text">{project.details}</p>}
-
-                                        <div className="project-expanded-metadata">
-                                            {project.refCode && (
-                                                <div className="metadata-badge ref-code">
-                                                    <FileText size={12} />
-                                                    <span>{project.refCode}</span>
+                                        {/* Business Problem, Goal, Solution Grid */}
+                                        <div className="recruiter-grid">
+                                            {project.problem && (
+                                                <div className="recruiter-box problem-box">
+                                                    <h4>🎯 Business Problem</h4>
+                                                    <p>{project.problem}</p>
                                                 </div>
                                             )}
-                                            {project.fundingOrg && (
-                                                <div className="metadata-badge funding-org">
-                                                    <Award size={12} />
-                                                    <span>{project.fundingOrg}</span>
+                                            {project.goal && (
+                                                <div className="recruiter-box goal-box">
+                                                    <h4>🏁 Goal / Objective</h4>
+                                                    <p>{project.goal}</p>
                                                 </div>
                                             )}
-                                            <div className="project-expanded-tags">
-                                                {(project.tags || []).map((tag, tIdx) => (
-                                                    <span key={tIdx} className="dot-tag">
-                                                        <span className="tag-dot" style={{ backgroundColor: getDotColor(tag) }} />
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
+                                            {project.solution && (
+                                                <div className="recruiter-box solution-box">
+                                                    <h4>💡 Solution</h4>
+                                                    <p>{project.solution}</p>
+                                                </div>
+                                            )}
                                         </div>
 
-                                        <div className="project-actions-row">
+                                        {/* Contributions */}
+                                        {project.contributions && (
+                                            <div className="recruiter-section contributions-section">
+                                                <h4>🛠️ Your Contributions</h4>
+                                                {renderBulletList(project.contributions)}
+                                            </div>
+                                        )}
+
+                                        {/* Challenges & Solutions */}
+                                        {(project.challenges || project.solutions) && (
+                                            <div className="recruiter-section challenges-section">
+                                                <h4>⚡ Technical Challenges & Solutions</h4>
+                                                <div className="challenges-grid">
+                                                    {project.challenges && (
+                                                        <div className="challenge-sub-box challenge">
+                                                            <h5>The Challenge</h5>
+                                                            <p>{project.challenges}</p>
+                                                        </div>
+                                                    )}
+                                                    {project.solutions && (
+                                                        <div className="challenge-sub-box engineering-sol">
+                                                            <h5>Engineering Solution</h5>
+                                                            <p>{project.solutions}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Impact & Results */}
+                                        {project.impact && (
+                                            <div className="recruiter-section impact-section">
+                                                <h4>📈 Results & Impact</h4>
+                                                {renderBulletList(project.impact)}
+                                            </div>
+                                        )}
+
+                                        {/* Tech Stack organized by category */}
+                                        {(project.backendStack || project.aiStack || project.databaseStack || project.cloudStack) ? (
+                                            <div className="recruiter-section tech-stack-section">
+                                                <h4>💻 Categorized Tech Stack</h4>
+                                                <div className="tech-stack-categories">
+                                                    {project.aiStack && (
+                                                        <div className="tech-cat-box">
+                                                            <span className="cat-title">AI / ML</span>
+                                                            <div className="cat-tags">
+                                                                {project.aiStack.split(',').map((s, idx) => <span key={idx} className="cat-tag-pill ai">{s.trim()}</span>)}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {project.backendStack && (
+                                                        <div className="tech-cat-box">
+                                                            <span className="cat-title">Backend</span>
+                                                            <div className="cat-tags">
+                                                                {project.backendStack.split(',').map((s, idx) => <span key={idx} className="cat-tag-pill backend">{s.trim()}</span>)}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {project.databaseStack && (
+                                                        <div className="tech-cat-box">
+                                                            <span className="cat-title">Database</span>
+                                                            <div className="cat-tags">
+                                                                {project.databaseStack.split(',').map((s, idx) => <span key={idx} className="cat-tag-pill db">{s.trim()}</span>)}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {project.cloudStack && (
+                                                        <div className="tech-cat-box">
+                                                            <span className="cat-title">Cloud / DevOps</span>
+                                                            <div className="cat-tags">
+                                                                {project.cloudStack.split(',').map((s, idx) => <span key={idx} className="cat-tag-pill cloud">{s.trim()}</span>)}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            /* Fallback tags */
+                                            project.tags && project.tags.length > 0 && (
+                                                <div className="recruiter-section tech-stack-section">
+                                                    <h4>💻 Tech Stack</h4>
+                                                    <div className="project-expanded-tags">
+                                                        {project.tags.map((tag, tIdx) => (
+                                                            <span key={tIdx} className="dot-tag">
+                                                                <span className="tag-dot" style={{ backgroundColor: getDotColor(tag) }} />
+                                                                {tag}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )
+                                        )}
+
+                                        {/* Deep-Dive Expandable Accordion sections */}
+                                        <div className="deep-dive-section">
+                                            {/* Architecture */}
+                                            {(project.architectureDesc || project.architectureUrl) && (
+                                                <div className="deep-dive-item">
+                                                    <details className="deep-dive-details">
+                                                        <summary className="deep-dive-summary">📐 System Architecture & Data Flow</summary>
+                                                        <div className="deep-dive-content">
+                                                            {project.architectureUrl && (
+                                                                <div className="architecture-img-wrap" onClick={(e) => { e.stopPropagation(); setSelectedFile(resolveUrl(project.architectureUrl)); }}>
+                                                                    <img src={resolveUrl(project.architectureUrl)} alt="System Architecture Diagram" className="architecture-img" />
+                                                                    <span className="zoom-hint">🔍 Click to enlarge diagram</span>
+                                                                </div>
+                                                            )}
+                                                            {project.architectureDesc && <p className="architecture-desc">{project.architectureDesc}</p>}
+                                                        </div>
+                                                    </details>
+                                                </div>
+                                            )}
+
+                                            {/* Key Features */}
+                                            {project.features && (
+                                                <div className="deep-dive-item">
+                                                    <details className="deep-dive-details">
+                                                        <summary className="deep-dive-summary">🔑 Key Features</summary>
+                                                        <div className="deep-dive-content">
+                                                            {renderBulletList(project.features)}
+                                                        </div>
+                                                    </details>
+                                                </div>
+                                            )}
+
+                                            {/* Lessons Learned */}
+                                            {project.lessons && (
+                                                <div className="deep-dive-item">
+                                                    <details className="deep-dive-details">
+                                                        <summary className="deep-dive-summary">📝 Lessons Learned</summary>
+                                                        <div className="deep-dive-content">
+                                                            <p className="lessons-text">{project.lessons}</p>
+                                                        </div>
+                                                    </details>
+                                                </div>
+                                            )}
+
+                                            {/* Future Improvements */}
+                                            {project.future && (
+                                                <div className="deep-dive-item">
+                                                    <details className="deep-dive-details">
+                                                        <summary className="deep-dive-summary">🚀 Future Improvements</summary>
+                                                        <div className="deep-dive-content">
+                                                            {renderBulletList(project.future)}
+                                                        </div>
+                                                    </details>
+                                                </div>
+                                            )}
+
+                                            {/* Screenshots */}
+                                            {project.screenshots && (
+                                                <div className="deep-dive-item">
+                                                    <details className="deep-dive-details">
+                                                        <summary className="deep-dive-summary">📸 Screenshots & Interface Gallery</summary>
+                                                        <div className="deep-dive-content">
+                                                            <div className="screenshots-gallery">
+                                                                {project.screenshots.split(',').map((url, sIdx) => {
+                                                                    const cleanUrl = url.trim();
+                                                                    if (!cleanUrl) return null;
+                                                                    return (
+                                                                        <div key={sIdx} className="gallery-img-wrap" onClick={(e) => { e.stopPropagation(); setSelectedFile(resolveUrl(cleanUrl)); }}>
+                                                                            <img src={resolveUrl(cleanUrl)} alt={`Screenshot ${sIdx + 1}`} className="gallery-img" />
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    </details>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Action buttons row */}
+                                        <div className="project-actions-row" style={{ marginTop: '24px' }}>
                                             {project.githubUrl && (
                                                 <a href={resolveUrl(project.githubUrl)} target="_blank" rel="noopener noreferrer" className="project-action-btn github-btn">
                                                     <Github size={14} /> GitHub
@@ -147,6 +340,16 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                             {project.projectUrl && (
                                                 <a href={resolveUrl(project.projectUrl)} target="_blank" rel="noopener noreferrer" className="project-action-btn live-btn">
                                                     <ExternalLink size={14} /> Live Demo
+                                                </a>
+                                            )}
+                                            {project.docsUrl && (
+                                                <a href={resolveUrl(project.docsUrl)} target="_blank" rel="noopener noreferrer" className="project-action-btn docs-btn">
+                                                    <FileText size={14} /> Documentation
+                                                </a>
+                                            )}
+                                            {project.apiDocsUrl && (
+                                                <a href={resolveUrl(project.apiDocsUrl)} target="_blank" rel="noopener noreferrer" className="project-action-btn api-btn">
+                                                    <ExternalLink size={14} /> API Docs
                                                 </a>
                                             )}
                                             {project.certificateUrl && (
@@ -478,11 +681,318 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                     transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 }
                 .proj-entry.expanded .proj-card-body {
-                    max-height: 900px;
+                    max-height: 3000px;
                 }
                 .proj-card-inner {
                     padding: 0 24px 24px 24px;
                     border-top: 1px solid var(--border-color);
+                }
+
+                /* Recruiter-friendly Styles */
+                .proj-meta-top {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin-bottom: 6px;
+                }
+                .proj-role-badge {
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    color: var(--text-secondary);
+                    background: rgba(255, 255, 255, 0.05);
+                    padding: 2px 8px;
+                    border-radius: 6px;
+                    border: 1px solid var(--border-color);
+                }
+                .proj-collapsed-desc {
+                    font-size: 0.95rem;
+                    color: var(--text-secondary);
+                    margin: 4px 0 10px 0;
+                    line-height: 1.45;
+                }
+                .proj-collapsed-tags {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 6px;
+                    margin-top: 8px;
+                }
+                .collapsed-tag-pill {
+                    font-size: 0.72rem;
+                    font-weight: 600;
+                    color: var(--text-secondary);
+                    padding: 2px 8px;
+                    border-radius: 100px;
+                    background: rgba(255, 255, 255, 0.01);
+                    border: 1px solid var(--border-color);
+                }
+                .collapsed-tag-more {
+                    font-size: 0.72rem;
+                    font-weight: 600;
+                    color: var(--primary);
+                    padding: 2px 4px;
+                }
+                
+                /* Recruiter Grid (Problem, Goal, Solution) */
+                .recruiter-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                    gap: 16px;
+                    margin: 20px 0;
+                }
+                .recruiter-box {
+                    padding: 16px;
+                    border-radius: 12px;
+                    border: 1px solid var(--border-color);
+                    background: rgba(255, 255, 255, 0.01);
+                }
+                .problem-box {
+                    border-left: 3px solid #ef4444;
+                    background: rgba(239, 68, 68, 0.02);
+                }
+                .goal-box {
+                    border-left: 3px solid #3b82f6;
+                    background: rgba(59, 130, 246, 0.02);
+                }
+                .solution-box {
+                    border-left: 3px solid #10b981;
+                    background: rgba(16, 185, 129, 0.02);
+                }
+                .recruiter-box h4 {
+                    font-size: 0.95rem;
+                    font-weight: 700;
+                    margin: 0 0 8px 0;
+                    color: var(--text-color);
+                }
+                .recruiter-box p {
+                    font-size: 0.9rem;
+                    color: var(--text-secondary);
+                    line-height: 1.5;
+                    margin: 0;
+                }
+
+                /* Recruiter Sections */
+                .recruiter-section {
+                    margin-top: 24px;
+                    border-top: 1px solid var(--border-color);
+                    padding-top: 20px;
+                }
+                .recruiter-section h4 {
+                    font-size: 1.05rem;
+                    font-weight: 700;
+                    color: var(--text-color);
+                    margin: 0 0 12px 0;
+                }
+                
+                .recruiter-bullet-list {
+                    margin: 0;
+                    padding-left: 20px;
+                    list-style-type: square;
+                }
+                .recruiter-bullet-list li {
+                    font-size: 0.92rem;
+                    color: var(--text-secondary);
+                    line-height: 1.6;
+                    margin-bottom: 6px;
+                }
+                
+                /* Challenges Grid */
+                .challenges-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                    gap: 16px;
+                }
+                .challenge-sub-box {
+                    padding: 14px;
+                    border-radius: 10px;
+                    border: 1px dashed var(--border-color);
+                }
+                .challenge-sub-box.challenge {
+                    border-left: 3px solid #f59e0b;
+                    background: rgba(245, 158, 11, 0.01);
+                }
+                .challenge-sub-box.engineering-sol {
+                    border-left: 3px solid #8b5cf6;
+                    background: rgba(139, 92, 246, 0.01);
+                }
+                .challenge-sub-box h5 {
+                    font-size: 0.85rem;
+                    font-weight: 750;
+                    margin: 0 0 6px 0;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                }
+                .challenge-sub-box.challenge h5 { color: #f59e0b; }
+                .challenge-sub-box.engineering-sol h5 { color: #a78bfa; }
+                .challenge-sub-box p {
+                    font-size: 0.9rem;
+                    color: var(--text-secondary);
+                    line-height: 1.5;
+                    margin: 0;
+                }
+
+                /* Categorized Tech Stack */
+                .tech-stack-categories {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                    gap: 14px;
+                }
+                .tech-cat-box {
+                    background: rgba(255, 255, 255, 0.01);
+                    border: 1px solid var(--border-color);
+                    border-radius: 10px;
+                    padding: 12px;
+                }
+                .cat-title {
+                    display: block;
+                    font-size: 0.78rem;
+                    font-weight: 750;
+                    color: var(--text-secondary);
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    margin-bottom: 8px;
+                    border-bottom: 1px solid var(--border-color);
+                    padding-bottom: 4px;
+                }
+                .cat-tags {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 6px;
+                }
+                .cat-tag-pill {
+                    font-size: 0.72rem;
+                    font-weight: 650;
+                    padding: 3px 8px;
+                    border-radius: 6px;
+                    background: rgba(255, 255, 255, 0.03);
+                    border: 1px solid var(--border-color);
+                }
+                .cat-tag-pill.ai { color: #a78bfa; border-color: rgba(167, 139, 250, 0.3); }
+                .cat-tag-pill.backend { color: #60a5fa; border-color: rgba(96, 165, 250, 0.3); }
+                .cat-tag-pill.db { color: #34d399; border-color: rgba(52, 211, 153, 0.3); }
+                .cat-tag-pill.cloud { color: #f472b6; border-color: rgba(244, 114, 182, 0.3); }
+
+                /* Deep Dive Expandable Accordions */
+                .deep-dive-section {
+                    margin-top: 24px;
+                    border-top: 1px solid var(--border-color);
+                    padding-top: 20px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                .deep-dive-item {
+                    border: 1px solid var(--border-color);
+                    border-radius: 10px;
+                    background: rgba(255, 255, 255, 0.01);
+                    overflow: hidden;
+                }
+                .deep-dive-details {
+                    width: 100%;
+                }
+                .deep-dive-summary {
+                    padding: 14px 18px;
+                    font-size: 0.92rem;
+                    font-weight: 600;
+                    color: var(--text-color);
+                    cursor: pointer;
+                    user-select: none;
+                    outline: none;
+                    transition: background 0.2s;
+                }
+                .deep-dive-summary:hover {
+                    background: rgba(255, 255, 255, 0.03);
+                }
+                .deep-dive-content {
+                    padding: 18px;
+                    border-top: 1px solid var(--border-color);
+                    background: rgba(0, 0, 0, 0.05);
+                }
+                .architecture-img-wrap {
+                    position: relative;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    border: 1px solid var(--border-color);
+                    margin-bottom: 12px;
+                    cursor: zoom-in;
+                }
+                .architecture-img {
+                    width: 100%;
+                    max-height: 400px;
+                    object-fit: contain;
+                    display: block;
+                    background: #0f172a;
+                    transition: transform 0.3s;
+                }
+                .architecture-img-wrap:hover .architecture-img {
+                    transform: scale(1.02);
+                }
+                .zoom-hint {
+                    position: absolute;
+                    bottom: 8px;
+                    right: 8px;
+                    background: rgba(15, 23, 42, 0.8);
+                    color: white;
+                    font-size: 0.72rem;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    pointer-events: none;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                }
+                .architecture-desc {
+                    font-size: 0.9rem;
+                    color: var(--text-secondary);
+                    line-height: 1.5;
+                    margin: 0;
+                }
+                .lessons-text {
+                    font-size: 0.9rem;
+                    color: var(--text-secondary);
+                    line-height: 1.5;
+                    margin: 0;
+                }
+                
+                /* Gallery */
+                .screenshots-gallery {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                    gap: 12px;
+                }
+                .gallery-img-wrap {
+                    position: relative;
+                    aspect-ratio: 16/9;
+                    border-radius: 6px;
+                    overflow: hidden;
+                    border: 1px solid var(--border-color);
+                    cursor: zoom-in;
+                }
+                .gallery-img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.2s;
+                }
+                .gallery-img-wrap:hover .gallery-img {
+                    transform: scale(1.05);
+                }
+                
+                /* Action Button enhancements */
+                .project-action-btn.docs-btn {
+                    background: rgba(59, 130, 246, 0.05);
+                    color: #60a5fa;
+                    border-color: rgba(59, 130, 246, 0.2);
+                }
+                .project-action-btn.docs-btn:hover {
+                    background: rgba(59, 130, 246, 0.1);
+                    border-color: #3b82f6;
+                }
+                .project-action-btn.api-btn {
+                    background: rgba(244, 114, 182, 0.05);
+                    color: #f472b6;
+                    border-color: rgba(244, 114, 182, 0.2);
+                }
+                .project-action-btn.api-btn:hover {
+                    background: rgba(244, 114, 182, 0.1);
+                    border-color: #f472b6;
                 }
 
                 /* chevron */
