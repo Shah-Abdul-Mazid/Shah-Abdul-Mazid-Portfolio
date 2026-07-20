@@ -184,13 +184,13 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                             {project.problem && (
                                                 <div className="recruiter-box problem-box">
                                                     <h4>🎯 Business Problem</h4>
-                                                    <p className="line-clamp-2">{project.problem}</p>
+                                                    <p>{project.problem}</p>
                                                 </div>
                                             )}
                                             {project.solution && (
                                                 <div className="recruiter-box solution-box">
                                                     <h4>💡 Solution</h4>
-                                                    <p className="line-clamp-2">{project.solution}</p>
+                                                    <p>{project.solution}</p>
                                                 </div>
                                             )}
                                         </div>
