@@ -1,6 +1,6 @@
 import { useRef, useState, useMemo } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Download, Loader, Printer, CheckCircle2, AlertCircle, Info, X, Zap, Mail, MapPin, Globe, Briefcase } from 'lucide-react';
+import { Download, Loader, Printer, CheckCircle2, AlertCircle, Info, X, Zap, Mail, MapPin, Globe, Briefcase, Eye, FileDown, Phone, Linkedin, Github } from 'lucide-react';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
@@ -16,7 +16,35 @@ const Resume = () => {
     const sheetRef = useRef<HTMLDivElement>(null);
     const [busy, setBusy] = useState(false);
     const [showAts, setShowAts] = useState(false);
-    const [cvType, setCvType] = useState<'modern' | 'europass'>('modern');
+    const [showPdfViewer, setShowPdfViewer] = useState(false);
+    const [cvType, setCvType] = useState<'v1_ats' | 'v2_visual' | 'europass'>('v2_visual');
+
+    // Static compiled PDF & TeX paths
+    const PDF_V1 = '/resume/Shah_Abdul_Mazid_ATS_CV_Version_1.pdf';
+    const PDF_V2 = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
+    const TEX_V1 = '/resume/Shah_Abdul_Mazid_ATS_CV_Version_1.tex';
+    const TEX_V2 = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.tex';
+
+    const activePdf = cvType === 'v1_ats' ? PDF_V1 : PDF_V2;
+    const activeTex = cvType === 'v1_ats' ? TEX_V1 : TEX_V2;
+
+    const downloadStaticPdf = () => {
+        const link = document.createElement('a');
+        link.href = activePdf;
+        link.download = cvType === 'v1_ats'
+            ? 'Shah_Abdul_Mazid_ATS_CV_Version_1.pdf'
+            : 'Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
+        link.click();
+    };
+
+    const downloadTex = () => {
+        const link = document.createElement('a');
+        link.href = activeTex;
+        link.download = cvType === 'v1_ats'
+            ? 'Shah_Abdul_Mazid_ATS_CV_Version_1.tex'
+            : 'Shah_Abdul_Mazid_Visual_CV_Version_2.tex';
+        link.click();
+    };
 
     // --- ATS SCORING LOGIC ---
     const atsScore = useMemo(() => {
@@ -114,33 +142,89 @@ const Resume = () => {
             <div className="rv-toolbar">
                 <div className="rv-layout-toggle">
                     <button 
-                        onClick={() => setCvType('modern')} 
-                        className={`rv-btn ${cvType === 'modern' ? 'rv-active' : ''}`}
+                        onClick={() => setCvType('v1_ats')} 
+                        className={`rv-btn ${cvType === 'v1_ats' ? 'rv-active' : ''}`}
                     >
-                        Modern Layout
+                        Version 1: ATS CV
+                    </button>
+                    <button 
+                        onClick={() => setCvType('v2_visual')} 
+                        className={`rv-btn ${cvType === 'v2_visual' ? 'rv-active' : ''}`}
+                    >
+                        Version 2: Visual CV (2-Column)
                     </button>
                     <button 
                         onClick={() => setCvType('europass')} 
                         className={`rv-btn ${cvType === 'europass' ? 'rv-active' : ''}`}
                     >
-                        Europass (German)
+                        Version 3: Europass (German)
                     </button>
                 </div>
                 <div style={{ flex: 1 }} />
                 <button onClick={() => setShowAts(true)} className="rv-btn rv-solid" style={{ background: '#10b981', border: 'none' }}>
                     <Zap size={14} fill="white" /> Check ATS Score
                 </button>
-                <button onClick={downloadPDF} disabled={busy} className="rv-btn rv-solid" style={{ background: '#f59e0b', color: 'white', border: 'none' }}>
+                <button onClick={() => setShowPdfViewer(true)} className="rv-btn rv-solid" style={{ background: '#8b5cf6', color: 'white', border: 'none' }}>
+                    <Eye size={14} /> View PDF
+                </button>
+                <button onClick={downloadStaticPdf} className="rv-btn rv-solid" style={{ background: '#f59e0b', color: 'white', border: 'none' }}>
+                    <FileDown size={14} /> Download PDF
+                </button>
+                {cvType !== 'europass' && (
+                    <button onClick={downloadTex} className="rv-btn rv-solid" style={{ background: '#0284c7', color: 'white', border: 'none' }}>
+                        <Download size={14} /> Download .tex
+                    </button>
+                )}
+                <button onClick={downloadPDF} disabled={busy} className="rv-btn rv-solid" style={{ background: '#e11d48', color: 'white', border: 'none' }}>
                     {busy ? <Loader size={14} className="rv-spin" /> : <Download size={14} />}
-                    {busy ? 'Generating…' : 'Download PDF'}
+                    {busy ? 'Generating…' : 'Generate PDF'}
                 </button>
                 <button onClick={downloadDynamic} className="rv-btn rv-solid" style={{ background: '#3b82f6', color: 'white', border: 'none' }}>
                     <Printer size={14} /> Print CV
                 </button>
             </div>
 
+            {/* ===== PDF VIEWER MODAL ===== */}
+            {showPdfViewer && (
+                <div className="pdf-viewer-overlay" onClick={(e) => { if (e.target === e.currentTarget) setShowPdfViewer(false); }}>
+                    <div className="pdf-viewer-modal">
+                        <div className="pdf-viewer-header">
+                            <div className="pdf-viewer-title">
+                                <Eye size={16} />
+                                <span>{cvType === 'v1_ats' ? 'Version 1: ATS CV' : cvType === 'v2_visual' ? 'Version 2: Visual CV (2-Column)' : 'Version 3: Europass CV'}</span>
+                            </div>
+                            <div className="pdf-viewer-actions">
+                                <a href={activePdf} download className="pdf-viewer-dl-btn">
+                                    <FileDown size={15} /> Download
+                                </a>
+                                <button onClick={() => setShowPdfViewer(false)} className="pdf-viewer-close">
+                                    <X size={18} />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="pdf-viewer-body">
+                            <iframe
+                                src={`${activePdf}#toolbar=1&navpanes=0&scrollbar=1`}
+                                title="Resume PDF Viewer"
+                                className="pdf-viewer-iframe"
+                                allowFullScreen
+                            />
+                            <div className="pdf-viewer-fallback">
+                                <p>Your browser cannot display the PDF inline.</p>
+                                <a href={activePdf} target="_blank" rel="noopener noreferrer" className="rv-btn rv-solid" style={{ background: '#8b5cf6', color: 'white', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
+                                    <Eye size={14} /> Open PDF in new tab
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className={`rv-sheet ${cvType === 'europass' ? 'ep-sheet' : ''}`} ref={sheetRef}>
-                {cvType === 'modern' ? (
+                {/* ========================================================================= */}
+                {/* VERSION 1: ATS CV (SINGLE COLUMN)                                         */}
+                {/* ========================================================================= */}
+                {cvType === 'v1_ats' && (
                     <div className="rv-content">
                         <div className="rv-hd">
                             <div className="rv-hd-left">
@@ -158,10 +242,6 @@ const Resume = () => {
                                 <div className="rv-contact-row"><a href={data.contact.linkedin} target="_blank" rel="noopener noreferrer" className="rv-link">LinkedIn: linkedin.com/in/shahabdulmazid</a></div>
                             </div>
                         </div>
-
-                        {/* <div className="rv-print-tip" style={{ fontSize: '10px', color: '#6b7280', textAlign: 'center', marginBottom: '8px', fontStyle: 'italic' }}>
-                            Note: For active clickable hyperlinks in the PDF, please use the "Print CV" button and select "Save as PDF".
-                        </div> */}
 
                         <div className="rv-body">
                             {data.about.bio && (
@@ -308,7 +388,274 @@ const Resume = () => {
                             )}
                         </div>
                     </div>
-                ) : (
+                )}
+
+                {/* ========================================================================= */}
+                {/* VERSION 2: VISUAL CV (2-COLUMN MODERN LAYOUT)                             */}
+                {/* ========================================================================= */}
+                {cvType === 'v2_visual' && (
+                    <div className="rv-content v2-visual-content">
+                        {/* Header Navy Block */}
+                        <div className="v2-header-band">
+                            <div className="v2-header-left">
+                                <h1 className="v2-name">SHAH ABDUL MAZID</h1>
+                                <h2 className="v2-subtitle">AI/ML ENGINEER</h2>
+                                <div className="v2-tags">
+                                    Generative AI &nbsp;|&nbsp; LLMs &nbsp;|&nbsp; RAG &nbsp;|&nbsp; Computer Vision &nbsp;|&nbsp; NLP
+                                </div>
+                                <div className="v2-contact-grid">
+                                    <span className="v2-citem"><MapPin size={11} /> Dhaka, Bangladesh</span>
+                                    <span className="v2-citem"><Mail size={11} /> <a href={`mailto:${em}`}>{em}</a></span>
+                                    <span className="v2-citem"><Phone size={11} /> {ph}</span>
+                                    <span className="v2-citem"><Linkedin size={11} /> <a href="https://www.linkedin.com/in/shahabdulmazid" target="_blank" rel="noreferrer">LinkedIn</a></span>
+                                    <span className="v2-citem"><Github size={11} /> <a href="https://github.com/Shah-Abdul-Mazid" target="_blank" rel="noreferrer">GitHub</a></span>
+                                </div>
+                            </div>
+                            <div className="v2-header-right">
+                                <img src="/resume/FD=109767.jpg" alt="Shah Abdul Mazid" className="v2-avatar" />
+                            </div>
+                        </div>
+
+                        {/* Professional Summary */}
+                        <div className="v2-summary-box">
+                            <h3 className="v2-sec-heading">Professional Summary</h3>
+                            <p className="v2-summary-p">
+                                AI/ML Engineer with a B.Sc. in Computer Science and Engineering from East West University, majoring in Intelligent Systems and Data Science. Experienced in Generative AI, LLMs, RAG, Machine Learning, Deep Learning, Computer Vision, and NLP. Skilled in building AI applications using Python, PyTorch, TensorFlow, FastAPI, Pinecone, OpenAI APIs, and AWS. Passionate about AI research and developing intelligent solutions for real-world problems.
+                            </p>
+                        </div>
+
+                        {/* PAGE 1 CONTENT (2-COLUMN GRID) */}
+                        <div className="v2-page1">
+                            <div className="v2-grid">
+                                {/* Page 1 Left Column */}
+                                <div className="v2-col">
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Technical Skills</h3>
+                                        <div className="v2-skill-entry"><b>Languages:</b> Python, Java, C/C++, JavaScript, TypeScript, SQL</div>
+                                        <div className="v2-skill-entry"><b>AI / ML:</b> Machine Learning, Deep Learning, Transfer Learning, Model Evaluation, Data Preprocessing</div>
+                                        <div className="v2-skill-entry"><b>Generative AI:</b> Generative AI, LLMs, RAG, Prompt Engineering, AI Agents, Agentic AI, Multi-Agent Systems</div>
+                                        <div className="v2-skill-entry"><b>NLP:</b> Natural Language Processing, Semantic Search, Vector Search, Embeddings, Sentence Transformers, Document Q&A, AI Chatbots</div>
+                                        <div className="v2-skill-entry"><b>Computer Vision:</b> Object Detection, Image Classification, Medical Imaging, YOLO, OpenCV, Grad-CAM, CBAM Attention</div>
+                                        <div className="v2-skill-entry"><b>Frameworks:</b> PyTorch, TensorFlow, Keras, Scikit-learn, NumPy, Pandas, Matplotlib, Plotly</div>
+                                        <div className="v2-skill-entry"><b>Backend:</b> FastAPI, REST APIs, JWT Authentication, API Integration, PDF Processing</div>
+                                        <div className="v2-skill-entry"><b>Frontend:</b> React, Next.js, Streamlit, Gradio</div>
+                                        <div className="v2-skill-entry"><b>Databases:</b> Pinecone, Vector Databases, MongoDB, MySQL, SQLite</div>
+                                        <div className="v2-skill-entry"><b>Cloud / DevOps:</b> AWS, EC2, Docker, PM2, Git, GitHub</div>
+                                        <div className="v2-skill-entry"><b>Automation:</b> n8n, Workflow Automation, API Integration</div>
+                                    </div>
+
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Education</h3>
+                                        <div className="v2-item">
+                                            <div className="v2-bold">B.Sc. in Computer Science & Engineering</div>
+                                            <div className="v2-sub">East West University <span className="v2-right-date">2021–2026</span></div>
+                                            <div className="v2-small">Major: Intelligent Systems & Data Science</div>
+                                        </div>
+                                        <div className="v2-item">
+                                            <div className="v2-bold">Higher Secondary Certificate</div>
+                                            <div className="v2-sub">Dhaka Ideal College <span className="v2-right-date">2018–2020</span></div>
+                                            <div className="v2-small">Science</div>
+                                        </div>
+                                        <div className="v2-item">
+                                            <div className="v2-bold">Secondary School Certificate</div>
+                                            <div className="v2-sub">Badshah Faisal Institute <span className="v2-right-date">2016–2018</span></div>
+                                            <div className="v2-small">Science</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Languages</h3>
+                                        <div><b>Bengali</b> — Native</div>
+                                        <div><b>English</b> — Professional Working Proficiency</div>
+                                    </div>
+                                </div>
+
+                                {/* Page 1 Right Column */}
+                                <div className="v2-col">
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Tools & Platforms</h3>
+                                        <div className="v2-skill-entry"><b>Models & APIs:</b> OpenAI API, Llama 2, Mistral, Claude API, HuggingFace Models</div>
+                                        <div className="v2-skill-entry"><b>Vector DBs & Search:</b> Pinecone, Weaviate, Milvus, Chroma, FAISS</div>
+                                        <div className="v2-skill-entry"><b>Deployment:</b> Hugging Face Hub, AWS SageMaker, Docker Hub, Streamlit Cloud</div>
+                                        <div className="v2-skill-entry"><b>Dev Tools:</b> VS Code, Git, GitHub, Jupyter, Google Colab, Linux/Ubuntu</div>
+                                        <div className="v2-skill-entry"><b>APIs & Integrations:</b> OpenAI API, Google Maps, Stripe, Google Sheets, Anthropic API</div>
+                                    </div>
+
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Key Achievements</h3>
+                                        <ul className="v2-ul">
+                                            <li>Published research on interpretable ML for agricultural disease diagnosis (ICCIT 2025)</li>
+                                            <li>Built enterprise RAG platform processing 10,000+ documents with 95%+ accuracy</li>
+                                            <li>Developed traffic detection system for real-world Bangladesh traffic conditions</li>
+                                            <li>Designed multi-agent AI system handling complex enterprise workflows</li>
+                                            <li>9+ IBM and AWS certifications in AI/ML specializations</li>
+                                        </ul>
+                                    </div>
+
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Professional Highlights</h3>
+                                        <div className="v2-item"><b>Published Researcher:</b> MangoStack ensemble model published in ICCIT 2025</div>
+                                        <div className="v2-item"><b>RAG Specialist:</b> Built enterprise platforms for document-based Q&A systems</div>
+                                        <div className="v2-item"><b>Full-Stack AI:</b> End-to-end ML systems from training to production deployment</div>
+                                        <div className="v2-item"><b>Automation Expert:</b> n8n workflow automation for business process efficiency</div>
+                                    </div>
+
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Research Interests</h3>
+                                        <ul className="v2-ul">
+                                            <li>Generative AI, LLMs & RAG Architecture</li>
+                                            <li>Multi-Agent AI Systems & Autonomous Workflows</li>
+                                            <li>Healthcare AI & Medical Image Diagnosis</li>
+                                            <li>Computer Vision, Grad-CAM & Model Interpretability</li>
+                                        </ul>
+                                    </div>
+
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Career Focus</h3>
+                                        <div>AI/ML Engineering &nbsp;|&nbsp; Generative AI &nbsp;|&nbsp; RAG Systems</div>
+                                        <div>Computer Vision &nbsp;|&nbsp; AI Research &nbsp;|&nbsp; Data Science</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* PAGE 2 CONTENT (2-COLUMN GRID) */}
+                        <div className="v2-page2 html2pdf__page-break" style={{ pageBreakBefore: 'always' }}>
+                            <div className="v2-grid">
+                                {/* Page 2 Left Column */}
+                                <div className="v2-col">
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Professional Experience</h3>
+                                        <div className="v2-item">
+                                            <div className="v2-bold">AI Engineer <span className="v2-right-date">Feb 2026 — May 2026</span></div>
+                                            <div className="v2-sub">Softvence Agency — Dhaka, Bangladesh</div>
+                                            <ul className="v2-ul">
+                                                <li>Developed RAG-based chatbots using Large Language Models for intelligent question answering.</li>
+                                                <li>Built scalable FastAPI backend services for AI model deployment and integration.</li>
+                                                <li>Developed Text-to-Speech and voice generation systems for interactive applications.</li>
+                                                <li>Automated workflows using n8n to improve operational efficiency.</li>
+                                                <li>Integrated APIs and external services for end-to-end AI solutions.</li>
+                                                <li>Researched and implemented emerging Generative AI, LLM, and RAG techniques.</li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="v2-item">
+                                            <div className="v2-bold">Campus Ambassador <span className="v2-right-date">Jan 2022 — Jan 2025</span></div>
+                                            <div className="v2-sub">eShikhon — Dhaka, Bangladesh</div>
+                                            <ul className="v2-ul">
+                                                <li>Represented the organization at East West University.</li>
+                                                <li>Organized technology workshops and student events.</li>
+                                                <li>Promoted digital learning and technology-focused initiatives.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Publication</h3>
+                                        <div className="v2-bold">MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis</div>
+                                        <div className="v2-small"><b>2025</b> — 28th International Conference on Computer and Information Technology (ICCIT).</div>
+                                    </div>
+
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Certifications</h3>
+                                        <ul className="v2-ul">
+                                            <li>IBM Deep Learning with PyTorch, Keras and TensorFlow</li>
+                                            <li>DeepLearning.AI TensorFlow Developer</li>
+                                            <li>IBM Machine Learning</li>
+                                            <li>IBM RAG and Agentic AI</li>
+                                            <li>Building AI Agents and Agentic Workflows</li>
+                                            <li>IBM AI Developer</li>
+                                            <li>AWS Generative AI and AI Agents with Amazon Bedrock</li>
+                                            <li>IBM AI Engineering</li>
+                                            <li>IBM Data Science</li>
+                                        </ul>
+                                    </div>
+
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Competitions & Awards</h3>
+                                        <div className="v2-item"><b>Network War</b> — EWU Telecommunication Club, 2024</div>
+                                        <div className="v2-item"><b>IT Olympiad</b> — CSE FEST, East West University, 2024</div>
+                                        <div className="v2-item"><b>In House Programming Battle</b> — EWUCoPC, 2022</div>
+                                    </div>
+
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Online Profiles</h3>
+                                        <div><b>Portfolio:</b> <a href="http://shah-abdul-mazid-portfolio.vercel.app/" target="_blank" rel="noreferrer">shah-abdul-mazid-portfolio.vercel.app</a></div>
+                                        <div><b>GitHub:</b> <a href="https://github.com/Shah-Abdul-Mazid" target="_blank" rel="noreferrer">github.com/Shah-Abdul-Mazid</a></div>
+                                        <div><b>LinkedIn:</b> <a href="https://www.linkedin.com/in/shahabdulmazid" target="_blank" rel="noreferrer">linkedin.com/in/shahabdulmazid</a></div>
+                                        <div><b>Nexus Intelligence:</b> <a href="https://ai-rag-project-llm-based.vercel.app/auth/login" target="_blank" rel="noreferrer">Live Demo</a></div>
+                                    </div>
+                                </div>
+
+                                {/* Page 2 Right Column */}
+                                <div className="v2-col">
+                                    <div className="v2-sec">
+                                        <h3 className="v2-sec-heading">Selected Projects</h3>
+
+                                        <div className="v2-item">
+                                            <div className="v2-bold">Nexus Intelligence — Enterprise Multi-Agent AI Platform</div>
+                                            <p className="v2-small">Built a full-stack enterprise AI platform for secure question answering over private documents, spreadsheets, and web content.</p>
+                                            <ul className="v2-ul">
+                                                <li>Implemented RAG and multi-agent architecture.</li>
+                                                <li>Integrated Pinecone vector search and live data routing.</li>
+                                                <li>Added feedback memory, JWT authentication, and PII detection.</li>
+                                                <li>Developed Next.js frontend and FastAPI backend.</li>
+                                                <li><b>Tech:</b> FastAPI, Next.js, React, TypeScript, OpenAI, Pinecone, RAG, AWS.</li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="v2-item">
+                                            <div className="v2-bold">HR Policies RAG Chatbot — AI-Powered Document Q&A</div>
+                                            <p className="v2-small">Developed an AI chatbot capable of answering HR policy questions from PDF documents using semantic retrieval and LLM generation.</p>
+                                            <ul className="v2-ul">
+                                                <li>Implemented PDF processing and document retrieval.</li>
+                                                <li>Used vector search and sentence embeddings.</li>
+                                                <li>Developed interactive Streamlit interface.</li>
+                                                <li><b>Tech:</b> Python, FastAPI, Streamlit, Pinecone, Llama 2, NLP.</li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="v2-item">
+                                            <div className="v2-bold">Bangladesh Traffic Flow Dataset — Vehicle Detection</div>
+                                            <p className="v2-small">Developed a deep learning system for vehicle detection and classification under Bangladesh traffic conditions.</p>
+                                            <ul className="v2-ul">
+                                                <li>Implemented YOLO-based object detection.</li>
+                                                <li>Applied Grad-CAM/EigenCAM for model interpretation.</li>
+                                                <li>Built interactive inference using Streamlit and Gradio.</li>
+                                                <li><b>Tech:</b> PyTorch, YOLO, OpenCV, NumPy, Pandas.</li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="v2-item">
+                                            <div className="v2-bold">Brain Tumor Detection — MobDenseNet with CBAM</div>
+                                            <p className="v2-small">Developed a hybrid deep learning model combining MobileNet and DenseNet with CBAM attention for MRI brain tumor classification.</p>
+                                            <ul className="v2-ul">
+                                                <li>Implemented preprocessing, augmentation, and classification.</li>
+                                                <li>Evaluated accuracy, precision, recall, and F1-score.</li>
+                                                <li>Applied Grad-CAM for model interpretability.</li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="v2-item">
+                                            <div className="v2-bold">WhatsUpIn — AI Travel Recommendation Engine</div>
+                                            <p className="v2-small">Developed an automated AI travel recommendation platform generating personalized travel plans.</p>
+                                            <ul className="v2-ul">
+                                                <li>Integrated OpenAI for itinerary generation.</li>
+                                                <li>Automated workflows using n8n.</li>
+                                                <li>Integrated Google Maps, Google Sheets, and Stripe.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ========================================================================= */}
+                {/* VERSION 3: EUROPASS CV (GERMAN / EU FORMAT)                               */}
+                {/* ========================================================================= */}
+                {cvType === 'europass' && (
                     <div className="ep-content">
                         <div className="ep-frame-top" />
                         <div className="ep-frame-bottom" />
@@ -539,307 +886,154 @@ const Resume = () => {
                 * { box-sizing: border-box !important; }
                 @page { size: A4; margin: 0.5in; }
                 .rv-page { background: #f1f5f9; min-height: 100vh; padding: 32px 16px 60px; display: flex; flex-direction: column; align-items: center; font-family: 'Source Sans Pro', 'Inter', sans-serif; }
-                .rv-toolbar { width: min(794px, 100%); display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 16px; }
-                .rv-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: all 0.2s; }
-                .rv-solid { background: #3d5a80; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-                .rv-solid:hover { background: #2b3f5a; transform: translateY(-1px); }
-                .rv-spin { animation: rvSpin 1s linear infinite; }
-                @keyframes rvSpin { to { transform: rotate(360deg); } }
-                .ep-sheet { border: none !important; }
-                .ep-page-break { page-break-before: always !important; padding-top: 50px !important; }
-                .rv-content { padding: 40px !important; overflow-wrap: break-word !important; position: relative; z-index: 2; }
-                .ep-content { padding: 40px 40px !important; color: #333 !important; line-height: 1.4 !important; font-family: 'Arial', sans-serif !important; background: white; position: relative; z-index: 2; }
-                .ep-frame-top { position: absolute; top: 0; left: 0; right: 0; height: 35px; background: #a8c4e5; clip-path: polygon(0 0, 100% 0, 100% 100%, 96% 100%, 96% 35%, 4% 35%, 4% 100%, 0 100%); z-index: 3; pointer-events: none; }
-                .ep-frame-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 35px; background: #a8c4e5; clip-path: polygon(0 100%, 100% 100%, 100% 0, 96% 0, 96% 65%, 4% 65%, 4% 0, 0 0%); z-index: 3; pointer-events: none; }
-                .pdf-export .ep-frame-top, .pdf-export .ep-frame-bottom { display: none !important; }
-                .ep-header { display: grid; grid-template-columns: 120px 1fr 180px; align-items: start; gap: 20px; margin-bottom: 25px; position: relative; z-index: 4; }
-                .ep-photo { width: 110px; height: 110px; border-radius: 50%; overflow: hidden; border: 1px solid #ddd; flex-shrink: 0; }
-                .ep-photo img { width: 100%; height: 100%; object-fit: cover; }
-                .ep-name { font-size: 22px; font-weight: bold; color: #003399; margin: 0 0 10px; }
-                .ep-details { font-size: 11px; display: flex; flex-direction: column; gap: 3px; color: #333; }
-                .ep-detail-row { display: flex; align-items: center; gap: 6px; }
-                .ep-logo { width: 180px; flex-shrink: 0; text-align: right; margin-top: -25px; }
-                .ep-logo img { width: 100%; height: auto; }
-                .ep-summary-text { font-size: 11px; color: #333; line-height: 1.5; text-align: justify; }
+                .rv-toolbar { width: min(794px, 100%); display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+                .rv-layout-toggle { display: flex; gap: 6px; background: rgba(0,0,0,0.06); padding: 4px; border-radius: 8px; }
+                .rv-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: all 0.2s; background: white; color: #334155; }
+                .rv-btn:hover { background: #f8fafc; color: #0f172a; }
+                .rv-btn.rv-active { background: #2563eb !important; color: white !important; }
+                .rv-btn.rv-solid { font-weight: 600; }
+                .rv-spin { animation: spin 1s linear infinite; }
+                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+                .rv-sheet { width: min(794px, 100%); background: white; border-radius: 8px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); padding: 40px; margin-bottom: 40px; }
+
+                /* ===== VERSION 1: ATS STYLES ===== */
+                .rv-content { color: #1e293b; line-height: 1.5; font-size: 0.9rem; }
+                .rv-hd { display: grid; grid-template-columns: 1.5fr 2fr 1.5fr; gap: 12px; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 20px; }
+                .rv-hd-left { font-size: 0.78rem; color: #475569; }
+                .rv-hd-mid { text-align: center; }
+                .rv-name { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin: 0; letter-spacing: -0.02em; }
+                .rv-role { font-size: 0.85rem; font-weight: 600; color: #3b82f6; margin: 2px 0 0; text-transform: uppercase; letter-spacing: 0.05em; }
+                .rv-hd-right { text-align: right; font-size: 0.78rem; }
+                .rv-contact-row { margin-bottom: 2px; }
+                .rv-link { color: #2563eb; text-decoration: none; }
+                .rv-summary { background: #f8fafc; border-left: 3px solid #3b82f6; padding: 12px 16px; margin-bottom: 20px; border-radius: 0 6px 6px 0; font-size: 0.88rem; color: #334155; }
+                .rv-sec { margin-bottom: 20px; }
+                .rv-sec-hd { font-size: 0.95rem; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 12px; }
+                .rv-skill-row { margin: 0 0 6px; font-size: 0.85rem; }
+                .rv-item { margin-bottom: 12px; }
+                .rv-item-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.88rem; }
+                .rv-bold { font-weight: 700; color: #0f172a; }
+                .rv-meta-date { font-size: 0.8rem; font-weight: 600; color: #2563eb; }
+                .rv-meta { font-size: 0.8rem; color: #64748b; }
+                .rv-item-sub { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 4px; }
+                .rv-muted { color: #475569; font-weight: 500; }
+                .rv-ul { margin: 4px 0 0 16px; padding: 0; font-size: 0.83rem; color: #334155; }
+                .rv-ul li { margin-bottom: 3px; }
+                .rv-proj-hd { display: flex; justify-content: space-between; align-items: baseline; }
+                .rv-proj-title { font-weight: 700; color: #0f172a; font-size: 0.88rem; }
+                .rv-proj-link { font-size: 0.78rem; color: #2563eb; font-weight: 500; }
+                .rv-ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+                .rv-ref-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; font-size: 0.82rem; }
+                .rv-ref-name { font-weight: 700; color: #0f172a; }
+                .rv-ref-pos { color: #2563eb; font-weight: 600; }
+                .rv-ref-org { color: #475569; }
+                .rv-ref-rel { color: #64748b; font-style: italic; font-size: 0.78rem; margin-bottom: 4px; }
+                .rv-ref-link { color: #2563eb; text-decoration: none; }
+
+                /* ===== EUROPASS STYLES ===== */
+                .ep-sheet { padding: 0 !important; }
+                .ep-content { padding: 40px; position: relative; color: #222; font-family: Arial, sans-serif; font-size: 11px; line-height: 1.4; }
+                .ep-frame-top { height: 8px; background: #a8c4e5; position: absolute; top: 0; left: 0; right: 0; }
+                .ep-frame-bottom { height: 8px; background: #a8c4e5; position: absolute; bottom: 0; left: 0; right: 0; }
+                .ep-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+                .ep-photo img { width: 90px; height: 110px; object-fit: cover; border-radius: 4px; }
+                .ep-info { flex: 1; margin: 0 20px; }
+                .ep-name { font-size: 22px; font-weight: 700; color: #003399; margin: 0 0 10px; }
+                .ep-details { font-size: 10.5px; color: #444; }
+                .ep-detail-row { margin-bottom: 3px; display: flex; align-items: center; gap: 4px; }
+                .ep-logo img { width: 120px; }
                 .ep-section { margin-bottom: 20px; }
-                .ep-sec-title { font-size: 13px; font-weight: bold; color: #003399; margin: 0 0 4px; text-transform: uppercase; }
-                .ep-sec-line { height: 1px; background: #ccd1d9; margin-bottom: 12px; }
+                .ep-sec-title { font-size: 12px; font-weight: 700; color: #003399; margin: 0 0 4px; text-transform: uppercase; }
+                .ep-sec-line { height: 1.5px; background: #003399; margin-bottom: 10px; }
+                .ep-summary-text { font-size: 11px; color: #333; line-height: 1.4; }
+                .ep-item { margin-bottom: 12px; }
+                .ep-item-title { font-size: 11.5px; font-weight: 700; color: #111; margin: 0 0 2px; }
+                .ep-item-org { font-size: 10.5px; font-weight: 600; color: #003399; }
+                .ep-item-meta { font-size: 10px; color: #555; margin-top: 2px; }
+                .ep-meta-row { display: block; margin-bottom: 1px; }
+                .ep-company-row { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #111; }
+                .ep-company { color: #003399; }
+                .ep-loc { color: #555; font-weight: normal; }
+                .ep-role { font-size: 11px; font-weight: 700; color: #333; margin: 2px 0; }
+                .ep-dates { font-size: 10px; color: #666; font-weight: bold; margin-bottom: 4px; }
+                .ep-bullets { margin: 4px 0 0 14px; padding: 0; font-size: 10.5px; color: #333; }
+                .ep-bullets li { margin-bottom: 2px; }
+                .ep-lang-row { font-size: 10.5px; color: #333; }
+                .ep-skill-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #f8fafc; border-radius: 4px; margin-bottom: 4px; font-size: 10.5px; }
+                .ep-skill-name { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #1e293b; }
+                .ep-skill-icon { color: #003399; display: flex; align-items: center; }
+                .ep-skill-level { font-size: 10px; color: #475569; }
+                .ep-cert-item { margin-bottom: 8px; font-size: 10.5px; }
+                .ep-cert-meta { font-size: 10px; color: #666; font-weight: bold; }
+                .ep-cert-name { font-weight: 700; color: #003399; }
+                .ep-cert-mode { font-size: 10px; color: #555; }
+                .ep-cert-link { font-size: 10px; }
 
-                /* Modern Layout Core CSS */
-                .rv-sheet { background: white; width: 794px; min-height: 1123px; color: #1a1a1a; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; margin: 0 auto; }
-                .rv-hd { display: grid !important; grid-template-columns: 1.2fr 2fr 1.2fr !important; align-items: center !important; gap: 15px !important; padding-bottom: 15px !important; border-bottom: 1.5px solid #3d5a80 !important; margin-bottom: 12px !important; }
-                .rv-hd-left { display: flex !important; flex-direction: column !important; gap: 2px !important; text-align: left !important; font-size: 11px !important; }
-                .rv-hd-mid { display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; }
-                .rv-hd-right { display: flex !important; flex-direction: column !important; gap: 2px !important; text-align: right !important; font-size: 11px !important; }
-                .rv-name { font-size: 26px; font-weight: 700; color: #1a1a1a; margin: 0; line-height: 1.1; white-space: nowrap; }
-                .rv-role { font-size: 12px; color: #3d5a80; font-weight: 600; margin: 4px 0 0; line-height: 1.3; max-width: 100%; }
-                .rv-contact-row { line-height: 1.3; }
-                .rv-contact-row a { color: #3d5a80; text-decoration: none; }
-                .rv-contact-row a:hover { text-decoration: underline; }
-                .rv-link { color: #3d5a80 !important; text-decoration: none !important; font-weight: 600 !important; }
-                .rv-link:hover { text-decoration: underline !important; }
-                .rv-proj-link-anchor:hover .rv-proj-title { color: #3d5a80; text-decoration: underline; }
-                .rv-body { padding: 0; }
-                .rv-summary { font-size: 12.5px; color: #1a1a1a; line-height: 1.4; margin: 0 0 10px; text-align: justify; }
-                .rv-sec { margin-bottom: 5px !important; min-height: 0 !important; padding: 0 !important; display: block; overflow: visible; break-inside: avoid !important; page-break-inside: avoid !important; }
-                .rv-sec-hd { font-size: 13px; font-weight: 700; text-transform: uppercase; color: #3d5a80; margin-bottom: 3px; display: flex; align-items: center; gap: 8px; break-after: avoid !important; page-break-after: avoid !important; }
-                .rv-sec-hd::after { content: ""; flex: 1; height: 1px; background: #3d5a80; margin-left: 8px; opacity: 0.3; }
-                .rv-skill-row { font-size: 11.5px; margin: 0 0 3px; color: #374151; break-inside: avoid; page-break-inside: avoid; }
-                .rv-skill-row b { color: #1a1a1a; }
-                .rv-item { margin-bottom: 4px; break-inside: avoid !important; page-break-inside: avoid !important; }
-                .rv-item-top { display: flex !important; justify-content: space-between !important; align-items: baseline !important; gap: 10px !important; margin-bottom: 1px !important; text-align: left !important; }
-                .rv-item-sub { display: flex !important; justify-content: space-between !important; align-items: baseline !important; gap: 10px !important; margin-bottom: 2px !important; text-align: left !important; }
-                .rv-bold { font-weight: 700; font-size: 13px; color: #1a1a1a; }
-                .rv-muted { color: #1a1a1a; font-weight: 600; font-size: 12.5px; }
-                .rv-sm { font-size: 12px; color: #374151; }
-                .rv-meta { font-size: 12px; color: #1a1a1a; font-weight: 600; white-space: nowrap; }
-                .rv-meta-date { font-weight: 700; font-size: 12.5px; color: #1a1a1a; }
-                .rv-ul { margin: 1px 0 0; padding-left: 14px; list-style: disc; }
-                .rv-ul li { font-size: 12px; color: #1a1a1a; margin-bottom: 1px; line-height: 1.3; }
-                .rv-proj-hd { display: flex; align-items: baseline; gap: 6px; break-inside: avoid !important; page-break-inside: avoid !important; }
-                .rv-proj-title { font-weight: 700; font-size: 13px; color: #1a1a1a; }
-                .rv-proj-link { font-size: 11px; color: #3d5a80; font-style: italic; }
-                .rv-ref-grid { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 10px 15px !important; margin-top: 2px !important; }
-                .rv-ref-item { border-left: 2px solid #3d5a80 !important; padding-left: 8px !important; break-inside: avoid !important; page-break-inside: avoid !important; }
-                .rv-ref-name { font-weight: 700; font-size: 11.5px; color: #1a1a1a; line-height: 1.2; }
-                .rv-ref-pos { font-size: 10.5px; color: #3d5a80; font-weight: 600; line-height: 1.2; }
-                .rv-ref-org { font-size: 10px; color: #374151; margin-bottom: 1px; }
-                .rv-ref-rel { font-size: 9.5px; color: #6b7280; font-style: italic; margin-bottom: 1px; }
-                .rv-ref-contact { font-size: 9.5px; color: #374151; }
-                .rv-ref-link { color: #3d5a80; text-decoration: none; }
-                .rv-ref-link:hover { text-decoration: underline; }
-                .rv-ref-phone { color: #374151; }
-                
-                .ep-item { margin-bottom: 15px; break-inside: avoid !important; page-break-inside: avoid !important; }
-                .ep-company-row { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: bold; color: #003399; margin-bottom: 2px; }
-                .ep-role { font-size: 11px; font-weight: bold; color: #333; margin: 0 0 2px; }
-                .ep-item-title { font-size: 12px; font-weight: bold; color: #003399; margin-bottom: 2px; }
-                .ep-item-org { font-size: 11px; font-weight: bold; color: #333; margin-bottom: 2px; }
-                .ep-item-meta { font-size: 10.5px; color: #555; line-height: 1.4; }
-                .ep-dates { color: #333; font-weight: bold; font-size: 10px; margin-bottom: 5px; }
-                .ep-meta-row { display: flex; gap: 5px; margin-top: 3px; }
-                .ep-meta-row a { color: #003399; text-decoration: none; }
-                .ep-bullets { margin: 0; padding-left: 18px; list-style: disc; }
-                .ep-bullets li { font-size: 10.5px; color: #333; margin-bottom: 2px; line-height: 1.4; }
-                .ep-skill-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #f2f4f7; }
-                .ep-skill-name { display: flex; align-items: center; gap: 10px; font-size: 11px; color: #444; }
-                .ep-skill-icon { color: #999; display: flex; align-items: center; }
-                .ep-skill-level { font-size: 10.5px; color: #333; text-align: right; }
-                .ep-skill-level b { color: #003399; font-size: 11px; }
-                .ep-lang-row { font-size: 11px; color: #333; margin-bottom: 5px; }
-                .ep-cert-item { margin-bottom: 12px; break-inside: avoid !important; page-break-inside: avoid !important; }
-                .ep-cert-meta { font-size: 10.5px; color: #666; margin-bottom: 2px; }
-                .ep-cert-name { font-size: 11.5px; font-weight: bold; color: #003399; margin-bottom: 2px; }
-                .ep-cert-mode, .ep-cert-link { font-size: 10.5px; color: #555; }
-                .ep-cert-link a { color: #003399; text-decoration: none; word-break: break-all; }
+                /* ===== ATS INSIGHT ANALYZER OVERLAY ===== */
+                .ats-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; }
+                .ats-panel { background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; width: min(480px, 100%); padding: 24px; color: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+                .ats-hd { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+                .ats-hd-txt h3 { font-size: 1.2rem; font-weight: 700; margin: 0 0 4px; color: #f8fafc; }
+                .ats-hd-txt p { font-size: 0.8rem; color: #94a3b8; margin: 0; }
+                .ats-close { background: transparent; border: none; color: #94a3b8; cursor: pointer; padding: 4px; border-radius: 6px; }
+                .ats-close:hover { color: white; background: rgba(255, 255, 255, 0.1); }
+                .ats-score-box { text-align: center; background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.05); }
+                .ats-circle { font-size: 2.8rem; font-weight: 800; color: #10b981; line-height: 1; }
+                .ats-pct { font-size: 1.4rem; color: #64748b; font-weight: 600; margin-left: 2px; }
+                .ats-label { font-size: 0.85rem; color: #94a3b8; font-weight: 600; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+                .ats-tips { display: flex; flex-direction: column; gap: 10px; max-height: 220px; overflow-y: auto; margin-bottom: 16px; }
+                .ats-tip { display: flex; gap: 10px; padding: 10px 12px; border-radius: 8px; font-size: 0.82rem; align-items: center; }
+                .ats-plus { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #a7f3d0; }
+                .ats-plus svg { color: #10b981; flex-shrink: 0; }
+                .ats-footer { border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 12px; text-align: center; font-size: 0.75rem; color: #64748b; }
+                .ats-footer p { margin: 0; }
 
-                /* ATS Overlay & Popup Modal Styles */
-                .ats-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(15, 23, 42, 0.75);
-                    backdrop-filter: blur(8px);
-                    -webkit-backdrop-filter: blur(8px);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 9999;
-                    padding: 20px;
-                    animation: atsFadeIn 0.2s ease-out;
-                }
+                /* ===== VERSION 2: VISUAL CV 2-COLUMN STYLES ===== */
+                .v2-visual-content { padding: 0 !important; font-family: 'Source Sans Pro', 'Inter', sans-serif; color: #333; }
+                .v2-header-band { background: #243B5A; color: white; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; margin-bottom: 16px; }
+                .v2-name { font-size: 26px; font-weight: 700; margin: 0 0 4px 0; color: white; letter-spacing: 0.5px; }
+                .v2-subtitle { font-size: 15px; font-weight: 600; margin: 0 0 8px 0; color: #EEF3F8; }
+                .v2-tags { font-size: 12px; margin-bottom: 12px; color: #EEF3F8; }
+                .v2-contact-grid { display: flex; flex-wrap: wrap; gap: 12px; font-size: 11.5px; color: #fff; }
+                .v2-citem { display: inline-flex; align-items: center; gap: 4px; }
+                .v2-citem a { color: #fff; text-decoration: none; }
+                .v2-avatar { width: 100px; height: 120px; object-fit: cover; border-radius: 4px; border: 2px solid white; }
+                .v2-summary-box { margin-bottom: 16px; }
+                .v2-summary-p { font-size: 12.5px; line-height: 1.5; color: #333; margin: 4px 0 0 0; }
+                .v2-sec-heading { font-size: 15px; font-weight: 700; color: #243B5A; border-bottom: 1.5px solid #243B5A; padding-bottom: 2px; margin: 12px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+                .v2-grid { display: flex !important; flex-direction: row !important; gap: 16px !important; }
+                .v2-col { flex: 1 !important; width: 48.5% !important; min-width: 0 !important; }
+                .v2-sec { margin-bottom: 14px; page-break-inside: avoid !important; break-inside: avoid !important; }
+                .v2-item { margin-bottom: 8px; font-size: 12px; page-break-inside: avoid !important; break-inside: avoid !important; }
+                .v2-skill-entry { font-size: 11.5px; margin-bottom: 4px; line-height: 1.4; }
+                .v2-bold { font-weight: 700; font-size: 12.5px; color: #243B5A; }
+                .v2-sub { font-size: 11.5px; font-style: italic; color: #555; display: flex; justify-content: space-between; }
+                .v2-right-date { font-weight: 700; font-style: normal; color: #333; }
+                .v2-small { font-size: 11.5px; color: #444; margin: 2px 0 4px 0; }
+                .v2-ul { margin: 4px 0 0 16px; padding: 0; font-size: 11.5px; line-height: 1.4; }
+                .v2-ul li { margin-bottom: 2px; }
 
-                .ats-panel {
-                    background: #1e293b;
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 20px;
-                    width: 100%;
-                    max-width: 500px;
-                    padding: 30px;
-                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-                    color: #f8fafc;
-                    animation: atsScaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-                    position: relative;
-                }
+                /* ===== PDF VIEWER MODAL ===== */
+                .pdf-viewer-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 20px; animation: pdfFadeIn 0.2s ease; }
+                @keyframes pdfFadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+                .pdf-viewer-modal { background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; width: min(960px, 100%); height: min(92vh, 1100px); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 32px 80px rgba(0,0,0,0.6); }
+                .pdf-viewer-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: #16213e; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+                .pdf-viewer-title { display: flex; align-items: center; gap: 8px; color: #e2e8f0; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em; }
+                .pdf-viewer-actions { display: flex; align-items: center; gap: 10px; }
+                .pdf-viewer-dl-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; background: #f59e0b; color: white; font-size: 0.8rem; font-weight: 600; text-decoration: none; transition: background 0.2s; }
+                .pdf-viewer-dl-btn:hover { background: #d97706; }
+                .pdf-viewer-close { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #94a3b8; cursor: pointer; transition: background 0.2s, color 0.2s; }
+                .pdf-viewer-close:hover { background: rgba(239,68,68,0.15); color: #ef4444; }
+                .pdf-viewer-body { flex: 1; position: relative; overflow: hidden; }
+                .pdf-viewer-iframe { width: 100%; height: 100%; border: none; display: block; }
+                .pdf-viewer-fallback { display: none; position: absolute; inset: 0; background: #1a1a2e; align-items: center; justify-content: center; flex-direction: column; gap: 16px; color: #94a3b8; font-size: 0.9rem; text-align: center; }
 
-                @keyframes atsFadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-
-                @keyframes atsScaleIn {
-                    from { transform: scale(0.95); opacity: 0; }
-                    to { transform: scale(1); opacity: 1; }
-                }
-
-                .ats-hd {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 24px;
-                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                    padding-bottom: 16px;
-                }
-
-                .ats-hd-txt h3 {
-                    margin: 0;
-                    font-size: 1.4rem;
-                    font-weight: 700;
-                    color: #38bdf8;
-                }
-
-                .ats-hd-txt p {
-                    margin: 4px 0 0;
-                    font-size: 0.85rem;
-                    color: #94a3b8;
-                }
-
-                .ats-close {
-                    background: none;
-                    border: none;
-                    color: #94a3b8 !important;
-                    cursor: pointer;
-                    padding: 8px;
-                    border-radius: 50%;
-                    transition: all 0.2s;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .ats-close:hover {
-                    background: rgba(255, 255, 255, 0.05);
-                    color: #f8fafc !important;
-                }
-
-                .ats-score-box {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 12px;
-                    margin-bottom: 24px;
-                }
-
-                .ats-circle {
-                    width: 100px;
-                    height: 100px;
-                    border-radius: 50%;
-                    border: 4px solid #10b981;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: rgba(16, 185, 129, 0.05);
-                }
-
-                .ats-num {
-                    font-size: 2.2rem;
-                    font-weight: 800;
-                    color: #10b981;
-                }
-
-                .ats-pct {
-                    font-size: 1.1rem;
-                    font-weight: 700;
-                    color: #10b981;
-                    margin-top: 6px;
-                }
-
-                .ats-label {
-                    font-size: 1.1rem;
-                    font-weight: 700;
-                    color: #f8fafc;
-                }
-
-                .ats-tips {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 12px;
-                    max-height: 250px;
-                    overflow-y: auto;
-                    margin-bottom: 24px;
-                    padding-right: 4px;
-                }
-
-                .ats-tips::-webkit-scrollbar {
-                    width: 6px;
-                }
-                .ats-tips::-webkit-scrollbar-track {
-                    background: rgba(255, 255, 255, 0.02);
-                }
-                .ats-tips::-webkit-scrollbar-thumb {
-                    background: rgba(255, 255, 255, 0.1);
-                    border-radius: 100px;
-                }
-
-                .ats-tip {
-                    display: flex;
-                    gap: 12px;
-                    padding: 12px;
-                    border-radius: 10px;
-                    font-size: 0.9rem;
-                    line-height: 1.4;
-                    align-items: flex-start;
-                    text-align: left;
-                }
-
-                .ats-plus {
-                    background: rgba(16, 185, 129, 0.1) !important;
-                    border: 1px solid rgba(16, 185, 129, 0.2) !important;
-                    color: #a7f3d0 !important;
-                }
-
-                .ats-tip.ats-plus svg {
-                    color: #10b981 !important;
-                    flex-shrink: 0;
-                    margin-top: 2px;
-                }
-
-                .ats-minus {
-                    background: rgba(239, 68, 68, 0.1) !important;
-                    border: 1px solid rgba(239, 68, 68, 0.2) !important;
-                    color: #fecaca !important;
-                }
-
-                .ats-tip.ats-minus svg {
-                    color: #ef4444 !important;
-                    flex-shrink: 0;
-                    margin-top: 2px;
-                }
-
-                .ats-tip.ats-tip {
-                    background: rgba(56, 189, 248, 0.1) !important;
-                    border: 1px solid rgba(56, 189, 248, 0.2) !important;
-                    color: #bae6fd !important;
-                }
-
-                .ats-tip.ats-tip svg {
-                    color: #38bdf8 !important;
-                    flex-shrink: 0;
-                    margin-top: 2px;
-                }
-
-                .ats-footer {
-                    border-top: 1px solid rgba(255, 255, 255, 0.1);
-                    padding-top: 16px;
-                    text-align: center;
-                }
-
-                .ats-footer p {
-                    margin: 0;
-                    font-size: 0.78rem;
-                    color: #64748b !important;
-                }
-                
                 @media print { 
                     @page { size: A4; margin: 0.75in 0.5in; }
                     .rv-page { background: white !important; padding: 0 !important; margin: 0 !important; width: 100% !important; } 
                     .rv-toolbar, .rv-print-tip { display: none !important; } 
-                    /* Hide ATS overlay in printed/exported CV */
-                    .ats-overlay, .ats-panel, .ats-score-box, .ats-hd, .ats-tips, .ats-footer,
-                    .ats-close { display: none !important; }
-
+                    .ats-overlay, .ats-panel, .ats-score-box, .ats-hd, .ats-tips, .ats-footer, .ats-close { display: none !important; }
                     .rv-sheet { box-shadow: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; overflow: visible !important; border: none !important; }
                     .rv-content { padding: 0 !important; width: 100% !important; }
                     .rv-hd { grid-template-columns: 1.4fr 2fr 1.4fr !important; gap: 10px !important; }
@@ -854,13 +1048,13 @@ const Resume = () => {
                     .rv-sec-hd { break-after: avoid !important; page-break-after: avoid !important; margin-top: 15px !important; }
                     .rv-sec-hd:first-child { margin-top: 0 !important; }
                     .rv-sheet a { pointer-events: auto !important; text-decoration: none !important; }
-                    
-                    /* Europass Print */
                     .ep-content { padding: 0 !important; border: none !important; }
                     .ep-name { color: #003399 !important; -webkit-print-color-adjust: exact; }
                     .ep-sec-title { color: #003399 !important; -webkit-print-color-adjust: exact; }
                 }
                 .pdf-export .rv-content { padding: 0 40px !important; }
+                .pdf-export .v2-grid { display: flex !important; flex-direction: row !important; }
+                .pdf-export .v2-col { width: 48.5% !important; flex: 1 !important; }
             `}</style>
         </div>
     );

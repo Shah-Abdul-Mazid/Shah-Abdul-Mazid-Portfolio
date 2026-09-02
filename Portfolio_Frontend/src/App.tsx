@@ -7,8 +7,12 @@ import ProjectsPage from './pages/ProjectsPage';
 import ContactsPage from './pages/ContactsPage';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
-import ResumeView from './pages/ResumeView';
 import SkillsPage from './pages/SkillsPage';
+
+import ResumeSelectorPage from './pages/Resume/ResumeSelectorPage';
+import VisualResumePage from './pages/Resume/VisualResumePage';
+import ATSResumePage from './pages/Resume/ATSResumePage';
+
 import { PortfolioProvider } from './context/PortfolioContext';
 import { useVisitorTracker } from './hooks/useVisitorTracker';
 
@@ -36,7 +40,11 @@ function App() {
                         <Route path="/projects" element={<ProjectsPage />} />
                         <Route path="/contacts" element={<ContactsPage />} />
 
-                        <Route path="/resume" element={<ResumeView />} />
+                        {/* CV / Resume Routes */}
+                        <Route path="/resume" element={<ResumeSelectorPage />} />
+                        <Route path="/resume/visual" element={<VisualResumePage />} />
+                        <Route path="/resume/ats" element={<ATSResumePage />} />
+
                         <Route path="/login/admin" element={<AdminLogin />} />
                         <Route path="/admin/dashboard" element={<AdminDashboard />} />
                         <Route path="*" element={<Navigate to="/home" replace />} />

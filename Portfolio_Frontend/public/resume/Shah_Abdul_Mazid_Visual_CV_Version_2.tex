@@ -1,0 +1,363 @@
+\documentclass[10pt,a4paper]{article}
+
+% =========================================================
+% PACKAGES & SETUP
+% =========================================================
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[british]{babel}
+
+\usepackage[
+    top=8mm,
+    bottom=8mm,
+    left=10mm,
+    right=10mm
+]{geometry}
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{fontawesome5}
+\usepackage{FiraSans}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+% =========================================================
+% COLORS
+% =========================================================
+
+\definecolor{navy}{HTML}{243B5A}
+\definecolor{blue}{HTML}{2F527F}
+\definecolor{lightblue}{HTML}{EEF3F8}
+\definecolor{darkgray}{HTML}{333333}
+\definecolor{gray}{HTML}{555555}
+
+% =========================================================
+% HYPERLINKS
+% =========================================================
+
+\hypersetup{
+    colorlinks=true,
+    urlcolor=blue,
+    linkcolor=blue,
+    pdfborder={0 0 0}
+}
+
+\newcommand{\headerhref}[2]{%
+    \begingroup
+    \hypersetup{colorlinks=true, urlcolor=white, linkcolor=white}%
+    \href{#1}{#2}%
+    \endgroup
+}
+
+% =========================================================
+% PAGE STYLES & SPACING
+% =========================================================
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+% =========================================================
+% LISTS
+% =========================================================
+
+\setlist[itemize]{
+    leftmargin=4mm,
+    itemsep=1pt,
+    topsep=1.5pt,
+    parsep=0pt,
+    partopsep=0pt
+}
+
+% =========================================================
+% SECTION STYLE
+% =========================================================
+
+\titleformat{\section}
+    {\bfseries\color{navy}\small}
+    {}
+    {0pt}
+    {}
+    [\vspace{1pt}\color{navy}\titlerule]
+
+\titlespacing*{\section}{0pt}{5pt}{3pt}
+
+% =========================================================
+% CUSTOM COMMANDS
+% =========================================================
+
+\newcommand{\job}[4]{%
+    {\bfseries\small #1}\hfill{\small\bfseries #4}\\[0.5pt]
+    \textit{\footnotesize #2} --- \footnotesize #3\vspace{1mm}%
+}
+
+\newcommand{\project}[2]{%
+    {\bfseries\small #1} \textit{\footnotesize | #2}%
+}
+
+\newcommand{\skill}[2]{%
+    {\footnotesize\textbf{#1:}} {\footnotesize #2}\par\vspace{1mm}%
+}
+
+% =========================================================
+% DOCUMENT
+% =========================================================
+
+\begin{document}
+
+% ---------------------------------------------------------
+% HEADER BAND
+% ---------------------------------------------------------
+
+\colorbox{navy}{%
+\begin{minipage}{0.98\textwidth}
+\color{white}
+\begin{minipage}[c]{0.74\textwidth}
+\vspace{3.5mm}
+{\LARGE\bfseries SHAH ABDUL MAZID}\\[1mm]
+{\large\bfseries AI/ML ENGINEER}\\[1.5mm]
+\footnotesize Generative AI \quad|\quad LLMs \quad|\quad RAG \quad|\quad Computer Vision \quad|\quad NLP
+\vspace{2.5mm}
+
+\scriptsize
+\faMapMarker*\ Dhaka, Bangladesh\quad
+\faEnvelope\ \headerhref{mailto:shahabdulmazid.ezan@yahoo.com}{shahabdulmazid.ezan@yahoo.com}\\[0.8mm]
+\faPhone*\ +880 1531329222\quad
+\faLinkedin\ \headerhref{https://www.linkedin.com/in/shahabdulmazid}{LinkedIn}\quad
+\faGithub\ \headerhref{https://github.com/Shah-Abdul-Mazid}{GitHub}
+\vspace{3.5mm}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.20\textwidth}
+\vspace{2mm}
+\begin{flushright}
+\includegraphics[width=26mm,height=32mm,keepaspectratio]{FD=109767.jpg}
+\end{flushright}
+\vspace{2mm}
+\end{minipage}
+\end{minipage}%
+}
+\vspace{2.5mm}
+
+% ---------------------------------------------------------
+% PROFESSIONAL SUMMARY
+% ---------------------------------------------------------
+
+\section*{Professional Summary}
+
+\footnotesize AI/ML Engineer with a B.Sc.\ in Computer Science and Engineering from East West University, majoring in Intelligent Systems and Data Science. Experienced in Generative AI, LLMs, RAG, Machine Learning, Deep Learning, Computer Vision, and NLP\@. Skilled in building AI applications using Python, PyTorch, TensorFlow, FastAPI, Pinecone, OpenAI APIs, and AWS\@. Passionate about AI research and developing intelligent solutions for real-world problems.
+
+\vspace{2mm}
+
+% =========================================================
+% PAGE 1 — 2-COLUMN BALANCED LAYOUT
+% =========================================================
+
+\noindent
+% ---- LEFT COLUMN (PAGE 1) -------------------------------
+\begin{minipage}[t]{0.485\textwidth}
+
+\section{Technical Skills}
+
+\skill{Languages}{Python, Java, C/C++, JavaScript, TypeScript, SQL}
+\skill{AI / ML}{Machine Learning, Deep Learning, Transfer Learning, Model Evaluation, Data Preprocessing}
+\skill{Generative AI}{Generative AI, LLMs, RAG, Prompt Engineering, AI Agents, Agentic AI, Multi-Agent Systems}
+\skill{NLP}{Natural Language Processing, Semantic Search, Vector Search, Embeddings, Sentence Transformers, AI Chatbots}
+\skill{Computer Vision}{Object Detection, Image Classification, Medical Imaging, YOLO, OpenCV, Grad-CAM, CBAM Attention}
+\skill{Frameworks}{PyTorch, TensorFlow, Keras, Scikit-learn, NumPy, Pandas, Matplotlib, Plotly}
+\skill{Backend}{FastAPI, REST APIs, JWT Authentication, API Integration, PDF Processing}
+\skill{Frontend}{React, Next.js, Streamlit, Gradio}
+\skill{Databases}{Pinecone, Vector Databases, MongoDB, MySQL, SQLite}
+\skill{Cloud / DevOps}{AWS, EC2, Docker, PM2, Git, GitHub}
+\skill{Automation}{n8n, Workflow Automation, API Integration}
+
+\section{Education}
+
+\textbf{\footnotesize B.Sc.\ in Computer Science \& Engineering}\\
+\textit{\footnotesize East West University}\hfill{\footnotesize\textbf{2021--2026}}\\
+\footnotesize Major: Intelligent Systems \& Data Science
+
+\vspace{1.5mm}
+
+\textbf{\footnotesize Higher Secondary Certificate}\\
+\textit{\footnotesize Dhaka Ideal College}\hfill{\footnotesize\textbf{2018--2020}}\\
+\footnotesize Science
+
+\vspace{1.5mm}
+
+\textbf{\footnotesize Secondary School Certificate}\\
+\textit{\footnotesize Badshah Faisal Institute}\hfill{\footnotesize\textbf{2016--2018}}\\
+\footnotesize Science
+
+\section{Languages}
+
+\footnotesize\textbf{Bengali} --- Native\\[0.5mm]
+\footnotesize\textbf{English} --- Professional Working Proficiency
+
+\section{Research Interests}
+
+\begin{itemize}
+\item \footnotesize Generative AI, LLMs \& RAG Architecture
+\item \footnotesize Multi-Agent AI Systems \& Autonomous Workflows
+\item \footnotesize Healthcare AI \& Medical Image Diagnosis
+\item \footnotesize Computer Vision, Grad-CAM \& Model Interpretability
+\end{itemize}
+
+\end{minipage}%
+\hfill
+% ---- RIGHT COLUMN (PAGE 1) ------------------------------
+\begin{minipage}[t]{0.485\textwidth}
+
+\section{Tools \& Platforms}
+
+\skill{Models \& APIs}{OpenAI API, Llama 2, Mistral, Claude API, HuggingFace Models}
+\skill{Vector DBs}{Pinecone, Weaviate, Milvus, Chroma, FAISS}
+\skill{Deployment}{Hugging Face Hub, AWS SageMaker, Docker Hub, Streamlit Cloud}
+\skill{Dev Tools}{VS Code, Git, GitHub, Jupyter, Google Colab, Linux/Ubuntu}
+\skill{Integrations}{OpenAI API, Google Maps, Stripe, Google Sheets, Anthropic API}
+
+\section{Key Achievements}
+
+\begin{itemize}
+\item \footnotesize Published research on interpretable ML for agricultural disease diagnosis (ICCIT 2025)
+\item \footnotesize Built enterprise RAG platform processing 10,000+ documents with 95\%+ accuracy
+\item \footnotesize Developed traffic detection system for real-world Bangladesh traffic conditions
+\item \footnotesize Designed multi-agent AI system handling complex enterprise workflows
+\item \footnotesize 9+ IBM and AWS certifications in AI/ML specialisations
+\end{itemize}
+
+\section{Professional Highlights}
+
+\footnotesize\textbf{Published Researcher:} MangoStack ensemble model published in ICCIT 2025\\[1mm]
+\footnotesize\textbf{RAG Specialist:} Built enterprise platforms for document Q\&A systems\\[1mm]
+\footnotesize\textbf{Full-Stack AI:} End-to-end ML systems from training to production\\[1mm]
+\footnotesize\textbf{Automation Expert:} n8n workflow automation for business efficiency
+
+\section{Career Focus}
+
+\footnotesize AI/ML Engineering \quad|\quad Generative AI \quad|\quad RAG Systems\\
+Computer Vision \quad|\quad AI Research \quad|\quad Data Science
+
+\end{minipage}
+
+% =========================================================
+% PAGE 2 — 2-COLUMN BALANCED LAYOUT
+% =========================================================
+
+\clearpage
+
+\noindent
+% ---- LEFT COLUMN (PAGE 2) -------------------------------
+\begin{minipage}[t]{0.485\textwidth}
+
+\section{Professional Experience}
+
+\job{AI Engineer}{Softvence Agency}{Dhaka, Bangladesh}{Feb 2026 -- May 2026}
+\begin{itemize}
+\item \footnotesize Developed RAG-based chatbots using Large Language Models for intelligent Q\&A.
+\item \footnotesize Built scalable FastAPI backend services for AI model deployment.
+\item \footnotesize Developed Text-to-Speech and voice generation systems.
+\item \footnotesize Automated workflows using n8n for operational efficiency.
+\item \footnotesize Integrated APIs and external services for end-to-end AI solutions.
+\item \footnotesize Researched and implemented emerging GenAI and LLM techniques.
+\end{itemize}
+
+\vspace{2mm}
+
+\job{Campus Ambassador}{eShikhon}{Dhaka, Bangladesh}{Jan 2022 -- Jan 2025}
+\begin{itemize}
+\item \footnotesize Represented the organisation at East West University.
+\item \footnotesize Organised technology workshops and student events.
+\item \footnotesize Promoted digital learning and technology initiatives.
+\end{itemize}
+
+\section{Publication}
+
+\footnotesize\textbf{MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis}\\[0.5mm]
+\textbf{2025} --- 28th International Conference on Computer and Information Technology (ICCIT).
+
+\section{Certifications}
+
+\begin{itemize}
+\item \footnotesize IBM Deep Learning with PyTorch, Keras and TensorFlow
+\item \footnotesize DeepLearning.AI TensorFlow Developer
+\item \footnotesize IBM Machine Learning \& AI Engineering
+\item \footnotesize IBM RAG, Agentic AI \& AI Developer
+\item \footnotesize AWS Generative AI and AI Agents with Amazon Bedrock
+\end{itemize}
+
+\section{Competitions \& Awards}
+
+\footnotesize\textbf{Network War} --- EWU Telecommunication Club, 2024\\[0.5mm]
+\footnotesize\textbf{IT Olympiad} --- CSE FEST, East West University, 2024\\[0.5mm]
+\footnotesize\textbf{In House Programming Battle} --- EWUCoPC, 2022
+
+\section{Online Profiles}
+
+\footnotesize\textbf{Portfolio:} \href{https://shah-abdul-mazid-portfolio.vercel.app}{shah-abdul-mazid-portfolio.vercel.app}\\[0.5mm]
+\footnotesize\textbf{GitHub:} \href{https://github.com/Shah-Abdul-Mazid}{github.com/Shah-Abdul-Mazid}\\[0.5mm]
+\footnotesize\textbf{LinkedIn:} \href{https://www.linkedin.com/in/shahabdulmazid}{linkedin.com/in/shahabdulmazid}\\[0.5mm]
+\footnotesize\textbf{Nexus Intelligence:} \href{https://ai-rag-project-llm-based.vercel.app/auth/login}{Live Demo}
+
+\end{minipage}%
+\hfill
+% ---- RIGHT COLUMN (PAGE 2) ------------------------------
+\begin{minipage}[t]{0.485\textwidth}
+
+\section{Selected Projects}
+
+\project{Nexus Intelligence}{Enterprise Multi-Agent AI Platform}\\[0.5mm]
+\footnotesize Built a full-stack enterprise AI platform for secure Q\&A over private documents, spreadsheets, and web content.
+\begin{itemize}
+\item \footnotesize Implemented RAG and multi-agent architecture.
+\item \footnotesize Integrated Pinecone vector search and live data routing.
+\item \footnotesize Added feedback memory, JWT auth, and PII detection.
+\item \footnotesize Developed Next.js frontend and FastAPI backend.
+\item \footnotesize\textbf{Tech:} FastAPI, Next.js, React, TypeScript, OpenAI, Pinecone, AWS.
+\end{itemize}
+
+\vspace{1.5mm}
+
+\project{HR Policies RAG Chatbot}{AI-Powered Document Q\&A}\\[0.5mm]
+\footnotesize AI chatbot to answer HR policy questions from PDF documents using semantic retrieval and LLMs.
+\begin{itemize}
+\item \footnotesize Implemented PDF processing and vector retrieval.
+\item \footnotesize Developed interactive Streamlit interface.
+\item \footnotesize\textbf{Tech:} Python, FastAPI, Streamlit, Pinecone, Llama 2.
+\end{itemize}
+
+\vspace{1.5mm}
+
+\project{Bangladesh Traffic Flow Dataset}{Deep Learning Vehicle Detection}\\[0.5mm]
+\footnotesize Deep learning system for vehicle detection under Bangladesh traffic conditions.
+\begin{itemize}
+\item \footnotesize Implemented YOLO-based object detection \& Grad-CAM.
+\item \footnotesize Built inference using Streamlit and Gradio.
+\item \footnotesize\textbf{Tech:} PyTorch, YOLO, OpenCV, NumPy, Pandas.
+\end{itemize}
+
+\vspace{1.5mm}
+
+\project{Brain Tumor Detection}{MobDenseNet with CBAM Attention}\\[0.5mm]
+\footnotesize Hybrid deep learning model combining MobileNet, DenseNet, and CBAM attention for MRI brain tumor classification.
+\begin{itemize}
+\item \footnotesize Preprocessing, augmentation, and classification pipeline.
+\item \footnotesize Applied Grad-CAM interpretability & Streamlit deploy.
+\end{itemize}
+
+\vspace{1.5mm}
+
+\project{WhatsUpIn}{AI Travel Recommendation Engine}\\[0.5mm]
+\footnotesize Automated AI travel recommendation platform generating personalized itineraries.
+\begin{itemize}
+\item \footnotesize Integrated OpenAI, n8n, Google Maps, and Stripe.
+\end{itemize}
+
+\end{minipage}
+
+\end{document}
