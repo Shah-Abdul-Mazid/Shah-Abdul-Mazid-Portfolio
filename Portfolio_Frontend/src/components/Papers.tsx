@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { usePortfolio, PaperItem } from '../context/PortfolioContext';
+import { usePortfolio, type PaperItem } from '../context/PortfolioContext';
 import { Search, GraduationCap, Quote, Copy, Check, X } from 'lucide-react';
 
 type FilterType = 'journal' | 'conference' | 'book-chapter' | null;

@@ -95,6 +95,7 @@ export interface PaperItem {
     link?: string;
     documentUrl?: string;
     certificateUrl?: string;
+    bibtex?: string;
 }
 
 export interface ActivityItem {
