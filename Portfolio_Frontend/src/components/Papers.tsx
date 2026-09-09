@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { usePortfolio, type PaperItem } from '../context/PortfolioContext';
-import { Search, GraduationCap, Quote, Copy, Check, X } from 'lucide-react';
+import { Search, GraduationCap, Quote, Copy, Check, X, Github, ExternalLink } from 'lucide-react';
 
 type FilterType = 'journal' | 'conference' | 'book-chapter' | null;
 
@@ -108,12 +108,68 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                     <p className="pub-page-sub">Journal articles, book chapters, and conference papers.</p>
                 </div>
 
-                {/* Google Scholar Banner */}
-                <a href={SCHOLAR_URL} target="_blank" rel="noopener noreferrer" className="scholar-banner">
-                    <GraduationCap size={20} className="scholar-icon" />
-                    <span>Full citation list on</span>
-                    <span className="scholar-link-text">Google Scholar</span>
-                </a>
+                {/* Academic & Research Profiles / IDs */}
+                <div className="research-profiles-bar">
+                    <a 
+                        href={SCHOLAR_URL} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="research-id-card scholar"
+                        title="Google Scholar Profile & Citations"
+                    >
+                        <GraduationCap size={18} className="id-icon scholar-icon" />
+                        <div className="id-info">
+                            <span className="id-title">Google Scholar</span>
+                            <span className="id-meta">Citations & Profile</span>
+                        </div>
+                        <ExternalLink size={13} className="id-arrow" />
+                    </a>
+
+                    <a 
+                        href="https://orcid.org/0009-0009-6864-5343" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="research-id-card orcid"
+                        title="ORCID iD: 0009-0009-6864-5343"
+                    >
+                        <span className="orcid-badge-icon">iD</span>
+                        <div className="id-info">
+                            <span className="id-title">ORCID iD</span>
+                            <span className="id-meta">0009-0009-6864-5343</span>
+                        </div>
+                        <ExternalLink size={13} className="id-arrow" />
+                    </a>
+
+                    <a 
+                        href="https://www.researchgate.net/profile/Shah-Abdul-Mazid" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="research-id-card researchgate"
+                        title="ResearchGate Profile: Shah-Abdul-Mazid"
+                    >
+                        <span className="rg-badge-icon">RG</span>
+                        <div className="id-info">
+                            <span className="id-title">ResearchGate</span>
+                            <span className="id-meta">Preprints & Network</span>
+                        </div>
+                        <ExternalLink size={13} className="id-arrow" />
+                    </a>
+
+                    <a 
+                        href="https://github.com/Shah-Abdul-Mazid" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="research-id-card github"
+                        title="GitHub Profile & Repositories"
+                    >
+                        <Github size={17} className="id-icon github-icon" />
+                        <div className="id-info">
+                            <span className="id-title">GitHub</span>
+                            <span className="id-meta">Code & Datasets</span>
+                        </div>
+                        <ExternalLink size={13} className="id-arrow" />
+                    </a>
+                </div>
 
                 {/* Search Bar */}
                 <div className="pub-search-wrap">
@@ -282,34 +338,147 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                     line-height: 1.5;
                 }
 
-                /* Scholar Banner */
-                .scholar-banner {
+                /* Research Profiles / Academic IDs Bar */
+                .research-profiles-bar {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+                    gap: 12px;
+                    margin-bottom: 24px;
+                }
+
+                .research-id-card {
                     display: flex;
                     align-items: center;
-                    gap: 10px;
-                    padding: 14px 20px;
+                    gap: 12px;
+                    padding: 12px 16px;
                     border-radius: 12px;
-                    background: rgba(249, 115, 22, 0.07);
-                    border: 1px solid rgba(249, 115, 22, 0.25);
                     text-decoration: none;
-                    color: var(--text-color, #334155);
-                    font-size: 0.92rem;
-                    margin-bottom: 24px;
-                    transition: all 0.2s ease;
+                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+                    background: var(--card-bg, rgba(255, 255, 255, 0.02));
+                    position: relative;
                 }
-                .scholar-banner:hover {
-                    background: rgba(249, 115, 22, 0.12);
-                    border-color: rgba(249, 115, 22, 0.4);
+
+                .research-id-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+                }
+
+                .id-info {
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1;
+                    min-width: 0;
+                }
+
+                .id-title {
+                    font-size: 0.88rem;
+                    font-weight: 700;
+                    color: var(--text-color, #f8fafc);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .id-meta {
+                    font-size: 0.74rem;
+                    color: var(--text-secondary, #94a3b8);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    margin-top: 1px;
+                }
+
+                .id-arrow {
+                    color: var(--text-secondary, #64748b);
+                    opacity: 0.45;
+                    transition: all 0.2s ease;
+                    flex-shrink: 0;
+                }
+
+                .research-id-card:hover .id-arrow {
+                    opacity: 1;
+                    transform: translateX(2px);
+                }
+
+                /* Scholar */
+                .research-id-card.scholar {
+                    background: rgba(234, 88, 12, 0.04);
+                    border-color: rgba(234, 88, 12, 0.2);
+                }
+                .research-id-card.scholar:hover {
+                    background: rgba(234, 88, 12, 0.09);
+                    border-color: rgba(234, 88, 12, 0.45);
+                    box-shadow: 0 6px 20px rgba(234, 88, 12, 0.15);
                 }
                 .scholar-icon {
                     color: #ea580c;
                     flex-shrink: 0;
                 }
-                .scholar-link-text {
-                    color: #ea580c;
-                    font-weight: 700;
-                    text-decoration: underline;
-                    text-underline-offset: 3px;
+
+                /* ORCID */
+                .research-id-card.orcid {
+                    background: rgba(166, 206, 57, 0.04);
+                    border-color: rgba(166, 206, 57, 0.25);
+                }
+                .research-id-card.orcid:hover {
+                    background: rgba(166, 206, 57, 0.09);
+                    border-color: rgba(166, 206, 57, 0.5);
+                    box-shadow: 0 6px 20px rgba(166, 206, 57, 0.15);
+                }
+                .orcid-badge-icon {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 22px;
+                    height: 22px;
+                    border-radius: 50%;
+                    background: #a6ce39;
+                    color: #fff;
+                    font-size: 0.72rem;
+                    font-weight: 800;
+                    letter-spacing: -0.5px;
+                    flex-shrink: 0;
+                }
+
+                /* ResearchGate */
+                .research-id-card.researchgate {
+                    background: rgba(0, 204, 187, 0.04);
+                    border-color: rgba(0, 204, 187, 0.25);
+                }
+                .research-id-card.researchgate:hover {
+                    background: rgba(0, 204, 187, 0.09);
+                    border-color: rgba(0, 204, 187, 0.5);
+                    box-shadow: 0 6px 20px rgba(0, 204, 187, 0.15);
+                }
+                .rg-badge-icon {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 22px;
+                    height: 22px;
+                    border-radius: 5px;
+                    background: #00ccbb;
+                    color: #fff;
+                    font-size: 0.68rem;
+                    font-weight: 800;
+                    letter-spacing: -0.5px;
+                    flex-shrink: 0;
+                }
+
+                /* GitHub */
+                .research-id-card.github {
+                    background: rgba(139, 92, 246, 0.04);
+                    border-color: rgba(139, 92, 246, 0.2);
+                }
+                .research-id-card.github:hover {
+                    background: rgba(139, 92, 246, 0.09);
+                    border-color: rgba(139, 92, 246, 0.45);
+                    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.15);
+                }
+                .github-icon {
+                    color: #a855f7;
+                    flex-shrink: 0;
                 }
 
                 /* Search input */

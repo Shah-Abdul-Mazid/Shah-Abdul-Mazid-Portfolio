@@ -53,21 +53,41 @@ const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =
                             </div>
                         </div>
 
-                        <a 
-                            href="https://github.com/Shah-Abdul-Mazid" 
-                            target="_blank" 
-                            className="btn-glow"
-                        >
-                            My GitHub
-                        </a>
-                        <a 
-                            href="https://scholar.google.com/citations?user=TYkiwUgAAAAJ"
-                            target="_blank" 
-                            className="btn-glow"
-                            style={{ marginLeft: '20px' }}
-                        >
-                            My Google Scholar
-                        </a>
+                        <div className="about-actions">
+                            <a 
+                                href="https://github.com/Shah-Abdul-Mazid" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="btn-glow"
+                            >
+                                My GitHub
+                            </a>
+                            <a 
+                                href="https://scholar.google.com/citations?user=TYkiwUgAAAAJ"
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="btn-glow"
+                            >
+                                My Google Scholar
+                            </a>
+                            <a 
+                                href="https://orcid.org/0009-0009-6864-5343" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="btn-glow"
+                            >
+                                My ORCID
+                            </a>
+                            <a 
+                                href="https://www.researchgate.net/profile/Shah-Abdul-Mazid" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="btn-glow"
+                            >
+                                My ResearchGate
+                            </a>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -174,21 +194,32 @@ const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =
                     margin-top: 5px;
                 }
 
+                .about-actions {
+                    display: flex;
+                    gap: 14px;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    margin-top: 15px;
+                }
+
                 .btn-glow {
-                    display: inline-block;
-                    padding: 14px 32px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 12px 24px;
                     border-radius: 999px;
                     background: linear-gradient(135deg, #7c3aed, #a855f7);
                     color: #fff;
                     font-weight: 600;
+                    font-size: 0.92rem;
                     text-decoration: none;
                     transition: 0.3s ease;
-                    box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+                    box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
                 }
 
                 .btn-glow:hover {
-                    transform: translateY(-2px) scale(1.03);
-                    box-shadow: 0 0 30px rgba(168, 85, 247, 0.9);
+                    transform: translateY(-2px) scale(1.02);
+                    box-shadow: 0 0 28px rgba(168, 85, 247, 0.85);
                 }
 
                 @media (max-width: 768px) {

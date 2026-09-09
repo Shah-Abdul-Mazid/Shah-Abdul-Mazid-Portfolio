@@ -596,7 +596,9 @@ const defaultData: PortfolioData = {
         projects: "15+",
         bioLinks: [
             { label: 'GitHub Profile', url: 'https://github.com/Shah-Abdul-Mazid', icon: 'github' },
-            { label: 'Google Scholar', url: 'https://scholar.google.com/citations?user=TYkiwUgAAAAJ', icon: 'scholar' }
+            { label: 'Google Scholar', url: 'https://scholar.google.com/citations?user=TYkiwUgAAAAJ', icon: 'scholar' },
+            { label: 'ORCID iD', url: 'https://orcid.org/0009-0009-6864-5343', icon: 'orcid' },
+            { label: 'ResearchGate', url: 'https://www.researchgate.net/profile/Shah-Abdul-Mazid', icon: 'researchgate' }
         ]
     },
     skills: [

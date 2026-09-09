@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import FloatingContactForm from '../components/FloatingContactForm';
@@ -5,7 +6,14 @@ import IntelligenceMatrix from '../components/IntelligenceMatrix';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { usePortfolio } from '../context/PortfolioContext';
 import { formatDateLabel, sortRecentFirst } from '../utils/dateUtils';
-import { Github, BookOpen, ExternalLink } from 'lucide-react';
+import { Github, ExternalLink, GraduationCap } from 'lucide-react';
+
+const CORE_RESEARCH_LINKS = [
+  { label: 'GitHub Profile', url: 'https://github.com/Shah-Abdul-Mazid', icon: 'github' },
+  { label: 'Google Scholar', url: 'https://scholar.google.com/citations?user=TYkiwUgAAAAJ', icon: 'scholar' },
+  { label: 'ORCID iD', url: 'https://orcid.org/0009-0009-6864-5343', icon: 'orcid' },
+  { label: 'ResearchGate', url: 'https://www.researchgate.net/profile/Shah-Abdul-Mazid', icon: 'researchgate' }
+];
 
 const ProfilePage = () => {
   const { addToRefs } = useIntersectionObserver();
@@ -14,6 +22,14 @@ const ProfilePage = () => {
   const education = data.education || [];
   const workExperience = sortRecentFirst(data.work || []);
   const certifications = data.certifications || [];
+
+  const allBioLinks = useMemo(() => {
+    const customLinks = data.about.bioLinks || [];
+    if (customLinks.length === 0) return CORE_RESEARCH_LINKS;
+    const existingUrls = new Set(customLinks.map(l => (l.url || '').toLowerCase()));
+    const missing = CORE_RESEARCH_LINKS.filter(c => !existingUrls.has(c.url.toLowerCase()));
+    return [...customLinks, ...missing];
+  }, [data.about.bioLinks]);
 
   return (
     <div className="app">
@@ -38,38 +54,25 @@ const ProfilePage = () => {
             
             {/* Profile Action Links */}
             <div className="bio-links">
-              {(data.about.bioLinks && data.about.bioLinks.length > 0)
-                ? data.about.bioLinks.map((link, idx) => {
-                    const iconType = (link.icon || '').toLowerCase();
-                    const Icon = iconType === 'github'
-                      ? Github
-                      : iconType === 'scholar'
-                      ? BookOpen
-                      : ExternalLink;
-                    return (
-                      <a
-                        key={idx}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`bio-btn ${iconType || 'custom'}`}
-                      >
-                        <Icon size={16} />
-                        {link.label}
-                      </a>
-                    );
-                  })
-                : (
-                  <>
-                    <a href="https://github.com/Shah-Abdul-Mazid" target="_blank" rel="noopener noreferrer" className="bio-btn github">
-                      <Github size={16} /> GitHub Profile
-                    </a>
-                    <a href="https://scholar.google.com/citations?user=TYkiwUgAAAAJ" target="_blank" rel="noopener noreferrer" className="bio-btn scholar">
-                      <BookOpen size={16} /> Google Scholar
-                    </a>
-                  </>
-                )
-              }
+              {allBioLinks.map((link, idx) => {
+                const iconType = (link.icon || '').toLowerCase();
+                return (
+                  <a
+                    key={idx}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`bio-btn ${iconType || 'custom'}`}
+                  >
+                    {iconType === 'github' && <Github size={16} />}
+                    {iconType === 'scholar' && <GraduationCap size={16} />}
+                    {iconType === 'orcid' && <span className="orcid-dot">iD</span>}
+                    {iconType === 'researchgate' && <span className="rg-dot">RG</span>}
+                    {iconType !== 'github' && iconType !== 'scholar' && iconType !== 'orcid' && iconType !== 'researchgate' && <ExternalLink size={16} />}
+                    {link.label}
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -276,6 +279,57 @@ const ProfilePage = () => {
           border-color: #24292e;
           background: rgba(0, 0, 0, 0.05);
           color: #000;
+        }
+
+        .bio-btn.scholar:hover {
+          border-color: #ea580c;
+          background: rgba(234, 88, 12, 0.08);
+          color: #ea580c;
+          box-shadow: 0 4px 14px rgba(234, 88, 12, 0.2);
+        }
+
+        .bio-btn.orcid:hover {
+          border-color: #a6ce39;
+          background: rgba(166, 206, 57, 0.08);
+          color: #a6ce39;
+          box-shadow: 0 4px 14px rgba(166, 206, 57, 0.2);
+        }
+
+        .bio-btn.researchgate:hover {
+          border-color: #00ccbb;
+          background: rgba(0, 204, 187, 0.08);
+          color: #00ccbb;
+          box-shadow: 0 4px 14px rgba(0, 204, 187, 0.2);
+        }
+
+        .orcid-dot {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 17px;
+          height: 17px;
+          border-radius: 50%;
+          background: #a6ce39;
+          color: #fff;
+          font-size: 0.62rem;
+          font-weight: 800;
+          line-height: 1;
+          flex-shrink: 0;
+        }
+
+        .rg-dot {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 17px;
+          height: 17px;
+          border-radius: 4px;
+          background: #00ccbb;
+          color: #fff;
+          font-size: 0.62rem;
+          font-weight: 800;
+          line-height: 1;
+          flex-shrink: 0;
         }
 
         /* Timeline Grid Layout */

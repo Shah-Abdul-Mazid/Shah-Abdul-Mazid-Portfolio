@@ -1147,6 +1147,8 @@ const AdminDashboard = () => {
                                             >
                                                 <option value="github">GitHub</option>
                                                 <option value="scholar">Scholar</option>
+                                                <option value="orcid">ORCID</option>
+                                                <option value="researchgate">ResearchGate</option>
                                                 <option value="link">Generic Link</option>
                                             </select>
                                             <button
