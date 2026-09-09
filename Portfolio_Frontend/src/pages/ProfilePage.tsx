@@ -8,11 +8,13 @@ import { usePortfolio } from '../context/PortfolioContext';
 import { formatDateLabel, sortRecentFirst } from '../utils/dateUtils';
 import { Github, ExternalLink, GraduationCap } from 'lucide-react';
 
+import { GITHUB_URL, SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL } from '../constants/researchLinks';
+
 const CORE_RESEARCH_LINKS = [
-  { label: 'GitHub Profile', url: 'https://github.com/Shah-Abdul-Mazid', icon: 'github' },
-  { label: 'Google Scholar', url: 'https://scholar.google.com/citations?user=TYkiwUgAAAAJ', icon: 'scholar' },
-  { label: 'ORCID iD', url: 'https://orcid.org/0009-0009-6864-5343', icon: 'orcid' },
-  { label: 'ResearchGate', url: 'https://www.researchgate.net/profile/Shah-Abdul-Mazid', icon: 'researchgate' }
+  { label: 'GitHub Profile', url: GITHUB_URL, icon: 'github' },
+  { label: 'Google Scholar', url: SCHOLAR_URL, icon: 'scholar' },
+  { label: 'ORCID iD', url: ORCID_URL, icon: 'orcid' },
+  { label: 'ResearchGate', url: RESEARCHGATE_URL, icon: 'researchgate' }
 ];
 
 const ProfilePage = () => {

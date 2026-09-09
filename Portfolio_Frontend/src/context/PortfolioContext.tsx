@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { GITHUB_URL, SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL } from '../constants/researchLinks';
 
 export interface SkillCategory {
     name: string;
@@ -595,10 +596,10 @@ const defaultData: PortfolioData = {
         age: "24",
         projects: "15+",
         bioLinks: [
-            { label: 'GitHub Profile', url: 'https://github.com/Shah-Abdul-Mazid', icon: 'github' },
-            { label: 'Google Scholar', url: 'https://scholar.google.com/citations?user=TYkiwUgAAAAJ', icon: 'scholar' },
-            { label: 'ORCID iD', url: 'https://orcid.org/0009-0009-6864-5343', icon: 'orcid' },
-            { label: 'ResearchGate', url: 'https://www.researchgate.net/profile/Shah-Abdul-Mazid', icon: 'researchgate' }
+            { label: 'GitHub Profile', url: GITHUB_URL, icon: 'github' },
+            { label: 'Google Scholar', url: SCHOLAR_URL, icon: 'scholar' },
+            { label: 'ORCID iD', url: ORCID_URL, icon: 'orcid' },
+            { label: 'ResearchGate', url: RESEARCHGATE_URL, icon: 'researchgate' }
         ]
     },
     skills: [
@@ -681,7 +682,7 @@ const defaultData: PortfolioData = {
         whatsapp: "https://wa.me/8801531329222",
         messenger: "https://m.me/shahabdulmazid.ezan",
         facebook: "https://facebook.com/shahabdulmazid.ezan",
-        github: "https://github.com/Shah-Abdul-Mazid",
+        github: GITHUB_URL,
         linkedin: "https://linkedin.com/in/shahabdulmazid",
         nationality: "Bangladeshi",
         dob: "01/06/2001",

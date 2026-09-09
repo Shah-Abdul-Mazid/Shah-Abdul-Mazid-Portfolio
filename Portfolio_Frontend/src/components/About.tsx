@@ -1,6 +1,8 @@
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import avtarImg from '../assets/avtar.png';
 
+import { SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL, GITHUB_URL } from '../constants/researchLinks';
+
 const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
 
@@ -55,7 +57,7 @@ const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =
 
                         <div className="about-actions">
                             <a 
-                                href="https://github.com/Shah-Abdul-Mazid" 
+                                href={GITHUB_URL} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="btn-glow"
@@ -63,29 +65,23 @@ const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =
                                 My GitHub
                             </a>
                             <a 
-                                href="https://scholar.google.com/citations?user=TYkiwUgAAAAJ"
+                                href={SCHOLAR_URL} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="btn-glow"
                             >
                                 My Google Scholar
                             </a>
-                            <a
-                            id="cy-effective-orcid-url"
-                            class="underline"
-                            href="https://orcid.org/0009-0009-6864-5343"
-                            target="orcid.widget"
-                            rel="me noopener noreferrer"
-                            style="vertical-align: top">
-                            <img
-                                src="https://orcid.org/sites/default/files/images/orcid_16x16.png"
-                                style="width: 1em; margin-inline-start: 0.5em"
-                                alt="ORCID iD icon"/>
-                    
+                            <a 
+                                href={ORCID_URL} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="btn-glow"
+                            >
                                 My ORCID
                             </a>
                             <a 
-                                href="https://www.researchgate.net/profile/Shah-Abdul-Mazid" 
+                                href={RESEARCHGATE_URL} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="btn-glow"

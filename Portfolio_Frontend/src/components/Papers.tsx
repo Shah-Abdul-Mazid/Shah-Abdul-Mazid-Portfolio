@@ -4,7 +4,7 @@ import { Search, GraduationCap, Quote, Copy, Check, X, Github, ExternalLink } fr
 
 type FilterType = 'journal' | 'conference' | 'book-chapter' | null;
 
-const SCHOLAR_URL = 'https://scholar.google.com/citations?user=TYkiwUgAAAAJ';
+import { SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL, GITHUB_URL } from '../constants/researchLinks';
 
 const highlightAuthors = (authorsStr: string) => {
     if (!authorsStr) return null;
@@ -117,16 +117,15 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                         className="research-id-card scholar"
                         title="Google Scholar Profile & Citations"
                     >
-                        <GraduationCap size={18} className="id-icon scholar-icon" />
+                        <GraduationCap size={17} className="id-icon scholar-icon" />
                         <div className="id-info">
                             <span className="id-title">Google Scholar</span>
-                            <span className="id-meta">Citations & Profile</span>
                         </div>
-                        <ExternalLink size={13} className="id-arrow" />
+                        <ExternalLink size={12} className="id-arrow" />
                     </a>
 
                     <a 
-                        href="https://orcid.org/0009-0009-6864-5343" 
+                        href={ORCID_URL} 
                         target="_blank" 
                         rel="noopener noreferrer" 
                         className="research-id-card orcid"
@@ -135,13 +134,12 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                         <span className="orcid-badge-icon">iD</span>
                         <div className="id-info">
                             <span className="id-title">ORCID iD</span>
-                            <span className="id-meta">0009-0009-6864-5343</span>
                         </div>
-                        <ExternalLink size={13} className="id-arrow" />
+                        <ExternalLink size={12} className="id-arrow" />
                     </a>
 
                     <a 
-                        href="https://www.researchgate.net/profile/Shah-Abdul-Mazid" 
+                        href={RESEARCHGATE_URL} 
                         target="_blank" 
                         rel="noopener noreferrer" 
                         className="research-id-card researchgate"
@@ -150,24 +148,22 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                         <span className="rg-badge-icon">RG</span>
                         <div className="id-info">
                             <span className="id-title">ResearchGate</span>
-                            <span className="id-meta">Preprints & Network</span>
                         </div>
-                        <ExternalLink size={13} className="id-arrow" />
+                        <ExternalLink size={12} className="id-arrow" />
                     </a>
 
                     <a 
-                        href="https://github.com/Shah-Abdul-Mazid" 
+                        href={GITHUB_URL} 
                         target="_blank" 
                         rel="noopener noreferrer" 
                         className="research-id-card github"
                         title="GitHub Profile & Repositories"
                     >
-                        <Github size={17} className="id-icon github-icon" />
+                        <Github size={16} className="id-icon github-icon" />
                         <div className="id-info">
                             <span className="id-title">GitHub</span>
-                            <span className="id-meta">Code & Datasets</span>
                         </div>
-                        <ExternalLink size={13} className="id-arrow" />
+                        <ExternalLink size={12} className="id-arrow" />
                     </a>
                 </div>
 
@@ -338,25 +334,27 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                     line-height: 1.5;
                 }
 
-                /* Research Profiles / Academic IDs Bar */
+                /* Research Profiles / Academic IDs Bar - STRICT SINGLE ROW */
                 .research-profiles-bar {
                     display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-                    gap: 12px;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 10px;
                     margin-bottom: 24px;
+                    width: 100%;
                 }
 
                 .research-id-card {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
-                    padding: 12px 16px;
+                    gap: 8px;
+                    padding: 10px 12px;
                     border-radius: 12px;
                     text-decoration: none;
                     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
                     border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
                     background: var(--card-bg, rgba(255, 255, 255, 0.02));
-                    position: relative;
+                    min-width: 0;
+                    box-sizing: border-box;
                 }
 
                 .research-id-card:hover {
@@ -479,6 +477,18 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                 .github-icon {
                     color: #a855f7;
                     flex-shrink: 0;
+                }
+
+                @media (max-width: 860px) {
+                    .research-profiles-bar {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .research-profiles-bar {
+                        grid-template-columns: 1fr;
+                    }
                 }
 
                 /* Search input */
