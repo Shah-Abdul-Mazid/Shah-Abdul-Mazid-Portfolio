@@ -182,6 +182,13 @@ const ProfilePage = () => {
 
         .profile-header {
           margin-bottom: 40px;
+          padding: 28px 36px;
+          background: var(--card-bg);
+          backdrop-filter: blur(24px) saturate(180%);
+          -webkit-backdrop-filter: blur(24px) saturate(180%);
+          border: 1px solid var(--border-color);
+          border-radius: 24px;
+          box-shadow: var(--card-shadow);
         }
 
         .profile-title {
@@ -189,13 +196,14 @@ const ProfilePage = () => {
           font-size: 2.8rem;
           font-weight: 600;
           color: var(--text-color);
-          margin-bottom: 12px;
+          margin-bottom: 8px;
         }
 
         .profile-subtitle {
           font-size: 1.05rem;
           color: var(--text-secondary);
           line-height: 1.5;
+          margin: 0;
         }
 
         /* Short Biography Section */

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import aiCircuitBg from '../assets/ai-circuit-bg.jpg';
+import lightModeBg from '../assets/Light_Mode.png';
+import nightModeBg from '../assets/Night_Mode.png';
 
 /**
  * ═══════════════════════════════════════════════════════════════════
@@ -75,19 +76,24 @@ const lerpColor = (c1: { r: number; g: number; b: number }, c2: { r: number; g: 
     b: Math.round(lerp(c1.b, c2.b, t)),
 });
 
-const DATA_METRICS = [
-    'TENSOR.SHAPE: [64, 128, 768]',
-    'FORWARD_PASS: 1.42ms',
-    'LOSS_CONV: 0.0028',
-    'ACCURACY: 99.41%',
-    'SYNAPSE_WEIGHTS: 4.8M',
-    'LATENT_VEC: 512-DIM',
-    'ATTENTION_HEADS: 12',
-    'GRAD_DESCENT: ADAM_W',
-];
-
 const IntelligenceMatrix: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [isLightMode, setIsLightMode] = React.useState(() =>
+        typeof document !== 'undefined' ? document.documentElement.classList.contains('light-mode') : false
+    );
+
+    useEffect(() => {
+        const updateTheme = () => {
+            setIsLightMode(document.documentElement.classList.contains('light-mode'));
+        };
+        window.addEventListener('themechange', updateTheme);
+        const observer = new MutationObserver(updateTheme);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        return () => {
+            window.removeEventListener('themechange', updateTheme);
+            observer.disconnect();
+        };
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -531,22 +537,6 @@ const IntelligenceMatrix: React.FC = () => {
                 }
             });
 
-            // 11. AMBIENT DATA SCIENCE METRICS (High-Tech HUD Periphery)
-            ctx.save();
-            ctx.font = '10px "JetBrains Mono", monospace, "Courier New"';
-
-            // Top-left HUD badge
-            ctx.fillStyle = themeBlend > 0.5 ? 'rgba(71, 85, 105, 0.65)' : 'rgba(56, 189, 248, 0.45)';
-            ctx.fillText('◈ AI.INTELLIGENCE_MATRIX // OPERATIONAL', 24, 40);
-
-            // Bottom-left and bottom-right live telemetry
-            const metricIdx = Math.floor((frame / 120) % DATA_METRICS.length);
-            ctx.fillText(`▶ METRIC: ${DATA_METRICS[metricIdx]}`, 24, H - 24);
-
-            ctx.textAlign = 'right';
-            ctx.fillText(`NEURAL_GRAPH :: ${nodes.length}_NODES // SYNC_60FPS`, W - 24, H - 24);
-            ctx.restore();
-
             animId = requestAnimationFrame(draw);
         };
 
@@ -562,94 +552,120 @@ const IntelligenceMatrix: React.FC = () => {
 
     return (
         <div className="im-container">
-            {/* ── High-Def AI Circuit Core Background (Full Opacity) ── */}
+            {/* ── Full Screen Dual-Mode Backgrounds (Light_Mode.png & Night_Mode.png) ── */}
             <div className="im-image-wrapper">
                 <img
-                    src={aiCircuitBg}
-                    alt="Cybernetic Artificial Intelligence Matrix"
-                    className="im-bg-image"
+                    src={nightModeBg}
+                    alt="Night Mode Background"
+                    className="im-bg-image im-bg-night"
+                    style={{
+                        opacity: isLightMode ? 0 : 0.42,
+                        pointerEvents: 'none',
+                    }}
                 />
-                {/* Center Vignette / Typography Shield for 100% legibility */}
-                <div className="im-center-shield" />
+                <img
+                    src={lightModeBg}
+                    alt="Light Mode Background"
+                    className="im-bg-image im-bg-light"
+                    style={{
+                        opacity: isLightMode ? 0.52 : 0,
+                        pointerEvents: 'none',
+                    }}
+                />
+                {/* Overlay to keep content readable */}
+                <div className="im-overlay" />
             </div>
 
-            {/* ── Real-Time Synaptic & HUD Telemetry Canvas ── */}
+            {/* ── Real-Time Synaptic Canvas ── */}
             <canvas
                 ref={canvasRef}
                 className="im-canvas"
             />
 
             <style>{`
+                /* ─── Cross-platform full-screen container ─── */
                 .im-container {
                     position: fixed;
                     top: 0;
                     left: 0;
+                    right: 0;
+                    bottom: 0;
+                    /* Fallback for older browsers */
                     width: 100vw;
                     height: 100vh;
+                    /* iOS Safari: use -webkit-fill-available */
+                    height: -webkit-fill-available;
+                    /* Modern browsers: dynamic viewport (handles iOS toolbar) */
+                    height: 100dvh;
                     pointer-events: none;
                     z-index: -1;
                     overflow: hidden;
+                    /* GPU acceleration for smooth rendering */
+                    transform: translateZ(0);
+                    -webkit-transform: translateZ(0);
+                    will-change: transform;
                 }
 
                 .im-image-wrapper {
                     position: absolute;
-                    inset: 0;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
                     width: 100%;
                     height: 100%;
+                    overflow: hidden;
                 }
 
+                /* ─── Background images: full bleed on every device ─── */
                 .im-bg-image {
-                    width: 100%;
-                    height: 100%;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    /* Use 100% + min to guarantee full coverage */
+                    width: 100vw;
+                    height: 100vh;
+                    height: -webkit-fill-available;
+                    height: 100dvh;
+                    /* Cover the entire viewport regardless of image ratio */
                     object-fit: cover;
                     object-position: center center;
-                    opacity: 1; /* FULL OPACITY in Dark Mode */
-                    transition: filter 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease;
-                    filter: saturate(1.2) brightness(1.0);
+                    /* Prevent image from being smaller than viewport */
+                    min-width: 100%;
+                    min-height: 100%;
+                    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
                     display: block;
+                    /* Prevent iOS tap highlight */
+                    -webkit-tap-highlight-color: transparent;
+                    /* Crisp rendering */
+                    image-rendering: auto;
                 }
 
-                /* Day / Light Mode: Invert to pristine technical blueprint with deep cobalt circuit lines */
-                html.light-mode .im-bg-image {
-                    filter: invert(1) hue-rotate(180deg) saturate(1.3) contrast(1.1) brightness(0.98);
-                    opacity: 0.95; /* FULL OPACITY in Day Mode */
-                }
-
-                /* Soft typography protection shield: smooth feathered glassmorphic blur to dissolve conflicting background text under the headline while keeping circuit brain at 100% full opacity around it */
-                .im-center-shield {
-                    position: absolute;
-                    top: 48%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    width: 820px;
-                    max-width: 96vw;
-                    height: 560px;
-                    border-radius: 48px;
-                    backdrop-filter: blur(28px);
-                    -webkit-backdrop-filter: blur(28px);
-                    background: radial-gradient(
-                        ellipse at center,
-                        rgba(2, 6, 23, 0.88) 0%,
-                        rgba(2, 6, 23, 0.70) 45%,
-                        rgba(2, 6, 23, 0.20) 75%,
-                        transparent 100%
-                    );
-                    mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
-                    -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+                /* ─── Overlay ─── */
+                .im-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    height: 100dvh;
+                    background: rgba(2, 6, 23, 0.62);
                     pointer-events: none;
-                    transition: background 0.6s ease;
+                    transition: background 0.5s ease;
+                }
+                html.light-mode .im-overlay {
+                    background: rgba(220, 232, 255, 0.52);
                 }
 
-                html.light-mode .im-center-shield {
-                    background: radial-gradient(
-                        ellipse at center,
-                        rgba(248, 250, 252, 0.94) 0%,
-                        rgba(248, 250, 252, 0.80) 45%,
-                        rgba(248, 250, 252, 0.25) 75%,
-                        transparent 100%
-                    );
-                }
+                /* ─── Night / Light mode opacity ─── */
+                .im-bg-night { opacity: 0.42; }
+                .im-bg-light { opacity: 0; pointer-events: none; }
+                html.light-mode .im-bg-night { opacity: 0; pointer-events: none; }
+                html.light-mode .im-bg-light { opacity: 0.52; }
 
+                /* ─── Canvas ─── */
                 .im-canvas {
                     position: absolute;
                     top: 0;
@@ -658,6 +674,41 @@ const IntelligenceMatrix: React.FC = () => {
                     height: 100%;
                     display: block;
                     pointer-events: none;
+                }
+
+                /* ─── Mobile: prevent image gaps on notch/safe-area devices ─── */
+                @supports (padding: env(safe-area-inset-top)) {
+                    .im-container {
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                    }
+                    .im-bg-image,
+                    .im-overlay {
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+
+                /* ─── Portrait phones ─── */
+                @media (max-width: 600px) {
+                    .im-bg-image {
+                        object-position: center top;
+                    }
+                }
+
+                /* ─── Landscape phones ─── */
+                @media (max-height: 500px) and (orientation: landscape) {
+                    .im-bg-image {
+                        object-position: center center;
+                        height: 100vh;
+                        height: 100dvh;
+                    }
                 }
             `}</style>
         </div>

@@ -279,7 +279,7 @@ const FloatingContactForm = () => {
             </div>
 
             <style>{`
-                .floating-container { position: fixed; bottom: 30px; right: 30px; z-index: 9999; }
+                .floating-container { position: fixed; bottom: 60px; right: 3%; z-index: 9999; }
                 
                 .fab { 
                     width: 60px; height: 60px; border-radius: 50%; background: #3b82f6; color: white;

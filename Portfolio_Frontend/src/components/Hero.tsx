@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { Link } from 'react-router-dom';
-import { Moon } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 import avtarImg from '../assets/avtar.png';
 
 
@@ -12,6 +12,34 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
 
     const roles = data.hero.roles && data.hero.roles.length > 0 ? data.hero.roles : [data.hero.title];
     const [currentTime, setCurrentTime] = useState(new Date());
+
+    const [isLightMode, setIsLightMode] = useState(() =>
+        typeof document !== 'undefined' ? document.documentElement.classList.contains('light-mode') : false
+    );
+
+    useEffect(() => {
+        const updateTheme = () => {
+            setIsLightMode(document.documentElement.classList.contains('light-mode'));
+        };
+        window.addEventListener('themechange', updateTheme);
+        const observer = new MutationObserver(updateTheme);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        return () => {
+            window.removeEventListener('themechange', updateTheme);
+            observer.disconnect();
+        };
+    }, []);
+
+    const toggleTheme = () => {
+        if (isLightMode) {
+            document.documentElement.classList.remove('light-mode');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.add('light-mode');
+            localStorage.setItem('theme', 'light');
+        }
+        window.dispatchEvent(new Event('themechange'));
+    };
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -46,9 +74,20 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
     }, [roles.length]);
     
     return (
-        <section id="hero" className="hero section" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: '120px' }}>
+        <section id="hero" className="hero section" style={{ 
+            height: '100%',
+            minHeight: 0,
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            textAlign: 'center', 
+            paddingTop: '65px',
+            paddingBottom: '0',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+        }}>
             <div className="container">
-                <div className="hero-image fade-in" ref={addToRefs} style={{ marginBottom: '32px' }}>
+                <div className="hero-image fade-in" ref={addToRefs} style={{ marginBottom: '10px' }}>
                     <div className="image-wrapper">
                         <img src={data.hero.avatarUrl ? resolveUrl(data.hero.avatarUrl) : avtarImg} alt={data.hero.name} />
                     </div>
@@ -59,10 +98,21 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                         <div className="time-pill">
                             <span className="time-text">{formatTime(currentTime)}</span>
                             <div className="pill-divider"></div>
-                            <div className="theme-toggle-mini">
-                                <Moon size={14} className="moon-icon" />
-                                <div className="toggle-slider">
-                                    <div className="slider-thumb">
+                            <div 
+                                className="theme-toggle-mini" 
+                                onClick={toggleTheme} 
+                                style={{ cursor: 'pointer' }}
+                                role="button"
+                                tabIndex={0}
+                                aria-label="Toggle theme"
+                            >
+                                {isLightMode ? (
+                                    <Sun size={14} className="sun-icon" style={{ color: '#f59e0b' }} />
+                                ) : (
+                                    <Moon size={14} className="moon-icon" />
+                                )}
+                                <div className={`toggle-slider ${isLightMode ? 'light' : ''}`}>
+                                    <div className={`slider-thumb ${isLightMode ? 'light' : ''}`}>
                                         <div className="thumb-dots"></div>
                                     </div>
                                 </div>
@@ -72,10 +122,10 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     </div>
 
                     <div className="badge fade-in" ref={addToRefs}>Available for new opportunities</div>
-                    <h1 className="fade-in" ref={addToRefs} style={{ fontSize: 'clamp(3rem, 10vw, 6rem)', fontWeight: 900, margin: '16px 0' }}>
+                    <h1 className="fade-in" ref={addToRefs} style={{ fontSize: 'clamp(2.2rem, 8vw, 5rem)', fontWeight: 900, margin: '10px 0' }}>
                         Hi, I'm <span className="gradient-text">{data.hero.name}</span>
                     </h1>
-                    <p className="fade-in" ref={addToRefs} style={{ fontSize: '1.5rem', color: 'var(--text-secondary)', maxWidth: '800px', margin: '0 auto 10px', lineHeight: 1.6, minHeight: '38px', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+                    <p className="fade-in" ref={addToRefs} style={{ fontSize: '1.3rem', color: 'var(--text-secondary)', maxWidth: '800px', margin: '0 auto 6px', lineHeight: 1.5, minHeight: '34px', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center' }}>
                             {(() => {
                                 const text = roles[roleIndex] || '';
@@ -100,14 +150,14 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                                                 whiteSpace: 'pre'
                                             }}
                                         >
-                                            {char === ' ' ? ' ' : char}
+                                            {char === ' ' ? '\u00A0' : char}
                                         </span>
                                     );
                                 });
                             })()}
                         </span>
                     </p>
-                    <p className="fade-in" ref={addToRefs} style={{ fontSize: '1.1rem', color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto 40px', lineHeight: 1.4 }}>
+                    <p className="fade-in" ref={addToRefs} style={{ fontSize: '1rem', color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto 24px', lineHeight: 1.4 }}>
                         {data.hero.description}
                     </p>
                     <div className="hero-btns fade-in" ref={addToRefs}>
@@ -119,8 +169,9 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                 </div>
             </div>
             <style>{`
+                #hero { min-height: 0 !important; }
                 .hero-grid { display: block; }
-                .time-pill-container { display: flex; justify-content: center; margin-bottom: 24px; }
+                .time-pill-container { display: flex; justify-content: center; margin-bottom: 12px; }
                 .time-pill { 
                     display: flex; 
                     align-items: center; 
@@ -128,7 +179,7 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     background: rgba(13, 13, 18, 0.6); 
                     backdrop-filter: blur(10px);
                     border: 1px solid rgba(255, 255, 255, 0.1);
-                    padding: 6px 6px 6px 20px;
+                    padding: 5px 6px 5px 18px;
                     border-radius: 100px;
                     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
                 }
@@ -145,18 +196,25 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     align-items: center;
                     gap: 8px;
                     padding-right: 4px;
+                    cursor: pointer;
+                    user-select: none;
                 }
-                .moon-icon { color: rgba(255, 255, 255, 0.6); }
+                .moon-icon { color: rgba(255, 255, 255, 0.7); }
+                .sun-icon { color: #f59e0b; }
                 .toggle-slider {
                     width: 32px;
                     height: 18px;
-                    background: rgba(255, 255, 255, 0.1);
+                    background: rgba(255, 255, 255, 0.15);
                     border-radius: 10px;
                     position: relative;
+                    transition: background 0.3s ease;
+                }
+                .toggle-slider.light {
+                    background: rgba(2, 132, 199, 0.35);
                 }
                 .slider-thumb {
                     position: absolute;
-                    right: 2px;
+                    left: 2px;
                     top: 2px;
                     width: 14px;
                     height: 14px;
@@ -165,12 +223,20 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+                }
+                .slider-thumb.light {
+                    transform: translateX(14px);
+                    background: #0284c7;
                 }
                 .thumb-dots {
                     width: 6px;
                     height: 6px;
-                    background: #ccc;
+                    background: #94a3b8;
                     border-radius: 50%;
+                }
+                .slider-thumb.light .thumb-dots {
+                    background: #e0f2fe;
                 }
 
 
@@ -188,9 +254,9 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     text-shadow: 0 1px 12px rgba(255, 255, 255, 0.9);
                 }
 
-                .badge { display: inline-block; padding: 10px 24px; background: var(--primary-glow); border: 1px solid var(--border-color); border-radius: 100px; color: var(--primary); font-size: 0.8125rem; font-weight: 600; margin-bottom: 24px; backdrop-filter: blur(12px); }
-                .hero-btns { display: flex; gap: 16px; margin-top: 40px; justify-content: center; }
-                .image-wrapper { position: relative; width: 140px; height: 140px; margin: 0 auto; }
+                .badge { display: inline-block; padding: 6px 20px; background: var(--primary-glow); border: 1px solid var(--border-color); border-radius: 100px; color: var(--primary); font-size: 0.8rem; font-weight: 600; margin-bottom: 12px; backdrop-filter: blur(12px); }
+                .hero-btns { display: flex; gap: 14px; margin-top: 20px; justify-content: center; }
+                .image-wrapper { position: relative; width: 110px; height: 110px; margin: 0 auto; }
                 .image-wrapper img { 
                     width: 100%; height: 100%; object-fit: cover; 
                     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
@@ -233,14 +299,67 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     100% { opacity: 0; filter: blur(10px); transform: scale(0.9); letter-spacing: 2px; }
                 }
 
-                .btn-gradient { background: var(--gradient); color: white; border: none; padding: 14px 32px; font-size: 1rem; }
-                .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); padding: 14px 32px; font-size: 1rem; }
-                .btn-outline:hover { background: var(--primary-glow); border-color: var(--primary); }
+                .btn-gradient { 
+                    background: var(--gradient); 
+                    color: white; 
+                    border: none; 
+                    padding: 11px 26px; 
+                    font-size: 0.95rem; 
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(56, 189, 248, 0.35);
+                    font-weight: 600;
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+                }
+                .btn-gradient:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 28px rgba(56, 189, 248, 0.5);
+                }
+                .btn-outline { 
+                    background: rgba(15, 23, 42, 0.85); 
+                    backdrop-filter: blur(16px);
+                    -webkit-backdrop-filter: blur(16px);
+                    border: 1px solid var(--border-color); 
+                    color: var(--text-color); 
+                    padding: 11px 26px; 
+                    font-size: 0.95rem; 
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+                    font-weight: 600;
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+                }
+                .btn-outline:hover { 
+                    background: rgba(56, 189, 248, 0.18); 
+                    border-color: var(--primary); 
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 24px rgba(56, 189, 248, 0.25);
+                }
+                html.light-mode .btn-outline {
+                    background: rgba(255, 255, 255, 0.90);
+                    border-color: rgba(203, 213, 225, 0.95);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+                }
+                html.light-mode .btn-outline:hover {
+                    background: rgba(2, 132, 199, 0.1);
+                    border-color: var(--primary);
+                    box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2);
+                }
 
                 @media (max-width: 480px) {
-                    .hero-btns { flex-direction: column; width: 100%; }
-                    .hero-btns .btn { width: 100%; text-align: center; }
-                    .image-wrapper { width: 100px; height: 100px; }
+                    .hero-btns { flex-direction: column; width: 100%; gap: 10px; margin-top: 20px; }
+                    .hero-btns .btn { width: 100%; text-align: center; padding: 12px 20px; }
+                    .image-wrapper { width: 80px; height: 80px; }
+                    .badge { padding: 7px 16px; font-size: 0.75rem; margin-bottom: 14px; }
+                    .time-pill { padding: 5px 5px 5px 14px; }
+                    .time-text { font-size: 0.75rem; }
+                }
+                @media (max-height: 700px) {
+                    .image-wrapper { width: 80px; height: 80px; }
+                    .hero-image { margin-bottom: 8px !important; }
+                    .badge { margin-bottom: 12px; padding: 6px 16px; }
+                    .hero-btns { margin-top: 16px; gap: 10px; }
+                    .hero-btns .btn { padding: 10px 22px; font-size: 0.9rem; }
                 }
             `}</style>
         </section>

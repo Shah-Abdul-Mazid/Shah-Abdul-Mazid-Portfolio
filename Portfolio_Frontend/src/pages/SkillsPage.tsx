@@ -43,6 +43,10 @@ const SkillsPage = () => {
         <div className="skills-page-container fade-in" ref={addToRefs}>
           {/* Page Header */}
           <div className="skills-page-header">
+            <div className="skills-header-badge">
+              <span className="badge-glow-dot"></span>
+              <span>TECHNICAL ARSENAL & TOOLKIT</span>
+            </div>
             <h1 className="skills-page-title">
               {data.sections?.skills?.title ? (
                 <span dangerouslySetInnerHTML={{ __html: data.sections.skills.title.replace(/(\S+)$/, '<span class="gradient-text">$1</span>') }} />
@@ -66,9 +70,16 @@ const SkillsPage = () => {
                   </div>
                   <div className={`skill-card-body ${cat.items.length > 5 ? 'grid-layout' : ''}`}>
                     {cat.items.filter(Boolean).map((item, ii) => {
+                      const defaultProficiencies: Record<string, number> = {
+                        'Python': 94, 'Java': 82, 'C/C++': 85, 'JavaScript': 88, 'TypeScript': 86, 'SQL': 89,
+                        'Machine Learning': 92, 'Deep Learning': 88, 'Natural Language Processing (NLP)': 90,
+                        'Computer Vision': 85, 'RAG & Vector Search': 93, 'Pinecone': 91, 'MongoDB': 87,
+                        'MySQL': 86, 'SQLite': 84, 'Vector Databases': 90, 'FastAPI': 92, 'PyTorch': 88,
+                        'TensorFlow': 84, 'Docker': 82, 'Git': 90,
+                      };
                       const proficiency = cat.proficiencies && cat.proficiencies[item] !== undefined
                         ? cat.proficiencies[item]
-                        : 80; // fallback default
+                        : (defaultProficiencies[item] || (82 + ((item.charCodeAt(0) * 7) % 13)));
                       
                       const associatedProjs = getAssociatedProjects(item, cat);
 
@@ -141,7 +152,37 @@ const SkillsPage = () => {
         }
 
         .skills-page-header {
-          margin-bottom: 48px;
+          margin-bottom: 40px;
+          padding: 28px 36px;
+          background: var(--card-bg);
+          backdrop-filter: blur(24px) saturate(180%);
+          -webkit-backdrop-filter: blur(24px) saturate(180%);
+          border: 1px solid var(--border-color);
+          border-radius: 24px;
+          box-shadow: var(--card-shadow);
+        }
+
+        .skills-header-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 5px 14px;
+          border-radius: 100px;
+          background: rgba(56, 189, 248, 0.12);
+          border: 1px solid rgba(56, 189, 248, 0.25);
+          color: var(--primary);
+          font-size: 0.75rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          margin-bottom: 12px;
+        }
+
+        .badge-glow-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: var(--primary);
+          box-shadow: 0 0 8px var(--primary);
         }
 
         .skills-page-title {
@@ -149,7 +190,7 @@ const SkillsPage = () => {
           font-size: 2.8rem;
           font-weight: 600;
           color: var(--text-color);
-          margin-bottom: 12px;
+          margin-bottom: 8px;
         }
 
         .skills-page-subtitle {
@@ -157,6 +198,7 @@ const SkillsPage = () => {
           color: var(--text-secondary);
           line-height: 1.5;
           max-width: 600px;
+          margin: 0;
         }
 
         /* Skills Grid (Masonry Columns to avoid vertical gaps) */

@@ -9,14 +9,37 @@ const HomePage = () => {
   const { addToRefs } = useIntersectionObserver();
 
   return (
-    <div className="app">
+    <div className="app home-page-app">
       <IntelligenceMatrix />
       <Header />
-      <main>
+      <main className="home-main-content">
         <Hero addToRefs={addToRefs} />
       </main>
       <Footer />
       <FloatingContactForm />
+      <style>{`
+        .home-page-app {
+          height: 100vh;
+          height: -webkit-fill-available;
+          height: 100dvh;
+          max-height: 100vh;
+          max-height: 100dvh;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          position: relative;
+        }
+        .home-main-content {
+          flex: 1;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+        }
+      `}</style>
     </div>
   );
 };

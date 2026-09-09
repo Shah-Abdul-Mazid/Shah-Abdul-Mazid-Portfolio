@@ -36,7 +36,17 @@ const Header = () => {
             document.documentElement.classList.add('light-mode');
             localStorage.setItem('theme', 'light');
         }
+        window.dispatchEvent(new Event('themechange'));
     }, [isDarkMode]);
+
+    useEffect(() => {
+        const handleExternalThemeChange = () => {
+            const isLight = document.documentElement.classList.contains('light-mode');
+            setIsDarkMode(!isLight);
+        };
+        window.addEventListener('themechange', handleExternalThemeChange);
+        return () => window.removeEventListener('themechange', handleExternalThemeChange);
+    }, []);
 
     // Close menu on route change
     useEffect(() => {
@@ -54,22 +64,24 @@ const Header = () => {
     };
 
     const closeMenu = () => setIsMenuOpen(false);
+    const isHomePage = location.pathname === '/' || location.pathname === '/home';
+    const isScrolledHeader = scrolled && !isHomePage;
 
     return (
         <>
-            <header className={scrolled ? 'scrolled' : ''} style={{
+            <header className={isScrolledHeader ? 'scrolled' : ''} style={{
                 position: 'fixed',
                 top: 0,
                 left: 0,
                 width: '100%',
                 zIndex: 1000,
-                padding: scrolled ? '12px 0' : '18px 0',
+                padding: isScrolledHeader ? '12px 0' : '16px 0',
                 transition: 'var(--transition)',
-                backgroundColor: scrolled ? 'var(--nav-bg)' : (isDarkMode ? 'rgba(2, 6, 23, 0.78)' : 'rgba(255, 255, 255, 0.85)'),
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                borderBottom: '1px solid var(--border-color)',
-                boxShadow: scrolled ? '0 4px 20px rgba(0,0,0,0.1)' : 'none'
+                backgroundColor: isScrolledHeader ? (isDarkMode ? 'rgba(2, 6, 23, 0.82)' : 'rgba(255, 255, 255, 0.88)') : 'transparent',
+                backdropFilter: isScrolledHeader ? 'blur(16px)' : 'none',
+                WebkitBackdropFilter: isScrolledHeader ? 'blur(16px)' : 'none',
+                borderBottom: isScrolledHeader ? '1px solid var(--border-color)' : 'none',
+                boxShadow: isScrolledHeader ? '0 4px 20px rgba(0,0,0,0.1)' : 'none'
             }}>
                 <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', width: '100%', padding: '0 3%' }}>
                     {/* Logo */}
@@ -85,7 +97,7 @@ const Header = () => {
                                 border: '2px solid var(--bg-color)'
                             }} />
                         </div>
-                        <span style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'var(--text-color)', whiteSpace: 'nowrap' }}>Shah Abdul Mazid</span>
+                        <span className="logo-name-text">Shah Abdul Mazid</span>
                     </Link>
 
                     {/* Desktop Nav - Compact */}
@@ -166,62 +178,116 @@ const Header = () => {
             </aside>
 
             <style>{`
+                .logo-name-text {
+                    font-size: 1.0625rem;
+                    font-weight: 700;
+                    color: #ffffff;
+                    white-space: nowrap;
+                    text-shadow: 0 1px 6px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.7);
+                    transition: color 0.3s ease;
+                }
+                html.light-mode .logo-name-text {
+                    color: #0f172a;
+                    text-shadow: 0 1px 4px rgba(255,255,255,0.8);
+                }
+
                 #theme-toggle {
-                    background: transparent;
-                    border: 1px solid var(--border-color);
-                    color: var(--text-color);
+                    background: rgba(15, 23, 42, 0.65);
+                    border: 1px solid rgba(255,255,255,0.15);
+                    color: #ffffff;
                     cursor: pointer;
                     width: 40px; height: 40px;
-                    border-radius: 12px;
+                    border-radius: 50%;
                     display: flex; align-items: center; justify-content: center;
                     transition: var(--transition);
                     flex-shrink: 0;
+                    backdrop-filter: blur(16px);
+                    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
                 }
-                #theme-toggle:hover { border-color: var(--primary); color: var(--primary); }
+                #theme-toggle:hover { border-color: #38bdf8; color: #38bdf8; transform: scale(1.05); }
+                html.light-mode #theme-toggle {
+                    background: rgba(255, 255, 255, 0.85);
+                    border: 1px solid rgba(0, 0, 0, 0.1);
+                    color: #0f172a;
+                    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+                }
+                html.light-mode #theme-toggle:hover {
+                    border-color: #0284c7;
+                    color: #0284c7;
+                }
 
-                /* Flat Desktop nav */
+                /* Floating Glass Capsule Desktop Nav */
                 .nav-links-desktop {
                     display: flex;
-                    gap: 4px;
+                    gap: 6px;
                     align-items: center;
                     margin: 0 auto;
                     flex-wrap: nowrap;
+                    background: rgba(15, 23, 42, 0.65);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                    border: 1px solid rgba(255, 255, 255, 0.14);
+                    border-radius: 100px;
+                    padding: 5px 10px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
                 }
+                html.light-mode .nav-links-desktop {
+                    background: rgba(255, 255, 255, 0.88);
+                    border: 1px solid rgba(0, 0, 0, 0.08);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+                }
+
                 .nav-flat-link {
                     text-decoration: none;
-                    color: var(--text-color);
+                    color: #ffffff;
                     font-size: 0.85rem;
-                    font-weight: 500;
-                    padding: 8px 12px;
-                    border-radius: 10px;
-                    opacity: 0.7;
+                    font-weight: 600;
+                    padding: 7px 14px;
+                    border-radius: 100px;
+                    opacity: 0.9;
                     white-space: nowrap;
                     transition: var(--transition);
                     position: relative;
+                    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+                    letter-spacing: 0.02em;
+                }
+                html.light-mode .nav-flat-link {
+                    color: #334155;
+                    text-shadow: none;
                 }
                 .nav-flat-link::after {
-                    content: '';
-                    position: absolute;
-                    bottom: 4px;
-                    left: 12px;
-                    right: 12px;
-                    height: 2px;
-                    background: var(--primary);
-                    border-radius: 2px;
-                    transform: scaleX(0);
-                    transition: transform 0.25s ease;
+                    display: none;
                 }
-                .nav-flat-link:hover { opacity: 1; color: var(--primary); background: rgba(139,92,246,0.08); }
-                .nav-flat-link:hover::after { transform: scaleX(1); }
-                .nav-flat-link.active { opacity: 1; color: var(--primary); font-weight: 700; }
-                .nav-flat-link.active::after { transform: scaleX(1); }
+                .nav-flat-link:hover { 
+                    opacity: 1; 
+                    color: #ffffff; 
+                    background: rgba(255,255,255,0.12); 
+                }
+                html.light-mode .nav-flat-link:hover {
+                    color: #0284c7;
+                    background: rgba(2, 132, 199, 0.08);
+                }
+                .nav-flat-link.active { 
+                    opacity: 1; 
+                    color: #ffffff; 
+                    font-weight: 700; 
+                    background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(168, 85, 247, 0.35)); 
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    box-shadow: 0 2px 10px rgba(56, 189, 248, 0.2);
+                }
+                html.light-mode .nav-flat-link.active { 
+                    color: #0284c7; 
+                    background: rgba(2, 132, 199, 0.12); 
+                    border: 1px solid rgba(2, 132, 199, 0.25);
+                    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.1);
+                }
 
                 /* Hamburger */
                 .mobile-toggle {
                     display: none;
                     width: 40px; height: 40px;
-                    background: transparent;
-                    border: 1px solid var(--border-color);
+                    background: rgba(0,0,0,0.3);
+                    border: 1px solid rgba(255,255,255,0.35);
                     border-radius: 12px;
                     cursor: pointer;
                     flex-direction: column;
@@ -230,11 +296,12 @@ const Header = () => {
                     gap: 5px;
                     flex-shrink: 0;
                     transition: var(--transition);
+                    backdrop-filter: blur(6px);
                 }
-                .mobile-toggle:hover { border-color: var(--primary); }
+                .mobile-toggle:hover { border-color: #a78bfa; }
                 .mobile-toggle .bar {
                     width: 20px; height: 2px;
-                    background: var(--text-color);
+                    background: #ffffff;
                     border-radius: 2px;
                     transition: var(--transition);
                     transform-origin: center;

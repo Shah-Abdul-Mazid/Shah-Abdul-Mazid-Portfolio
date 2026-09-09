@@ -32,7 +32,7 @@ const Footer = () => {
 
     return (
         <footer className="site-footer">
-            <div className="footer-inner container">
+            <div className="footer-inner">
                 <div className="footer-divider" />
                 <div className="footer-bottom">
                     <p className="footer-copy">
@@ -58,27 +58,29 @@ const Footer = () => {
 
             <style>{`
                 .site-footer {
-                    background: var(--bg-color, #0a0a14);
+                    background: transparent !important;
                     padding: 0;
                     margin-top: auto;
+                    width: 100%;
+                    position: relative;
+                    z-index: 10;
                 }
 
                 .footer-inner {
-                    padding-left: 1.5rem;
-                    padding-right: 1.5rem;
+                    width: 100%;
+                    padding: 0 3%;
+                    box-sizing: border-box;
                 }
 
                 .footer-divider {
-                    border: none;
-                    border-top: 1px solid rgba(255, 255, 255, 0.08);
-                    margin: 0;
+                    display: none;
                 }
 
                 .footer-bottom {
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    padding: 24px 0;
+                    padding: 10px 0;
                     gap: 1rem;
                     flex-wrap: wrap;
                 }
@@ -88,8 +90,12 @@ const Footer = () => {
                     font-size: 0.8rem;
                     letter-spacing: 0.08em;
                     text-transform: uppercase;
-                    color: var(--text-secondary, rgba(180, 185, 220, 0.65));
-                    font-weight: 400;
+                    color: var(--text-secondary, rgba(180, 185, 220, 0.75));
+                    font-weight: 500;
+                    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+                }
+                html.light-mode .footer-copy {
+                    text-shadow: 0 1px 6px rgba(255, 255, 255, 0.9);
                 }
 
                 .footer-socials {
@@ -105,15 +111,22 @@ const Footer = () => {
                     width: 36px;
                     height: 36px;
                     border-radius: 8px;
-                    color: var(--text-secondary, rgba(180, 185, 220, 0.65));
-                    background: transparent;
-                    transition: color 0.2s ease, background 0.2s ease;
+                    color: var(--text-secondary, rgba(180, 185, 220, 0.75));
+                    background: rgba(15, 23, 42, 0.4);
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
+                    transition: all 0.2s ease;
                     text-decoration: none;
+                    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+                }
+                html.light-mode .footer-social-icon {
+                    background: rgba(255, 255, 255, 0.4);
                 }
 
                 .footer-social-icon:hover {
                     color: #ffffff;
-                    background: rgba(255, 255, 255, 0.08);
+                    background: rgba(56, 189, 248, 0.25);
+                    transform: translateY(-2px);
                 }
 
                 @media (max-width: 600px) {
