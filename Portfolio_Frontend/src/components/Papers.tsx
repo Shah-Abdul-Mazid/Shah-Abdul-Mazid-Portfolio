@@ -346,20 +346,22 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                 .research-id-card {
                     display: flex;
                     align-items: center;
-                    gap: 8px;
-                    padding: 10px 12px;
-                    border-radius: 12px;
+                    gap: 10px;
+                    padding: 12px 14px;
+                    border-radius: 14px;
                     text-decoration: none;
                     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-                    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-                    background: var(--card-bg, rgba(255, 255, 255, 0.02));
+                    border: 1px solid var(--border-color);
+                    background: var(--card-bg);
+                    backdrop-filter: blur(24px);
+                    -webkit-backdrop-filter: blur(24px);
+                    box-shadow: var(--card-shadow);
                     min-width: 0;
                     box-sizing: border-box;
                 }
 
                 .research-id-card:hover {
                     transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
                 }
 
                 .id-info {
@@ -372,7 +374,7 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                 .id-title {
                     font-size: 0.88rem;
                     font-weight: 700;
-                    color: var(--text-color, #f8fafc);
+                    color: var(--text-color);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -380,7 +382,7 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
 
                 .id-meta {
                     font-size: 0.74rem;
-                    color: var(--text-secondary, #94a3b8);
+                    color: var(--text-secondary);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -388,7 +390,7 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                 }
 
                 .id-arrow {
-                    color: var(--text-secondary, #64748b);
+                    color: var(--text-secondary);
                     opacity: 0.45;
                     transition: all 0.2s ease;
                     flex-shrink: 0;
@@ -401,13 +403,11 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
 
                 /* Scholar */
                 .research-id-card.scholar {
-                    background: rgba(234, 88, 12, 0.04);
-                    border-color: rgba(234, 88, 12, 0.2);
+                    border-color: rgba(234, 88, 12, 0.35);
                 }
                 .research-id-card.scholar:hover {
-                    background: rgba(234, 88, 12, 0.09);
-                    border-color: rgba(234, 88, 12, 0.45);
-                    box-shadow: 0 6px 20px rgba(234, 88, 12, 0.15);
+                    border-color: #ea580c;
+                    box-shadow: 0 8px 24px rgba(234, 88, 12, 0.2);
                 }
                 .scholar-icon {
                     color: #ea580c;
@@ -416,13 +416,11 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
 
                 /* ORCID */
                 .research-id-card.orcid {
-                    background: rgba(166, 206, 57, 0.04);
-                    border-color: rgba(166, 206, 57, 0.25);
+                    border-color: rgba(166, 206, 57, 0.4);
                 }
                 .research-id-card.orcid:hover {
-                    background: rgba(166, 206, 57, 0.09);
-                    border-color: rgba(166, 206, 57, 0.5);
-                    box-shadow: 0 6px 20px rgba(166, 206, 57, 0.15);
+                    border-color: #a6ce39;
+                    box-shadow: 0 8px 24px rgba(166, 206, 57, 0.2);
                 }
                 .orcid-badge-icon {
                     display: inline-flex;
@@ -441,13 +439,11 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
 
                 /* ResearchGate */
                 .research-id-card.researchgate {
-                    background: rgba(0, 204, 187, 0.04);
-                    border-color: rgba(0, 204, 187, 0.25);
+                    border-color: rgba(0, 204, 187, 0.4);
                 }
                 .research-id-card.researchgate:hover {
-                    background: rgba(0, 204, 187, 0.09);
-                    border-color: rgba(0, 204, 187, 0.5);
-                    box-shadow: 0 6px 20px rgba(0, 204, 187, 0.15);
+                    border-color: #00ccbb;
+                    box-shadow: 0 8px 24px rgba(0, 204, 187, 0.2);
                 }
                 .rg-badge-icon {
                     display: inline-flex;
@@ -466,13 +462,11 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
 
                 /* GitHub */
                 .research-id-card.github {
-                    background: rgba(139, 92, 246, 0.04);
-                    border-color: rgba(139, 92, 246, 0.2);
+                    border-color: rgba(139, 92, 246, 0.35);
                 }
                 .research-id-card.github:hover {
-                    background: rgba(139, 92, 246, 0.09);
-                    border-color: rgba(139, 92, 246, 0.45);
-                    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.15);
+                    border-color: #a855f7;
+                    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
                 }
                 .github-icon {
                     color: #a855f7;
@@ -506,19 +500,21 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                 .pub-search-input {
                     width: 100%;
                     padding: 13px 18px 13px 44px;
-                    border: 1px solid var(--border-color, #e2e8f0);
+                    border: 1px solid var(--border-color);
                     border-radius: 12px;
-                    background: var(--card-bg, #ffffff);
-                    color: var(--text-color, #1e293b);
+                    background: var(--card-bg);
+                    color: var(--text-color);
                     font-size: 0.92rem;
                     outline: none;
                     transition: all 0.2s ease;
                     box-sizing: border-box;
-                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+                    box-shadow: var(--card-shadow);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
                 }
                 .pub-search-input:focus {
                     border-color: #ea580c;
-                    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
+                    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
                 }
 
                 /* Filter Tabs */
@@ -534,13 +530,15 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                     gap: 8px;
                     padding: 8px 18px;
                     border-radius: 10px;
-                    border: 1px solid var(--border-color, #e2e8f0);
-                    background: var(--card-bg, #ffffff);
-                    color: var(--text-secondary, #64748b);
+                    border: 1px solid var(--border-color);
+                    background: var(--card-bg);
+                    color: var(--text-secondary);
                     font-size: 0.88rem;
                     font-weight: 500;
                     cursor: pointer;
                     transition: all 0.2s ease;
+                    backdrop-filter: blur(16px);
+                    -webkit-backdrop-filter: blur(16px);
                 }
                 .pub-tab:hover {
                     border-color: #ea580c;
@@ -574,7 +572,7 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                     gap: 8px;
                     margin-bottom: 20px;
                     font-size: 0.92rem;
-                    color: var(--text-secondary, #64748b);
+                    color: var(--text-secondary);
                 }
                 .pub-count-num {
                     display: inline-flex;
@@ -594,22 +592,25 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                 .pub-cards-list {
                     display: flex;
                     flex-direction: column;
-                    gap: 14px;
+                    gap: 16px;
                 }
 
                 .pub-item-card {
                     display: flex;
                     gap: 20px;
-                    padding: 22px 26px;
-                    background: var(--card-bg, #ffffff);
-                    border: 1px solid var(--border-color, #e2e8f0);
-                    border-radius: 14px;
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.025);
+                    padding: 24px 28px;
+                    background: var(--card-bg);
+                    border: 1px solid var(--border-color);
+                    border-radius: 16px;
+                    box-shadow: var(--card-shadow);
+                    backdrop-filter: blur(24px);
+                    -webkit-backdrop-filter: blur(24px);
                     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
                 }
                 .pub-item-card:hover {
-                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-                    border-color: rgba(249, 115, 22, 0.3);
+                    transform: translateY(-2px);
+                    box-shadow: 0 10px 30px rgba(249, 115, 22, 0.12);
+                    border-color: rgba(249, 115, 22, 0.45);
                 }
 
                 .pub-year-badge-col {

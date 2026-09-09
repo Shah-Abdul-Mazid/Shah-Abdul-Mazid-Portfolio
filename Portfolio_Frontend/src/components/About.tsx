@@ -115,7 +115,7 @@ const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =
                 .about-title {
                     font-size: 2.2rem;
                     font-weight: 700;
-                    color: #fff;
+                    color: var(--text-color);
                     line-height: 1.4;
                 }
 
@@ -147,24 +147,23 @@ const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =
                     /* Alternatively use a circle/blob */
                     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
                     box-shadow: 0 0 50px rgba(0, 247, 255, 0.3);
-                    opacity: 0.85; /* Transparency to blend with space */
-                    mix-blend-mode: luminosity; /* Helps integrate the blue background into the dark space */
+                    opacity: 0.9;
                     transition: 0.5s ease;
                 }
                 .img-card:hover {
                     opacity: 1;
-                    mix-blend-mode: normal;
                     border-radius: 20px;
                 }
 
                 .about-text {
                     flex: 1 1 400px;
-                    color: #aaa;
+                    color: var(--text-secondary);
                 }
 
                 .about-text p.lead {
                     font-size: 1.1rem;
-                    color: #fff;
+                    color: var(--text-color);
+                    font-weight: 500;
                     margin-bottom: 1rem;
                 }
 
@@ -192,7 +191,7 @@ const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =
 
                 .label {
                     font-size: 0.9rem;
-                    color: #888;
+                    color: var(--text-secondary);
                     margin-top: 5px;
                 }
 

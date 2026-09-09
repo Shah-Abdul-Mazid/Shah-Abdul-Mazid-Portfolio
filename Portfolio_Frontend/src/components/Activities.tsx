@@ -91,7 +91,7 @@ const Activities = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void
                 .unified-card:hover { border-color: var(--primary); transform: translateY(-2px); }
                 
                 .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 20px; }
-                .card-title { font-size: 1.2rem; color: #fff; margin: 0 0 4px 0; font-weight: 700; }
+                .card-title { font-size: 1.2rem; color: var(--text-color); margin: 0 0 4px 0; font-weight: 700; }
                 .card-subtitle { color: var(--primary); font-weight: 700; font-size: 0.95rem; margin: 0; }
                 
                 .card-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }

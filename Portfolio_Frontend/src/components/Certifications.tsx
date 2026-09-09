@@ -157,7 +157,7 @@ const Certifications = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                 .cert-name {
                     font-size: 1.1rem;
                     font-weight: 700;
-                    color: #fff;
+                    color: var(--text-color);
                     margin: 0;
                     line-height: 1.3;
                 }

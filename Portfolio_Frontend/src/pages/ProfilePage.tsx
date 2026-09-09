@@ -338,13 +338,26 @@ const ProfilePage = () => {
         .timeline-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 50px;
+          gap: 32px;
           margin-top: 20px;
         }
 
         .timeline-column {
           display: flex;
           flex-direction: column;
+          background: var(--card-bg);
+          border: 1px solid var(--border-color);
+          border-radius: 20px;
+          padding: 36px 32px;
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          box-shadow: var(--card-shadow);
+          transition: var(--transition);
+        }
+
+        .timeline-column:hover {
+          border-color: var(--primary);
+          transform: translateY(-2px);
         }
 
         .timeline {
@@ -376,7 +389,7 @@ const ProfilePage = () => {
           width: 14px;
           height: 14px;
           border-radius: 50%;
-          border: 3px solid var(--bg-color);
+          border: 3px solid var(--card-bg-solid, #0f172a);
           z-index: 2;
         }
         

@@ -63,11 +63,13 @@ const Header = () => {
                 left: 0,
                 width: '100%',
                 zIndex: 1000,
-                padding: scrolled ? '12px 0' : '20px 0',
+                padding: scrolled ? '12px 0' : '18px 0',
                 transition: 'var(--transition)',
-                backgroundColor: scrolled ? 'var(--nav-bg)' : 'transparent',
-                backdropFilter: scrolled ? 'blur(12px)' : 'none',
-                borderBottom: scrolled ? '1px solid var(--border-color)' : 'none'
+                backgroundColor: scrolled ? 'var(--nav-bg)' : (isDarkMode ? 'rgba(2, 6, 23, 0.78)' : 'rgba(255, 255, 255, 0.85)'),
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                borderBottom: '1px solid var(--border-color)',
+                boxShadow: scrolled ? '0 4px 20px rgba(0,0,0,0.1)' : 'none'
             }}>
                 <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', width: '100%', padding: '0 3%' }}>
                     {/* Logo */}

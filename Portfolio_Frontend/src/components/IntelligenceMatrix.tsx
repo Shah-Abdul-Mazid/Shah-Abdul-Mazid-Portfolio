@@ -252,9 +252,9 @@ const IntelligenceMatrix: React.FC = () => {
 
             // ─ Holographic perspective grid (lower third) ─────────────────
             ctx.save();
-            ctx.globalAlpha = isLight ? 0.15 : 0.06;
+            ctx.globalAlpha = isLight ? 0.035 : 0.04;
             ctx.strokeStyle = isLight ? '#0284c7' : '#00f7ff';
-            ctx.lineWidth = 0.7;
+            ctx.lineWidth = 0.5;
             const gridH = H * 0.62;
             // Horizontal lines (squish toward horizon)
             for (let i = 0; i <= 14; i++) {
@@ -335,9 +335,9 @@ const IntelligenceMatrix: React.FC = () => {
                 ctx.fill();
 
                 // Label
-                ctx.globalAlpha = a * 0.52;
+                ctx.globalAlpha = a * (isLight ? 0.22 : 0.38);
                 ctx.font = '9px "Courier New"';
-                ctx.fillStyle = isLight ? '#0f172a' : nodeColor;
+                ctx.fillStyle = isLight ? '#64748b' : nodeColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
                 ctx.fillText(n.tag, n.x, n.y - n.size - 3);
@@ -349,16 +349,16 @@ const IntelligenceMatrix: React.FC = () => {
             orbs.slice(1).forEach((o, idx) => {
                 const orbColor = currentPalette[(idx + 1) % currentPalette.length];
                 ctx.save();
-                ctx.strokeStyle = orbColor + (isLight ? '15' : '25');
-                ctx.lineWidth = 0.8;
-                ctx.setLineDash([5, 9]);
+                ctx.strokeStyle = orbColor + (isLight ? '0c' : '18');
+                ctx.lineWidth = 0.6;
+                ctx.setLineDash([4, 8]);
                 ctx.beginPath(); ctx.arc(cx, cy, o.orbitR, 0, Math.PI * 2); ctx.stroke();
                 ctx.setLineDash([]);
                 ctx.restore();
                 // Line to center
                 ctx.save();
-                ctx.strokeStyle = orbColor + '18';
-                ctx.lineWidth = 0.4;
+                ctx.strokeStyle = orbColor + '10';
+                ctx.lineWidth = 0.3;
                 ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(o.x, o.y); ctx.stroke();
                 ctx.restore();
             });
@@ -372,21 +372,21 @@ const IntelligenceMatrix: React.FC = () => {
                 const pulse = Math.sin(frame * 0.035 + i * 1.2) * 0.5 + 0.5;
 
                 // Outer aura
-                const aura = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.size * (i===0 ? 5 : 4));
-                aura.addColorStop(0, orbColor + Math.round((0.25 + pulse * 0.25) * (isLight ? 0.3 : 1) * 255).toString(16).padStart(2,'0'));
-                aura.addColorStop(0.4, orbColor + (isLight ? '0a' : '18'));
+                const aura = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.size * (i===0 ? 4 : 3));
+                aura.addColorStop(0, orbColor + Math.round((0.15 + pulse * 0.15) * (isLight ? 0.2 : 0.55) * 255).toString(16).padStart(2,'0'));
+                aura.addColorStop(0.4, orbColor + (isLight ? '05' : '10'));
                 aura.addColorStop(1, 'transparent');
                 ctx.fillStyle = aura;
-                ctx.beginPath(); ctx.arc(o.x, o.y, o.size * (i===0 ? 5 : 4), 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(o.x, o.y, o.size * (i===0 ? 4 : 3), 0, Math.PI * 2); ctx.fill();
 
                 // Rings for LLM core
                 if (i === 0 && (o as any).rings) {
                     for (let r = 1; r <= 3; r++) {
-                        const rAlpha = (0.18 - r * 0.04 + pulse * 0.08) * (isLight ? 0.4 : 1);
+                        const rAlpha = (0.10 - r * 0.025 + pulse * 0.04) * (isLight ? 0.25 : 0.6);
                         ctx.beginPath();
-                        ctx.arc(o.x, o.y, o.size * 1.8 + r * 14 + pulse * 4, 0, Math.PI * 2);
+                        ctx.arc(o.x, o.y, o.size * 1.6 + r * 12 + pulse * 3, 0, Math.PI * 2);
                         ctx.strokeStyle = orbColor + Math.round(Math.max(0,rAlpha) * 255).toString(16).padStart(2,'0');
-                        ctx.lineWidth = r === 1 ? 1.5 : 0.8;
+                        ctx.lineWidth = r === 1 ? 1 : 0.6;
                         ctx.stroke();
                     }
                 }
@@ -404,8 +404,8 @@ const IntelligenceMatrix: React.FC = () => {
                 ctx.font = `bold ${i === 0 ? 11 : 9}px "Courier New"`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
-                ctx.fillStyle = isLight ? '#0f172a' : orbColor;
-                ctx.globalAlpha = 0.92;
+                ctx.fillStyle = isLight ? '#64748b' : orbColor;
+                ctx.globalAlpha = isLight ? 0.3 : 0.55;
                 ctx.fillText(o.name, o.x, o.y + o.size + 5);
                 ctx.restore();
             });

@@ -107,7 +107,7 @@ const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void 
                 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 24px; }
                 .card-header-left { display: flex; gap: 20px; align-items: center; flex: 1; min-width: 0; }
                 .card-title-group { flex: 1; min-width: 0; }
-                .card-title { font-size: 1.25rem; color: #fff; margin: 0 0 4px 0; font-weight: 700; white-space: nowrap; }
+                .card-title { font-size: 1.25rem; color: var(--text-color); margin: 0 0 4px 0; font-weight: 700; white-space: nowrap; }
                 @media (max-width: 1100px) {
                     .card-title { white-space: normal; }
                 }
