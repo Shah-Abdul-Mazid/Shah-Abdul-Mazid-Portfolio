@@ -2,36 +2,88 @@ import React, { useEffect, useRef } from 'react';
 
 /**
  * ═══════════════════════════════════════════════════════════════════
- *  MODERN AMBIENT GLOW & COSMIC MICRO-PARTICLES (OPTION 1)
- *  Elite, distraction-free atmospheric canvas for AI researcher portfolio.
- *  - Organic multi-point nebula mesh gradients (slow harmonic drift)
- *  - Subtle twinkling micro-stars & floating cosmic dust (no text / no rings)
- *  - Smooth mouse parallax response for interactive depth
- *  - Crisp Retina resolution handling & 60fps performance
+ *  CYBERNETIC AI & DATA SCIENCE INTELLIGENCE MATRIX
+ *  Inspired by high-end AI research visuals (Holographic Neural Core,
+ *  Circuit Graphs, Rotating Telemetry HUD Rings & Active Synapses).
+ * 
+ *  FEATURES:
+ *  1. Rotating Holographic AI Neural Rings & HUD Telemetry Ticks
+ *  2. Synaptic Neural Network with Real-Time Action Potential Firing (Data Packets)
+ *  3. Precision Engineering Circuit Traces with Terminal Pads
+ *  4. Ambient Multi-Layered Tech Data Stream (Loss, Tensors, Matrix Telemetry)
+ *  5. Dual-Mode Mastery:
+ *     - Night: Glowing Holographic Laser Cyan & Deep Space Obsidian
+ *     - Day: High-Contrast Technical Blueprint Cobalt & Clean Laboratory Slate
+ *  6. Center Typography Shield: 100% legibility for Hero text & Avatar
+ *  7. Interactive Mouse Neural Attractor
  * ═══════════════════════════════════════════════════════════════════
  */
 
-interface Star {
-    x: number;
-    y: number;
-    baseX: number;
-    baseY: number;
-    r: number;
-    alpha: number;
-    phase: number;
-    speed: number;
-    depth: number;
-}
-
-interface Comet {
+interface Node {
     x: number;
     y: number;
     vx: number;
     vy: number;
-    len: number;
-    life: number;
-    maxLife: number;
+    radius: number;
+    pulsePhase: number;
+    pulseSpeed: number;
+    colorIndex: number;
 }
+
+interface Pulse {
+    fromIdx: number;
+    toIdx: number;
+    progress: number;
+    speed: number;
+    colorIndex: number;
+}
+
+interface CircuitTrace {
+    startX: number;
+    startY: number;
+    midX: number;
+    midY: number;
+    endX: number;
+    endY: number;
+    progress: number;
+    speed: number;
+    colorIndex: number;
+}
+
+const DARK_PALETTE = [
+    { r: 0,   g: 247, b: 255 }, // Laser Cyan (#00f7ff)
+    { r: 56,  g: 189, b: 248 }, // Neural Sky (#38bdf8)
+    { r: 139, g: 92,  b: 246 }, // AI Violet (#8b5cf6)
+    { r: 16,  g: 185, b: 129 }, // Matrix Emerald (#10b981)
+    { r: 244, g: 63,  b: 94  }, // Action Red (#f43f5e)
+];
+
+const LIGHT_PALETTE = [
+    { r: 2,   g: 132, b: 199 }, // Technical Cobalt (#0284c7)
+    { r: 37,  g: 99,  b: 235 }, // Royal Blue (#2563eb)
+    { r: 124, g: 58,  b: 237 }, // Deep Violet (#7c3aed)
+    { r: 5,   g: 150, b: 105 }, // Data Emerald (#059669)
+    { r: 217, g: 70,  b: 239 }, // Vivid Magenta (#d946ef)
+];
+
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+const lerpColor = (c1: { r: number; g: number; b: number }, c2: { r: number; g: number; b: number }, t: number) => ({
+    r: Math.round(lerp(c1.r, c2.r, t)),
+    g: Math.round(lerp(c1.g, c2.g, t)),
+    b: Math.round(lerp(c1.b, c2.b, t)),
+});
+
+const DATA_METRICS = [
+    'TENSOR.SHAPE: [64, 128, 768]',
+    'FORWARD_PASS: 1.42ms',
+    'LOSS_CONV: 0.0028',
+    'ACCURACY: 99.41%',
+    'SYNAPSE_WEIGHTS: 4.8M',
+    'LATENT_VEC: 512-DIM',
+    'ATTENTION_HEADS: 12',
+    'GRAD_DESCENT: ADAM_W',
+];
 
 const IntelligenceMatrix: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -47,184 +99,456 @@ const IntelligenceMatrix: React.FC = () => {
         let H = window.innerHeight;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-        const initCanvasSize = () => {
+        const resize = () => {
             W = window.innerWidth;
             H = window.innerHeight;
             canvas.width = W * dpr;
             canvas.height = H * dpr;
             ctx.scale(dpr, dpr);
         };
-        initCanvasSize();
+        resize();
+        window.addEventListener('resize', resize);
 
-        // Mouse parallax tracking
-        let mouseX = W / 2;
-        let mouseY = H / 2;
-        let targetParallaxX = 0;
-        let targetParallaxY = 0;
-        let currentParallaxX = 0;
-        let currentParallaxY = 0;
+        // ── THEME TRACKING ───────────────────────────────────────────
+        let themeBlend = document.documentElement.classList.contains('light-mode') ? 1.0 : 0.0;
 
-        const handleMouseMove = (e: MouseEvent) => {
+        // ── MOUSE ATTRACTOR ──────────────────────────────────────────
+        let mouseX = -1000;
+        let mouseY = -1000;
+        let mouseActive = false;
+
+        const onMouseMove = (e: MouseEvent) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
-            targetParallaxX = (mouseX - W / 2) * 0.025;
-            targetParallaxY = (mouseY - H / 2) * 0.025;
+            mouseActive = true;
+        };
+        const onMouseLeave = () => {
+            mouseActive = false;
+            mouseX = -1000;
+            mouseY = -1000;
         };
 
-        const handleResize = () => {
-            initCanvasSize();
-        };
+        window.addEventListener('mousemove', onMouseMove, { passive: true });
+        window.addEventListener('mouseleave', onMouseLeave);
 
-        window.addEventListener('mousemove', handleMouseMove, { passive: true });
-        window.addEventListener('resize', handleResize);
+        // ── 1. NEURAL NODES ──────────────────────────────────────────
+        const NODE_COUNT = Math.min(Math.max(Math.floor((W * H) / 14000), 60), 105);
+        const nodes: Node[] = [];
 
-        // ── 1. AMBIENT NEBULA GLOW NODES ────────────────────────────────
-        const nebulaOrbs = [
-            { xRatio: 0.20, yRatio: 0.25, r: 420, hueDark: '99, 102, 241', hueLight: '14, 165, 233', alphaDark: 0.08, alphaLight: 0.065, speed: 0.0006, phase: 0 },
-            { xRatio: 0.80, yRatio: 0.30, r: 480, hueDark: '168, 85, 247', hueLight: '139, 92, 246', alphaDark: 0.075, alphaLight: 0.055, speed: 0.0005, phase: 1.8 },
-            { xRatio: 0.50, yRatio: 0.70, r: 520, hueDark: '6, 182, 212',  hueLight: '2, 132, 199',  alphaDark: 0.07, alphaLight: 0.05, speed: 0.0004, phase: 3.2 },
-            { xRatio: 0.15, yRatio: 0.85, r: 380, hueDark: '236, 72, 153', hueLight: '217, 70, 239', alphaDark: 0.06, alphaLight: 0.045, speed: 0.0007, phase: 4.5 },
-            { xRatio: 0.88, yRatio: 0.80, r: 400, hueDark: '16, 185, 129', hueLight: '16, 185, 129', alphaDark: 0.055, alphaLight: 0.04, speed: 0.0005, phase: 2.3 },
-        ];
+        for (let i = 0; i < NODE_COUNT; i++) {
+            nodes.push({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                vx: (Math.random() - 0.5) * 0.40,
+                vy: (Math.random() - 0.5) * 0.40,
+                radius: Math.random() * 2.2 + 1.8,
+                pulsePhase: Math.random() * Math.PI * 2,
+                pulseSpeed: 0.02 + Math.random() * 0.03,
+                colorIndex: i % DARK_PALETTE.length,
+            });
+        }
 
-        // ── 2. DELICATE COSMIC MICRO-STARS ──────────────────────────────
-        const STAR_COUNT = Math.min(Math.floor((W * H) / 7500), 200);
-        const stars: Star[] = Array.from({ length: STAR_COUNT }, () => {
-            const x = Math.random() * W;
-            const y = Math.random() * H;
-            return {
-                x,
-                y,
-                baseX: x,
-                baseY: y,
-                r: Math.random() * 0.9 + 0.3,
-                alpha: Math.random() * 0.5 + 0.2,
-                phase: Math.random() * Math.PI * 2,
-                speed: 0.008 + Math.random() * 0.02,
-                depth: Math.random() * 0.8 + 0.2,
-            };
-        });
+        // ── 2. SYNAPTIC FIRING SIGNALS ───────────────────────────────
+        const pulses: Pulse[] = [];
+        let pulseTimer = 0;
 
-        // ── 3. OCCASIONAL ELEGANT SHOOTING STAR ─────────────────────────
-        let comets: Comet[] = [];
-        let cometTimer = 0;
-        const spawnComet = () => {
-            const startX = Math.random() * (W * 0.8) + W * 0.1;
-            const startY = Math.random() * (H * 0.35);
-            const speed = 7 + Math.random() * 6;
-            const angle = Math.PI / 4 + (Math.random() - 0.5) * 0.3;
-            comets.push({
-                x: startX,
-                y: startY,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                len: 70 + Math.random() * 80,
-                life: 0,
-                maxLife: 60 + Math.random() * 40,
+        const spawnPulse = (from: number, to: number, colorIndex: number) => {
+            if (pulses.length >= 28) return;
+            pulses.push({
+                fromIdx: from,
+                toIdx: to,
+                progress: 0,
+                speed: 0.018 + Math.random() * 0.022,
+                colorIndex,
             });
         };
 
-        // ── ANIMATION LOOP ──────────────────────────────────────────────
+        // ── 3. ENGINEERING CIRCUIT TRACES ────────────────────────────
+        const circuitTraces: CircuitTrace[] = [];
+        const createCircuits = () => {
+            circuitTraces.length = 0;
+            const count = Math.min(Math.floor(W / 180), 8);
+            for (let i = 0; i < count; i++) {
+                const isLeft = i % 2 === 0;
+                const startX = isLeft ? Math.random() * (W * 0.22) : W - Math.random() * (W * 0.22);
+                const startY = Math.random() * H;
+                const midX = startX + (isLeft ? 60 + Math.random() * 60 : - (60 + Math.random() * 60));
+                const midY = startY + (Math.random() - 0.5) * 80;
+                const endX = midX + (isLeft ? 50 : -50);
+                const endY = midY;
+                circuitTraces.push({
+                    startX, startY, midX, midY, endX, endY,
+                    progress: Math.random(),
+                    speed: 0.003 + Math.random() * 0.005,
+                    colorIndex: i % DARK_PALETTE.length,
+                });
+            }
+        };
+        createCircuits();
+
+        // ── MAIN RENDER LOOP ──────────────────────────────────────────
         let frame = 0;
 
         const draw = () => {
             frame++;
 
-            // Smooth parallax interpolation
-            currentParallaxX += (targetParallaxX - currentParallaxX) * 0.05;
-            currentParallaxY += (targetParallaxY - currentParallaxY) * 0.05;
+            // Smooth theme interpolation (0 = Dark, 1 = Light)
+            const targetBlend = document.documentElement.classList.contains('light-mode') ? 1.0 : 0.0;
+            themeBlend += (targetBlend - themeBlend) * 0.08;
 
-            const isLight = document.documentElement.classList.contains('light-mode');
-
-            // 1. Clear background with base color
-            ctx.fillStyle = isLight ? '#f8fafc' : '#020617';
+            // 1. CLEAR CANVAS
+            const bgR = Math.round(lerp(3, 248, themeBlend));
+            const bgG = Math.round(lerp(7, 250, themeBlend));
+            const bgB = Math.round(lerp(23, 252, themeBlend));
+            ctx.fillStyle = `rgb(${bgR}, ${bgG}, ${bgB})`;
             ctx.fillRect(0, 0, W, H);
 
-            // 2. Render Soft Ambient Nebula Orbs
-            nebulaOrbs.forEach(orb => {
-                orb.phase += orb.speed;
-                const ox = W * orb.xRatio + Math.sin(orb.phase) * 60 + currentParallaxX * 0.3;
-                const oy = H * orb.yRatio + Math.cos(orb.phase * 0.85) * 50 + currentParallaxY * 0.3;
+            // Center of the AI neural core
+            const cx = W / 2;
+            const cy = H * 0.42;
 
-                const rgb = isLight ? orb.hueLight : orb.hueDark;
-                const baseAlpha = isLight ? orb.alphaLight : orb.alphaDark;
-
-                const grad = ctx.createRadialGradient(ox, oy, 0, ox, oy, orb.r);
-                grad.addColorStop(0, `rgba(${rgb}, ${baseAlpha})`);
-                grad.addColorStop(0.5, `rgba(${rgb}, ${baseAlpha * 0.45})`);
+            // 2. AMBIENT SCIENTIFIC NEBULA MESH
+            const nebAlpha = lerp(0.09, 0.065, themeBlend);
+            [
+                { x: W * 0.22, y: H * 0.25, r: 460, cDark: '0, 247, 255', cLight: '2, 132, 199' },
+                { x: W * 0.78, y: H * 0.28, r: 500, cDark: '139, 92, 246', cLight: '124, 58, 237' },
+                { x: cx,       y: cy,        r: 380, cDark: '56, 189, 248', cLight: '37, 99, 235' },
+                { x: W * 0.50, y: H * 0.82, r: 480, cDark: '16, 185, 129', cLight: '5, 150, 105' },
+            ].forEach(neb => {
+                const shiftX = Math.sin(frame * 0.002 + neb.r) * 25;
+                const shiftY = Math.cos(frame * 0.002 + neb.r) * 20;
+                const col = themeBlend > 0.5 ? neb.cLight : neb.cDark;
+                const grad = ctx.createRadialGradient(neb.x + shiftX, neb.y + shiftY, 0, neb.x + shiftX, neb.y + shiftY, neb.r);
+                grad.addColorStop(0, `rgba(${col}, ${nebAlpha})`);
+                grad.addColorStop(0.55, `rgba(${col}, ${nebAlpha * 0.35})`);
                 grad.addColorStop(1, 'transparent');
-
                 ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.arc(ox, oy, orb.r, 0, Math.PI * 2);
+                ctx.arc(neb.x + shiftX, neb.y + shiftY, neb.r, 0, Math.PI * 2);
                 ctx.fill();
             });
 
-            // 3. Render Delicate Twinkling Micro-Stars
-            stars.forEach(s => {
-                s.phase += s.speed;
-                const twinkle = Math.sin(s.phase) * 0.4 + 0.6;
-                const curAlpha = Math.max(0.05, Math.min(0.9, s.alpha * twinkle));
+            // 3. HOLOGRAPHIC ROTATING AI HUD RINGS (The Iconic Tech Centerpiece)
+            ctx.save();
+            const ringR = Math.min(W * 0.26, 260);
+            const ringAlpha = lerp(0.35, 0.45, themeBlend);
+            const ringDark = { r: 0, g: 247, b: 255 };
+            const ringLight = { r: 2, g: 132, b: 199 };
+            const ringRgb = lerpColor(ringDark, ringLight, themeBlend);
 
-                // Subtle parallax shift by depth
-                const px = s.baseX + currentParallaxX * s.depth;
-                const py = s.baseY + currentParallaxY * s.depth;
+            // Outer Dashed HUD Ring (Clockwise)
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(frame * 0.0018);
+            ctx.strokeStyle = `rgba(${ringRgb.r}, ${ringRgb.g}, ${ringRgb.b}, ${ringAlpha * 0.35})`;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([8, 14]);
+            ctx.beginPath();
+            ctx.arc(0, 0, ringR, 0, Math.PI * 2);
+            ctx.stroke();
 
+            // Precision HUD Ticks around outer ring
+            const tickCount = 36;
+            ctx.lineWidth = 1.2;
+            for (let t = 0; t < tickCount; t++) {
+                const angle = (t / tickCount) * Math.PI * 2;
+                const tLen = t % 6 === 0 ? 9 : 4;
+                const x1 = Math.cos(angle) * (ringR - tLen);
+                const y1 = Math.sin(angle) * (ringR - tLen);
+                const x2 = Math.cos(angle) * ringR;
+                const y2 = Math.sin(angle) * ringR;
                 ctx.beginPath();
-                ctx.arc(px, py, s.r, 0, Math.PI * 2);
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
+            ctx.restore();
 
-                if (isLight) {
-                    ctx.fillStyle = `rgba(100, 116, 139, ${curAlpha * 0.45})`;
-                } else {
-                    ctx.fillStyle = `rgba(226, 232, 240, ${curAlpha * 0.85})`;
-                }
-                ctx.fill();
-            });
+            // Middle Holographic Arc Ring (Counter-Clockwise)
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(-frame * 0.0025);
+            ctx.strokeStyle = `rgba(${ringRgb.r}, ${ringRgb.g}, ${ringRgb.b}, ${ringAlpha * 0.55})`;
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([45, 60, 15, 30]);
+            ctx.beginPath();
+            ctx.arc(0, 0, ringR * 0.72, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
 
-            // 4. Render Occasional Shooting Star
-            cometTimer++;
-            if (cometTimer > 360) {
-                cometTimer = 0;
-                if (Math.random() < 0.6 && comets.length < 2) {
-                    spawnComet();
+            // Inner Quantum Radar Ring
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(frame * 0.004);
+            ctx.strokeStyle = `rgba(${ringRgb.r}, ${ringRgb.g}, ${ringRgb.b}, ${ringAlpha * 0.25})`;
+            ctx.lineWidth = 0.8;
+            ctx.setLineDash([4, 10]);
+            ctx.beginPath();
+            ctx.arc(0, 0, ringR * 0.45, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.restore();
+
+            // 4. TECHNICAL COORDINATE MATRIX GRID WITH CROSSHAIRS
+            const gridSize = 72;
+            ctx.save();
+            const gridAlpha = lerp(0.35, 0.35, themeBlend);
+            const gridColor = themeBlend > 0.5
+                ? `rgba(203, 213, 225, ${gridAlpha})`
+                : `rgba(30, 41, 59, ${gridAlpha})`;
+            ctx.strokeStyle = gridColor;
+            ctx.lineWidth = 0.5;
+
+            ctx.beginPath();
+            for (let x = 0; x < W; x += gridSize) {
+                ctx.moveTo(x, 0); ctx.lineTo(x, H);
+            }
+            for (let y = 0; y < H; y += gridSize) {
+                ctx.moveTo(0, y); ctx.lineTo(W, y);
+            }
+            ctx.stroke();
+
+            // Coordinate Crosshairs (+)
+            const chAlpha = lerp(0.35, 0.55, themeBlend);
+            const chColor = themeBlend > 0.5
+                ? `rgba(2, 132, 199, ${chAlpha})`
+                : `rgba(0, 247, 255, ${chAlpha})`;
+            ctx.strokeStyle = chColor;
+            ctx.lineWidth = 1.0;
+            const chLen = 3.5;
+
+            for (let x = gridSize; x < W; x += gridSize * 2) {
+                for (let y = gridSize; y < H; y += gridSize * 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(x - chLen, y); ctx.lineTo(x + chLen, y);
+                    ctx.moveTo(x, y - chLen); ctx.lineTo(x, y + chLen);
+                    ctx.stroke();
                 }
             }
+            ctx.restore();
 
-            for (let i = comets.length - 1; i >= 0; i--) {
-                const c = comets[i];
-                c.x += c.vx;
-                c.y += c.vy;
-                c.life++;
+            // 5. CIRCUIT TRACES (Cyber Hardware Pathways at Periphery)
+            circuitTraces.forEach(ct => {
+                ct.progress += ct.speed;
+                if (ct.progress > 1) ct.progress = 0;
 
-                const progress = c.life / c.maxLife;
-                const fade = Math.sin(progress * Math.PI); // Fade in then out
-
-                const tailX = c.x - (c.vx / Math.hypot(c.vx, c.vy)) * c.len;
-                const tailY = c.y - (c.vy / Math.hypot(c.vx, c.vy)) * c.len;
-
-                const cometGrad = ctx.createLinearGradient(tailX, tailY, c.x, c.y);
-                cometGrad.addColorStop(0, 'transparent');
-                if (isLight) {
-                    cometGrad.addColorStop(0.7, `rgba(2, 132, 199, ${fade * 0.2})`);
-                    cometGrad.addColorStop(1, `rgba(2, 132, 199, ${fade * 0.6})`);
-                } else {
-                    cometGrad.addColorStop(0.7, `rgba(56, 189, 248, ${fade * 0.3})`);
-                    cometGrad.addColorStop(1, `rgba(255, 255, 255, ${fade * 0.85})`);
-                }
+                const dRgb = DARK_PALETTE[ct.colorIndex];
+                const lRgb = LIGHT_PALETTE[ct.colorIndex];
+                const rgb = lerpColor(dRgb, lRgb, themeBlend);
+                const traceAlpha = lerp(0.25, 0.35, themeBlend);
 
                 ctx.save();
-                ctx.strokeStyle = cometGrad;
-                ctx.lineWidth = isLight ? 1.2 : 1.5;
+                ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${traceAlpha})`;
+                ctx.lineWidth = 1.2;
                 ctx.beginPath();
-                ctx.moveTo(tailX, tailY);
-                ctx.lineTo(c.x, c.y);
+                ctx.moveTo(ct.startX, ct.startY);
+                ctx.lineTo(ct.midX, ct.midY);
+                ctx.lineTo(ct.endX, ct.endY);
                 ctx.stroke();
-                ctx.restore();
 
-                if (c.life >= c.maxLife || c.x > W + 100 || c.y > H + 100) {
-                    comets.splice(i, 1);
+                // Terminal circular pads
+                ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${traceAlpha * 1.5})`;
+                ctx.beginPath(); ctx.arc(ct.startX, ct.startY, 2.5, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(ct.endX, ct.endY, 2.5, 0, Math.PI * 2); ctx.fill();
+
+                // Electric signal moving through circuit
+                const t = ct.progress;
+                let sx = ct.startX, sy = ct.startY;
+                if (t < 0.5) {
+                    const localT = t / 0.5;
+                    sx = ct.startX + (ct.midX - ct.startX) * localT;
+                    sy = ct.startY + (ct.midY - ct.startY) * localT;
+                } else {
+                    const localT = (t - 0.5) / 0.5;
+                    sx = ct.midX + (ct.endX - ct.midX) * localT;
+                    sy = ct.midY + (ct.endY - ct.midY) * localT;
+                }
+                ctx.fillStyle = themeBlend > 0.5 ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.9)` : '#ffffff';
+                ctx.beginPath(); ctx.arc(sx, sy, 2.2, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            });
+
+            // 6. UPDATE NEURAL NODES
+            nodes.forEach(node => {
+                node.x += node.vx;
+                node.y += node.vy;
+
+                if (node.x < 14) { node.x = 14; node.vx *= -1; }
+                if (node.x > W - 14) { node.x = W - 14; node.vx *= -1; }
+                if (node.y < 14) { node.y = 14; node.vy *= -1; }
+                if (node.y > H - 14) { node.y = H - 14; node.vy *= -1; }
+
+                node.pulsePhase += node.pulseSpeed;
+            });
+
+            // 7. DRAW SYNAPTIC CONNECTIONS & TRIGGER FIRING PULSES
+            const maxDistance = 145;
+            pulseTimer++;
+
+            for (let i = 0; i < nodes.length; i++) {
+                const n1 = nodes[i];
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const n2 = nodes[j];
+                    const dx = n1.x - n2.x;
+                    const dy = n1.y - n2.y;
+                    const dist = Math.hypot(dx, dy);
+
+                    if (dist < maxDistance) {
+                        const linkStrength = 1 - dist / maxDistance;
+
+                        // Center attenuation (protective halo for avatar & title)
+                        const midX = (n1.x + n2.x) / 2;
+                        const midY = (n1.y + n2.y) / 2;
+                        const distToCenter = Math.hypot(midX - cx, midY - cy);
+                        const centerFade = Math.min(Math.max((distToCenter - 140) / 160, 0.28), 1.0);
+
+                        const dRgb = DARK_PALETTE[n1.colorIndex];
+                        const lRgb = LIGHT_PALETTE[n1.colorIndex];
+                        const rgb = lerpColor(dRgb, lRgb, themeBlend);
+
+                        const lineBaseAlpha = lerp(0.32, 0.40, themeBlend);
+                        const alpha = linkStrength * lineBaseAlpha * centerFade;
+
+                        ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+                        ctx.lineWidth = linkStrength * (themeBlend > 0.5 ? 1.1 : 1.3);
+                        ctx.beginPath();
+                        ctx.moveTo(n1.x, n1.y);
+                        ctx.lineTo(n2.x, n2.y);
+                        ctx.stroke();
+
+                        // Fire synaptic data packet
+                        if (pulseTimer % 16 === 0 && Math.random() < 0.10 && dist < 120) {
+                            spawnPulse(i, j, n1.colorIndex);
+                        }
+                    }
                 }
             }
+
+            // 8. DRAW ACTIVE SYNAPTIC FIRING SIGNALS (Data Packets)
+            for (let p = pulses.length - 1; p >= 0; p--) {
+                const pulse = pulses[p];
+                pulse.progress += pulse.speed;
+
+                if (pulse.progress >= 1) {
+                    pulses.splice(p, 1);
+                    continue;
+                }
+
+                const n1 = nodes[pulse.fromIdx];
+                const n2 = nodes[pulse.toIdx];
+                if (!n1 || !n2) {
+                    pulses.splice(p, 1);
+                    continue;
+                }
+
+                const curX = n1.x + (n2.x - n1.x) * pulse.progress;
+                const curY = n1.y + (n2.y - n1.y) * pulse.progress;
+
+                const dRgb = DARK_PALETTE[pulse.colorIndex];
+                const lRgb = LIGHT_PALETTE[pulse.colorIndex];
+                const rgb = lerpColor(dRgb, lRgb, themeBlend);
+
+                // Core packet
+                ctx.beginPath();
+                ctx.arc(curX, curY, 2.4, 0, Math.PI * 2);
+                ctx.fillStyle = themeBlend > 0.5 ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.95)` : '#ffffff';
+                ctx.fill();
+
+                // Luminous packet aura
+                const pGlow = ctx.createRadialGradient(curX, curY, 0, curX, curY, 8);
+                pGlow.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${themeBlend > 0.5 ? 0.6 : 0.9})`);
+                pGlow.addColorStop(1, 'transparent');
+                ctx.fillStyle = pGlow;
+                ctx.beginPath();
+                ctx.arc(curX, curY, 8, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 9. INTERACTIVE CURSOR SYNAPSE COUPLING
+            if (mouseActive) {
+                const mouseRadius = 165;
+                nodes.forEach(node => {
+                    const d = Math.hypot(node.x - mouseX, node.y - mouseY);
+                    if (d < mouseRadius) {
+                        const mStrength = 1 - d / mouseRadius;
+                        const dRgb = DARK_PALETTE[node.colorIndex];
+                        const lRgb = LIGHT_PALETTE[node.colorIndex];
+                        const rgb = lerpColor(dRgb, lRgb, themeBlend);
+
+                        const mAlpha = mStrength * (themeBlend > 0.5 ? 0.52 : 0.65);
+                        ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${mAlpha})`;
+                        ctx.lineWidth = mStrength * 1.6;
+                        ctx.beginPath();
+                        ctx.moveTo(node.x, node.y);
+                        ctx.lineTo(mouseX, mouseY);
+                        ctx.stroke();
+                    }
+                });
+
+                // Laser cursor aura
+                const cursorGlow = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 32);
+                const auraColor = themeBlend > 0.5 ? '2, 132, 199' : '0, 247, 255';
+                cursorGlow.addColorStop(0, `rgba(${auraColor}, ${themeBlend > 0.5 ? 0.28 : 0.4})`);
+                cursorGlow.addColorStop(1, 'transparent');
+                ctx.fillStyle = cursorGlow;
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, 32, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 10. RENDER NEURAL TENSOR NODES
+            nodes.forEach(node => {
+                const pulse = Math.sin(node.pulsePhase) * 0.35 + 0.65;
+                const dRgb = DARK_PALETTE[node.colorIndex];
+                const lRgb = LIGHT_PALETTE[node.colorIndex];
+                const rgb = lerpColor(dRgb, lRgb, themeBlend);
+
+                const distToCenter = Math.hypot(node.x - cx, node.y - cy);
+                const centerAlpha = Math.min(Math.max((distToCenter - 130) / 150, 0.32), 1.0);
+
+                // Glowing outer halo
+                const haloR = node.radius * (themeBlend > 0.5 ? 3.0 : 4.0);
+                const halo = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, haloR);
+                const haloAlpha = (themeBlend > 0.5 ? 0.35 : 0.50) * pulse * centerAlpha;
+                halo.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${haloAlpha})`);
+                halo.addColorStop(1, 'transparent');
+                ctx.fillStyle = halo;
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, haloR, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Core dot
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius * (0.85 + pulse * 0.15), 0, Math.PI * 2);
+                ctx.fillStyle = themeBlend > 0.5
+                    ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${0.92 * centerAlpha})`
+                    : `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${0.98 * centerAlpha})`;
+                ctx.fill();
+
+                // High-contrast rim in Day mode
+                if (themeBlend > 0.5) {
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${0.85 * centerAlpha})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                }
+            });
+
+            // 11. AMBIENT DATA SCIENCE METRICS (High-Tech HUD Periphery)
+            ctx.save();
+            ctx.font = '10px "JetBrains Mono", monospace, "Courier New"';
+
+            // Top-left HUD badge
+            ctx.fillStyle = themeBlend > 0.5 ? 'rgba(71, 85, 105, 0.65)' : 'rgba(56, 189, 248, 0.45)';
+            ctx.fillText('◈ AI.INTELLIGENCE_MATRIX // OPERATIONAL', 24, 40);
+
+            // Bottom-left and bottom-right live telemetry
+            const metricIdx = Math.floor((frame / 120) % DATA_METRICS.length);
+            ctx.fillText(`▶ METRIC: ${DATA_METRICS[metricIdx]}`, 24, H - 24);
+
+            ctx.textAlign = 'right';
+            ctx.fillText(`NEURAL_GRAPH :: ${nodes.length}_NODES // SYNC_60FPS`, W - 24, H - 24);
+            ctx.restore();
 
             animId = requestAnimationFrame(draw);
         };
@@ -233,8 +557,9 @@ const IntelligenceMatrix: React.FC = () => {
 
         return () => {
             cancelAnimationFrame(animId);
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('resize', resize);
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseleave', onMouseLeave);
         };
     }, []);
 
