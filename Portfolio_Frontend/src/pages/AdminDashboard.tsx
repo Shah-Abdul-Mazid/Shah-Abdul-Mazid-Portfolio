@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users } from 'lucide-react';
+import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles } from 'lucide-react';
 import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, PaperItem, SkillCategory } from '../context/PortfolioContext';
 import './AdminDashboard.css';
 
@@ -20,6 +20,7 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [bibtexInputs, setBibtexInputs] = useState<{[key:number]:string}>({});
+    const [bibtexParseStatus, setBibtexParseStatus] = useState<Record<number, { msg: string; type: 'success' | 'error' }>>({});
     const [generatingIndex, setGeneratingIndex] = useState<number | null>(null);
     const [customInstructions, setCustomInstructions] = useState<Record<number, string>>({});
 
@@ -97,44 +98,195 @@ const AdminDashboard = () => {
     };
 
     const handleParseBibtex = (index: number) => {
-        const str = bibtexInputs[index] || '';
-        // Helper: extract value from BibTeX field
+        const rawStr = bibtexInputs[index] !== undefined ? bibtexInputs[index] : (editData.papers[index]?.bibtex || '');
+        const str = (rawStr || '').trim();
+        if (!str) {
+            setBibtexParseStatus(prev => ({
+                ...prev,
+                [index]: { msg: '⚠️ Please paste a BibTeX snippet first!', type: 'error' }
+            }));
+            setTimeout(() => {
+                setBibtexParseStatus(prev => {
+                    const next = { ...prev };
+                    delete next[index];
+                    return next;
+                });
+            }, 3000);
+            return;
+        }
+
+        const cleanBibtexValue = (val: string): string => {
+            if (!val) return '';
+            return val
+                .replace(/[\r\n]+/g, ' ')
+                .replace(/^[\s"{]+|[\s"}]+$/g, '')
+                .replace(/\{+/g, '')
+                .replace(/\}+/g, '')
+                .replace(/\\&/g, '&')
+                .replace(/\\_/g, '_')
+                .replace(/\\%/g, '%')
+                .replace(/\\textbf/g, '')
+                .replace(/\\textit/g, '')
+                .replace(/~/g, ' ')
+                .replace(/\u00a0/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        };
+
         const extract = (key: string): string => {
-            const re = new RegExp(key + '\\s*=\\s*\\{([^}]+)\\}', 'i');
-            const match = str.match(re);
-            return match ? match[1].replace(/[\r\n]+/g, ' ').trim() : '';
+            const keyRegex = new RegExp(`(?:^|[,\\s])(?:${key})\\s*=\\s*`, 'i');
+            const match = str.match(keyRegex);
+            if (!match || match.index === undefined) return '';
+
+            const startPos = match.index + match[0].length;
+            const rest = str.slice(startPos).trimStart();
+            if (!rest) return '';
+
+            const firstChar = rest[0];
+            if (firstChar === '{') {
+                let depth = 0;
+                let result = '';
+                for (let j = 0; j < rest.length; j++) {
+                    const ch = rest[j];
+                    if (ch === '{') depth++;
+                    else if (ch === '}') {
+                        depth--;
+                        if (depth === 0) {
+                            result = rest.slice(1, j);
+                            break;
+                        }
+                    }
+                }
+                if (!result && depth > 0) {
+                    result = rest.slice(1).split(/[\n\r,]/)[0];
+                }
+                return cleanBibtexValue(result);
+            } else if (firstChar === '"') {
+                let result = '';
+                let escaped = false;
+                for (let j = 1; j < rest.length; j++) {
+                    const ch = rest[j];
+                    if (ch === '\\' && !escaped) {
+                        escaped = true;
+                        continue;
+                    }
+                    if (ch === '"' && !escaped) {
+                        result = rest.slice(1, j);
+                        break;
+                    }
+                    escaped = false;
+                }
+                if (!result) {
+                    result = rest.slice(1).split(/[\n\r,]/)[0];
+                }
+                return cleanBibtexValue(result);
+            } else {
+                const bareMatch = rest.match(/^([^,\r\n}]+)/);
+                return bareMatch ? cleanBibtexValue(bareMatch[1]) : '';
+            }
         };
-        // Auto-detect type from BibTeX entry prefix
+
+        const formatAuthors = (raw: string): string => {
+            if (!raw) return '';
+            const cleaned = raw.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ');
+            if (cleaned.toLowerCase().includes(' and ')) {
+                return cleaned
+                    .split(/\s+and\s+/i)
+                    .map(a => {
+                        const trimmed = a.trim();
+                        if (trimmed.includes(',')) {
+                            const parts = trimmed.split(',').map(p => p.trim());
+                            return `${parts.slice(1).join(' ')} ${parts[0]}`.trim();
+                        }
+                        return trimmed;
+                    })
+                    .filter(Boolean)
+                    .join(', ');
+            }
+            return cleaned;
+        };
+
+        const prefix = (str.match(/^\s*@(\w+)/i)?.[1] || '').toLowerCase();
+        const citeKeyMatch = str.match(/^\s*@\w+\s*\{\s*([^,\s]+)/);
+        const citeKey = citeKeyMatch ? citeKeyMatch[1].trim() : '';
+        const fallbackDoi = citeKey.startsWith('10.') ? citeKey : '';
+
+        const venueVal = extract('booktitle') || extract('journal') || extract('series');
+
         const detectType = (): 'journal' | 'conference' | 'book-chapter' => {
-            const prefix = (str.match(/^\s*@(\w+)/i)?.[1] || '').toLowerCase();
-            if (prefix === 'inproceedings' || prefix === 'proceedings') return 'conference';
-            if (prefix === 'incollection' || prefix === 'inbook' || prefix === 'chapter') return 'book-chapter';
-            return 'journal'; // @article, @misc, fallback
+            if (prefix === 'inproceedings' || prefix === 'proceedings' || prefix === 'conference') return 'conference';
+            if (prefix === 'incollection' || prefix === 'inbook' || prefix === 'chapter' || prefix === 'book') return 'book-chapter';
+            if (prefix === 'article') return 'journal';
+            if (venueVal.toLowerCase().includes('conference') || venueVal.toLowerCase().includes('symposium') || venueVal.toLowerCase().includes('proceedings')) return 'conference';
+            return 'journal';
         };
+
+        const title = extract('title');
+        const rawAuthors = extract('author');
+        const authors = formatAuthors(rawAuthors);
+        const venue = venueVal;
+        const year = extract('year');
+        const keywords = extract('keywords') || extract('keyword');
+        const rawDoi = extract('doi') || fallbackDoi;
+        const rawUrl = extract('url') || extract('link');
+        const publisher = extract('organization') || extract('publisher') || extract('institution');
+
+        const doi = rawDoi || (rawUrl && rawUrl.includes('doi.org') ? rawUrl : '');
+        const link = rawUrl || (doi ? (doi.startsWith('http') ? doi : `https://doi.org/${doi}`) : '');
+
+        let fieldsExtracted = 0;
+        if (title) fieldsExtracted++;
+        if (authors) fieldsExtracted++;
+        if (venue) fieldsExtracted++;
+        if (year) fieldsExtracted++;
+        if (keywords) fieldsExtracted++;
+        if (doi || link) fieldsExtracted++;
+        if (publisher) fieldsExtracted++;
+
+        if (fieldsExtracted === 0 && !prefix) {
+            setBibtexParseStatus(prev => ({
+                ...prev,
+                [index]: { msg: '⚠️ No BibTeX fields found. Check format.', type: 'error' }
+            }));
+            setTimeout(() => {
+                setBibtexParseStatus(prev => {
+                    const next = { ...prev };
+                    delete next[index];
+                    return next;
+                });
+            }, 3500);
+            return;
+        }
+
         setEditData(prev => {
             const papers = [...prev.papers];
-            const title = extract('title');
-            if (title) papers[index].title = title;
-            const authors = extract('author');
-            if (authors) papers[index].authors = authors;
-            const venue = extract('booktitle') || extract('journal') || extract('series');
-            if (venue) papers[index].venue = venue;
-            const year = extract('year');
-            if (year) papers[index].year = year;
-            const keywords = extract('keywords');
-            if (keywords) papers[index].keywords = keywords;
-            const doi = extract('doi');
-            if (doi) papers[index].doi = doi;
-            const publisher = extract('organization') || extract('publisher');
-            if (publisher) papers[index].publisher = publisher;
-            const link = extract('url') || extract('link');
-            if (link) papers[index].link = link;
-            // Always auto-set type from entry prefix
-            papers[index].type = detectType();
+            const current = { ...papers[index] };
+            if (title) current.title = title;
+            if (authors) current.authors = authors;
+            if (venue) current.venue = venue;
+            if (year) current.year = year;
+            if (keywords) current.keywords = keywords;
+            if (doi) current.doi = doi;
+            if (publisher) current.publisher = publisher;
+            if (link) current.link = link;
+            current.type = detectType();
+            current.bibtex = str;
+            papers[index] = current;
             return { ...prev, papers };
         });
-        setSaveStatus('BibTeX Extracted!');
-        setTimeout(()=>setSaveStatus(''), 2000);
+
+        setBibtexParseStatus(prev => ({
+            ...prev,
+            [index]: { msg: `✓ Extracted ${fieldsExtracted} fields!`, type: 'success' }
+        }));
+        showNotification(`✓ Extracted ${fieldsExtracted} fields from BibTeX!`);
+        setTimeout(() => {
+            setBibtexParseStatus(prev => {
+                const next = { ...prev };
+                delete next[index];
+                return next;
+            });
+        }, 3500);
     };
 
     useEffect(() => {
@@ -1691,10 +1843,36 @@ const AdminDashboard = () => {
                                     
                                     <div className="form-group" style={{ background: 'rgba(59,130,246,0.05)', padding: '16px', borderRadius: '12px', border: '1px dashed rgba(59,130,246,0.3)' }}>
                                         <label style={{ color: '#3b82f6' }}>✨ Option 1: Auto-Fill via BibTeX</label>
-                                        <textarea rows={4} style={{ fontFamily: 'monospace', fontSize: '0.85rem' }} placeholder="@INPROCEEDINGS{..."
-                                            value={bibtexInputs[i] || ''} onChange={e => setBibtexInputs({...bibtexInputs, [i]: e.target.value})} 
+                                        <textarea rows={5} style={{ fontFamily: 'monospace', fontSize: '0.85rem' }} placeholder="@INPROCEEDINGS{..."
+                                            value={bibtexInputs[i] !== undefined ? bibtexInputs[i] : (paper.bibtex || '')} 
+                                            onChange={e => setBibtexInputs({...bibtexInputs, [i]: e.target.value})} 
                                         />
-                                        <button className="btn-small btn-secondary" style={{ marginTop: '8px' }} onClick={() => handleParseBibtex(i)}>Parse & Autofill</button>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '10px', flexWrap: 'wrap' }}>
+                                            <button 
+                                                type="button" 
+                                                className="btn-small btn-secondary" 
+                                                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} 
+                                                onClick={() => handleParseBibtex(i)}
+                                            >
+                                                <Sparkles size={14} /> Parse & Autofill
+                                            </button>
+                                            {bibtexParseStatus[i] && (
+                                                <span style={{ 
+                                                    fontSize: '0.85rem', 
+                                                    fontWeight: 600,
+                                                    color: bibtexParseStatus[i]?.type === 'success' ? '#10b981' : '#f59e0b',
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px',
+                                                    padding: '4px 10px',
+                                                    borderRadius: '6px',
+                                                    background: bibtexParseStatus[i]?.type === 'success' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+                                                    border: `1px solid ${bibtexParseStatus[i]?.type === 'success' ? 'rgba(16, 185, 129, 0.25)' : 'rgba(245, 158, 11, 0.25)'}`
+                                                }}>
+                                                    {bibtexParseStatus[i]?.msg}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <h5 style={{ margin: '24px 0 16px', fontSize: '0.85rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Option 2: Manual Entry</h5>
