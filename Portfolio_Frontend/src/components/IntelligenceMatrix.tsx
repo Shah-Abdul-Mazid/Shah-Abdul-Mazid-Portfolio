@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import aiCircuitBg from '../assets/ai-circuit-bg.jpg';
 
 /**
  * ═══════════════════════════════════════════════════════════════════
@@ -196,16 +197,12 @@ const IntelligenceMatrix: React.FC = () => {
             const targetBlend = document.documentElement.classList.contains('light-mode') ? 1.0 : 0.0;
             themeBlend += (targetBlend - themeBlend) * 0.08;
 
-            // 1. CLEAR CANVAS
-            const bgR = Math.round(lerp(3, 248, themeBlend));
-            const bgG = Math.round(lerp(7, 250, themeBlend));
-            const bgB = Math.round(lerp(23, 252, themeBlend));
-            ctx.fillStyle = `rgb(${bgR}, ${bgG}, ${bgB})`;
-            ctx.fillRect(0, 0, W, H);
+            // 1. CLEAR CANVAS TRANSPARENTLY (Allows full-opacity AI Circuit Background to shine through)
+            ctx.clearRect(0, 0, W, H);
 
-            // Center of the AI neural core
+            // Center of the AI neural core (aligned with the circuit brain chip)
             const cx = W / 2;
-            const cy = H * 0.42;
+            const cy = H * 0.46;
 
             // 2. AMBIENT SCIENTIFIC NEBULA MESH
             const nebAlpha = lerp(0.09, 0.065, themeBlend);
@@ -564,19 +561,96 @@ const IntelligenceMatrix: React.FC = () => {
     }, []);
 
     return (
-        <canvas
-            ref={canvasRef}
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                zIndex: -1,
-                display: 'block',
-                pointerEvents: 'none',
-            }}
-        />
+        <div className="im-container">
+            {/* ── High-Def AI Circuit Core Background (Full Opacity) ── */}
+            <div className="im-image-wrapper">
+                <img
+                    src={aiCircuitBg}
+                    alt="Cybernetic Artificial Intelligence Matrix"
+                    className="im-bg-image"
+                />
+                {/* Center Vignette / Typography Shield for 100% legibility */}
+                <div className="im-center-shield" />
+            </div>
+
+            {/* ── Real-Time Synaptic & HUD Telemetry Canvas ── */}
+            <canvas
+                ref={canvasRef}
+                className="im-canvas"
+            />
+
+            <style>{`
+                .im-container {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    pointer-events: none;
+                    z-index: -1;
+                    overflow: hidden;
+                }
+
+                .im-image-wrapper {
+                    position: absolute;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                .im-bg-image {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    object-position: center center;
+                    opacity: 1; /* FULL OPACITY in Dark Mode */
+                    transition: filter 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease;
+                    filter: saturate(1.2) brightness(1.0);
+                    display: block;
+                }
+
+                /* Day / Light Mode: Invert to pristine technical blueprint with deep cobalt circuit lines */
+                html.light-mode .im-bg-image {
+                    filter: invert(1) hue-rotate(180deg) saturate(1.3) contrast(1.1) brightness(0.98);
+                    opacity: 0.95; /* FULL OPACITY in Day Mode */
+                }
+
+                /* Soft typography protection shield so avatar and headline have 100% crisp contrast */
+                .im-center-shield {
+                    position: absolute;
+                    inset: 0;
+                    pointer-events: none;
+                    background: radial-gradient(
+                        circle at 50% 46%,
+                        rgba(2, 6, 23, 0.45) 0%,
+                        rgba(2, 6, 23, 0.20) 45%,
+                        rgba(2, 6, 23, 0.05) 75%,
+                        transparent 100%
+                    );
+                    transition: background 0.6s ease;
+                }
+
+                html.light-mode .im-center-shield {
+                    background: radial-gradient(
+                        circle at 50% 46%,
+                        rgba(255, 255, 255, 0.65) 0%,
+                        rgba(255, 255, 255, 0.35) 45%,
+                        rgba(255, 255, 255, 0.10) 75%,
+                        transparent 100%
+                    );
+                }
+
+                .im-canvas {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    display: block;
+                    pointer-events: none;
+                }
+            `}</style>
+        </div>
     );
 };
 
