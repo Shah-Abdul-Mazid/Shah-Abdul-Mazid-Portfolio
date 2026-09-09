@@ -175,7 +175,20 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
 
 
 
-                .badge { display: inline-block; padding: 10px 24px; background: var(--primary-glow); border: 1px solid var(--border-color); border-radius: 100px; color: var(--primary); font-size: 0.8125rem; font-weight: 600; margin-bottom: 24px; }
+                .hero-content h1 {
+                    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.8);
+                }
+                html.light-mode .hero-content h1 {
+                    text-shadow: 0 2px 24px rgba(255, 255, 255, 0.95), 0 1px 2px rgba(255, 255, 255, 0.8);
+                }
+                .hero-content p {
+                    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85);
+                }
+                html.light-mode .hero-content p {
+                    text-shadow: 0 1px 12px rgba(255, 255, 255, 0.9);
+                }
+
+                .badge { display: inline-block; padding: 10px 24px; background: var(--primary-glow); border: 1px solid var(--border-color); border-radius: 100px; color: var(--primary); font-size: 0.8125rem; font-weight: 600; margin-bottom: 24px; backdrop-filter: blur(12px); }
                 .hero-btns { display: flex; gap: 16px; margin-top: 40px; justify-content: center; }
                 .image-wrapper { position: relative; width: 140px; height: 140px; margin: 0 auto; }
                 .image-wrapper img { 

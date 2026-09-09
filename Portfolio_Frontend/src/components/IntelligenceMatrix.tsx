@@ -615,27 +615,37 @@ const IntelligenceMatrix: React.FC = () => {
                     opacity: 0.95; /* FULL OPACITY in Day Mode */
                 }
 
-                /* Soft typography protection shield so avatar and headline have 100% crisp contrast */
+                /* Soft typography protection shield: smooth feathered glassmorphic blur to dissolve conflicting background text under the headline while keeping circuit brain at 100% full opacity around it */
                 .im-center-shield {
                     position: absolute;
-                    inset: 0;
-                    pointer-events: none;
+                    top: 48%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 820px;
+                    max-width: 96vw;
+                    height: 560px;
+                    border-radius: 48px;
+                    backdrop-filter: blur(28px);
+                    -webkit-backdrop-filter: blur(28px);
                     background: radial-gradient(
-                        circle at 50% 46%,
-                        rgba(2, 6, 23, 0.45) 0%,
-                        rgba(2, 6, 23, 0.20) 45%,
-                        rgba(2, 6, 23, 0.05) 75%,
+                        ellipse at center,
+                        rgba(2, 6, 23, 0.88) 0%,
+                        rgba(2, 6, 23, 0.70) 45%,
+                        rgba(2, 6, 23, 0.20) 75%,
                         transparent 100%
                     );
+                    mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+                    -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+                    pointer-events: none;
                     transition: background 0.6s ease;
                 }
 
                 html.light-mode .im-center-shield {
                     background: radial-gradient(
-                        circle at 50% 46%,
-                        rgba(255, 255, 255, 0.65) 0%,
-                        rgba(255, 255, 255, 0.35) 45%,
-                        rgba(255, 255, 255, 0.10) 75%,
+                        ellipse at center,
+                        rgba(248, 250, 252, 0.94) 0%,
+                        rgba(248, 250, 252, 0.80) 45%,
+                        rgba(248, 250, 252, 0.25) 75%,
                         transparent 100%
                     );
                 }
