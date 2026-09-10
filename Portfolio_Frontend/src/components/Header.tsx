@@ -378,13 +378,19 @@ const Header = () => {
                 .mobile-nav-link.active { opacity: 1; background: rgba(139,92,246,0.12); color: var(--primary); font-weight: 700; }
 
                 @media (max-width: 900px) {
-                    .nav-links-desktop { display: none; }
-                    .mobile-toggle { display: flex; }
+                    .nav-links-desktop { display: none !important; }
+                    .mobile-toggle { display: flex !important; }
                     .mobile-backdrop { display: block; }
                 }
 
-                @media (max-width: 480px) {
-                    .logo-link span { display: none; }
+                @media (max-width: 600px) {
+                    .logo-name-text { font-size: 0.95rem; }
+                    #theme-toggle { width: 36px; height: 36px; }
+                    .mobile-toggle { width: 36px; height: 36px; }
+                }
+
+                @media (max-width: 440px) {
+                    .logo-name-text { display: none; }
                 }
             `}</style>
         </>

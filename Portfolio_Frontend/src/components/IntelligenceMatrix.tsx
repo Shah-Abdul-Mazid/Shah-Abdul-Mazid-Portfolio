@@ -559,7 +559,7 @@ const IntelligenceMatrix: React.FC = () => {
                     alt="Night Mode Background"
                     className="im-bg-image im-bg-night"
                     style={{
-                        opacity: isLightMode ? 0 : 0.42,
+                        opacity: isLightMode ? 0 : 0.72,
                         pointerEvents: 'none',
                     }}
                 />
@@ -622,22 +622,18 @@ const IntelligenceMatrix: React.FC = () => {
                     position: fixed;
                     top: 0;
                     left: 0;
-                    /* Use 100% + min to guarantee full coverage */
                     width: 100vw;
                     height: 100vh;
                     height: -webkit-fill-available;
                     height: 100dvh;
-                    /* Cover the entire viewport regardless of image ratio */
-                    object-fit: cover;
+                    /* Fill: stretches image to exactly fill viewport — no cropping */
+                    object-fit: fill;
                     object-position: center center;
-                    /* Prevent image from being smaller than viewport */
                     min-width: 100%;
                     min-height: 100%;
                     transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
                     display: block;
-                    /* Prevent iOS tap highlight */
                     -webkit-tap-highlight-color: transparent;
-                    /* Crisp rendering */
                     image-rendering: auto;
                 }
 
@@ -651,7 +647,7 @@ const IntelligenceMatrix: React.FC = () => {
                     width: 100vw;
                     height: 100vh;
                     height: 100dvh;
-                    background: rgba(2, 6, 23, 0.62);
+                    background: rgba(2, 6, 23, 0.38);
                     pointer-events: none;
                     transition: background 0.5s ease;
                 }
@@ -660,7 +656,7 @@ const IntelligenceMatrix: React.FC = () => {
                 }
 
                 /* ─── Night / Light mode opacity ─── */
-                .im-bg-night { opacity: 0.42; }
+                .im-bg-night { opacity: 0.72; }
                 .im-bg-light { opacity: 0; pointer-events: none; }
                 html.light-mode .im-bg-night { opacity: 0; pointer-events: none; }
                 html.light-mode .im-bg-light { opacity: 0.52; }

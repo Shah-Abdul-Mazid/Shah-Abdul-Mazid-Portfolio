@@ -346,20 +346,66 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2);
                 }
 
-                @media (max-width: 480px) {
-                    .hero-btns { flex-direction: column; width: 100%; gap: 10px; margin-top: 20px; }
-                    .hero-btns .btn { width: 100%; text-align: center; padding: 12px 20px; }
-                    .image-wrapper { width: 80px; height: 80px; }
-                    .badge { padding: 7px 16px; font-size: 0.75rem; margin-bottom: 14px; }
-                    .time-pill { padding: 5px 5px 5px 14px; }
-                    .time-text { font-size: 0.75rem; }
+                @media (max-width: 768px) {
+                    #hero {
+                        height: auto !important;
+                        min-height: calc(100dvh - 120px) !important;
+                        padding-top: 75px !important;
+                        padding-bottom: 20px !important;
+                        overflow: visible !important;
+                    }
+                    .hero-image {
+                        margin-bottom: 8px !important;
+                    }
+                    .image-wrapper { 
+                        width: 85px !important; 
+                        height: 85px !important; 
+                    }
+                    .badge { 
+                        padding: 5px 14px !important; 
+                        font-size: 0.72rem !important; 
+                        margin-bottom: 10px !important; 
+                    }
+                    .time-pill-container {
+                        margin-bottom: 8px !important;
+                    }
+                    .time-pill { 
+                        padding: 4px 6px 4px 12px !important; 
+                    }
+                    .time-text { 
+                        font-size: 0.72rem !important; 
+                    }
+                    .hero-content h1 {
+                        font-size: clamp(1.75rem, 6vw, 2.6rem) !important;
+                        margin: 6px 0 !important;
+                        line-height: 1.2 !important;
+                    }
+                    .hero-content p {
+                        font-size: 0.92rem !important;
+                        max-width: 92% !important;
+                        margin: 0 auto 14px !important;
+                    }
+                    .hero-btns { 
+                        flex-direction: column !important; 
+                        align-items: center !important;
+                        width: 100% !important; 
+                        gap: 10px !important; 
+                        margin-top: 14px !important; 
+                    }
+                    .hero-btns .btn { 
+                        width: 100% !important; 
+                        max-width: 250px !important; 
+                        text-align: center !important; 
+                        padding: 10px 18px !important;
+                        font-size: 0.88rem !important;
+                    }
                 }
                 @media (max-height: 700px) {
-                    .image-wrapper { width: 80px; height: 80px; }
-                    .hero-image { margin-bottom: 8px !important; }
-                    .badge { margin-bottom: 12px; padding: 6px 16px; }
-                    .hero-btns { margin-top: 16px; gap: 10px; }
-                    .hero-btns .btn { padding: 10px 22px; font-size: 0.9rem; }
+                    .image-wrapper { width: 75px !important; height: 75px !important; }
+                    .hero-image { margin-bottom: 6px !important; }
+                    .badge { margin-bottom: 8px !important; padding: 4px 12px !important; }
+                    .hero-btns { margin-top: 10px !important; gap: 8px !important; }
+                    .hero-btns .btn { padding: 9px 18px !important; font-size: 0.85rem !important; }
                 }
             `}</style>
         </section>
