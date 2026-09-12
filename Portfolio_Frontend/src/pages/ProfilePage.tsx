@@ -135,21 +135,18 @@ const ProfilePage = () => {
                       });
                   };
 
-                  const cleanIntro = intro.replace(/^(?:\*\*|###\s*)?About\s+Me(?:\*\*)?[:\s]*/i, '').trim();
+                  const defaultIntro = "I am an AI Engineer at Neuroxyte and a Computer Science & Engineering graduate from East West University (majoring in Intelligent Systems & Data Science). Driven by AI innovation, research, and hackathons, my work focuses on building explainable, data-driven systems that bridge the gap between academic research and production engineering.";
+                  const cleanIntro = (intro || defaultIntro)
+                    .replace(/^(?:\*\*|###\s*)?About\s+Me(?:\*\*)?[:\s]*/i, '')
+                    .trim();
+
                   const engItems = extractItems(engBlock);
                   const resItems = extractItems(resBlock);
 
                   return (
                     <div className="bio-structured-content">
                       {cleanIntro && (
-                        <div className="bio-section bio-about-section">
-                          <div className="bio-subhead">
-                            <span className="bio-subhead-title">About Me</span>
-                          </div>
-                          <div className="bio-quote-box">
-                            <p className="bio-quote-text">{renderHighlighted(cleanIntro)}</p>
-                          </div>
-                        </div>
+                        <p className="bio-para">{renderHighlighted(cleanIntro)}</p>
                       )}
 
                       {engItems.length > 0 && (
