@@ -46,13 +46,164 @@ const ProfilePage = () => {
           </div>
 
           {/* Short Biography Card */}
-          <div className="bio-card">
-            <h2 className="section-heading">Short Biography</h2>
-            <div className="bio-content">
-              {data.about.bio.split('\n\n').map((para, idx) => (
-                <p key={idx} className="bio-para">{para}</p>
-              ))}
-            </div>
+            {/* Short Biography Card */}
+            <div className="bio-card">
+              <h2 className="section-heading">Short Biography</h2>
+              
+              {/* Heading / Hero Tagline */}
+              <div className="bio-hero-tagline">
+                <span className="bio-tagline-text">AI ENGINEER &amp; RESEARCHER &nbsp;|&nbsp; INTELLIGENT SYSTEMS &amp; DATA SCIENCE</span>
+              </div>
+
+              {(() => {
+                const TECH_PILLS = [
+                  'Multi-Agent RAG',
+                  'Grad-CAM',
+                  'Vision-Language Transformers',
+                  'Vision Transformers',
+                  'LLM pipelines',
+                  'production LLM',
+                  'computer vision',
+                  'AI microservices',
+                  'explainable AI',
+                  'Transformers',
+                  'RAG platforms',
+                ];
+
+                const renderHighlighted = (text: string) => {
+                  const escaped = TECH_PILLS.map(p => p.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|');
+                  const regex = new RegExp(`(\\b(?:${escaped})\\b|\\*\\*[^*]+\\*\\*)`, 'gi');
+                  const parts = text.split(regex);
+
+                  return parts.map((part, idx) => {
+                    if (!part) return null;
+                    if (part.startsWith('**') && part.endsWith('**')) {
+                      return <strong key={idx} className="bio-highlight-strong">{part.slice(2, -2)}</strong>;
+                    }
+                    const matched = TECH_PILLS.find(p => p.toLowerCase() === part.toLowerCase());
+                    if (matched) {
+                      return <span key={idx} className="bio-tech-pill">{part}</span>;
+                    }
+                    return <span key={idx}>{part}</span>;
+                  });
+                };
+
+                const rawBio = data.about.bio || '';
+                const hasEng = /Engineering\s+Focus/i.test(rawBio);
+                const hasRes = /Research\s+Focus/i.test(rawBio);
+
+                if (hasEng || hasRes) {
+                  const engIdx = rawBio.search(/(?:\*\*|###\s*)?Engineering\s+Focus(?:\*\*)?/i);
+                  const resIdx = rawBio.search(/(?:\*\*|###\s*)?Research\s+Focus(?:\*\*)?/i);
+
+                  let intro = '';
+                  let engBlock = '';
+                  let resBlock = '';
+
+                  if (engIdx !== -1 && resIdx !== -1) {
+                    if (engIdx < resIdx) {
+                      intro = rawBio.slice(0, engIdx).trim();
+                      engBlock = rawBio.slice(engIdx, resIdx).trim();
+                      resBlock = rawBio.slice(resIdx).trim();
+                    } else {
+                      intro = rawBio.slice(0, resIdx).trim();
+                      resBlock = rawBio.slice(resIdx, engIdx).trim();
+                      engBlock = rawBio.slice(engIdx).trim();
+                    }
+                  } else if (engIdx !== -1) {
+                    intro = rawBio.slice(0, engIdx).trim();
+                    engBlock = rawBio.slice(engIdx).trim();
+                  } else if (resIdx !== -1) {
+                    intro = rawBio.slice(0, resIdx).trim();
+                    resBlock = rawBio.slice(resIdx).trim();
+                  }
+
+                  engBlock = engBlock.replace(/^(?:\*\*|###\s*)?Engineering\s+Focus(?:\*\*)?[:\s•\-]*/i, '').trim();
+                  resBlock = resBlock.replace(/^(?:\*\*|###\s*)?Research\s+Focus(?:\*\*)?[:\s•\-]*/i, '').trim();
+
+                  const extractItems = (text: string) => {
+                    return text
+                      .split(/(?:\r?\n\s*[-*•]\s*|\r?\n|•\s*)/)
+                      .map(s => s.trim())
+                      .filter(s => s.length > 0 && s !== '-' && s !== '*' && s !== '•')
+                      .map(item => {
+                        const m = item.match(/^(?:\*\*)?([^:*]+?)(?:\*\*)?:\s*(.*)$/);
+                        if (m) {
+                          return { label: m[1].replace(/\*\*/g, '').trim(), desc: m[2].trim() };
+                        }
+                        return { label: '', desc: item.replace(/^[-*•]\s*/, '').trim() };
+                      });
+                  };
+
+                  const cleanIntro = intro.replace(/^(?:\*\*|###\s*)?About\s+Me(?:\*\*)?[:\s]*/i, '').trim();
+                  const engItems = extractItems(engBlock);
+                  const resItems = extractItems(resBlock);
+
+                  return (
+                    <div className="bio-structured-content">
+                      {cleanIntro && (
+                        <div className="bio-section bio-about-section">
+                          <div className="bio-subhead">
+                            <span className="bio-subhead-title">About Me</span>
+                          </div>
+                          <div className="bio-quote-box">
+                            <p className="bio-quote-text">{renderHighlighted(cleanIntro)}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {engItems.length > 0 && (
+                        <div className="bio-section bio-focus-section">
+                          <div className="bio-subhead">
+                            <span className="bio-subhead-icon">⚡</span>
+                            <span className="bio-subhead-title">Engineering Focus</span>
+                          </div>
+                          <ul className="bio-bullet-list">
+                            {engItems.map((item, i) => (
+                              <li key={i} className="bio-bullet-item">
+                                <span className="bio-bullet-marker">○</span>
+                                <div className="bio-bullet-text">
+                                  {item.label && <strong className="bio-label">{item.label}: </strong>}
+                                  <span>{renderHighlighted(item.desc)}</span>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {resItems.length > 0 && (
+                        <div className="bio-section bio-focus-section">
+                          <div className="bio-subhead">
+                            <span className="bio-subhead-icon">🔬</span>
+                            <span className="bio-subhead-title">Research Focus</span>
+                          </div>
+                          <ul className="bio-bullet-list">
+                            {resItems.map((item, i) => (
+                              <li key={i} className="bio-bullet-item">
+                                <span className="bio-bullet-marker">○</span>
+                                <div className="bio-bullet-text">
+                                  {item.label && <strong className="bio-label">{item.label}: </strong>}
+                                  <span>{renderHighlighted(item.desc)}</span>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                // Fallback for plain bio
+                return (
+                  <div className="bio-content">
+                    {rawBio.split(/\n\s*\n/).filter(b => b.trim().length > 0).map((block, idx) => (
+                      <p key={idx} className="bio-para">{renderHighlighted(block)}</p>
+                    ))}
+                  </div>
+                );
+              })()}
             
             {/* Profile Action Links */}
             <div className="bio-links">
@@ -239,9 +390,135 @@ const ProfilePage = () => {
           border-bottom: 1px solid var(--border-color);
         }
 
+        /* Bio hero tagline */
+        .bio-hero-tagline {
+          font-size: 0.88rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          margin-bottom: 22px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid var(--border-color);
+        }
+        .bio-tagline-text {
+          background: linear-gradient(135deg, var(--primary), #38bdf8);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        /* Bio structured content container */
+        .bio-structured-content {
+          display: flex;
+          flex-direction: column;
+          gap: 22px;
+        }
+
+        .bio-section {
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Section Subheaders */
+        .bio-subhead {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 10px;
+        }
+        .bio-subhead-icon {
+          font-size: 1rem;
+          color: var(--primary);
+        }
+        .bio-subhead-title {
+          font-size: 1.05rem;
+          font-weight: 700;
+          color: var(--text-color);
+          letter-spacing: 0.02em;
+        }
+
+        /* About Me Quote Box */
+        .bio-quote-box {
+          position: relative;
+          padding: 12px 18px;
+          border-left: 3px solid var(--primary);
+          background: rgba(56, 189, 248, 0.04);
+          border-radius: 0 12px 12px 0;
+          box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.02);
+        }
+        .light-mode .bio-quote-box {
+          background: rgba(2, 132, 199, 0.04);
+          border-left-color: #0284c7;
+        }
+        .bio-quote-text {
+          font-size: 1rem;
+          line-height: 1.8;
+          color: var(--text-secondary);
+          font-style: italic;
+          margin: 0;
+        }
+
+        /* Bullet lists for Engineering & Research */
+        .bio-bullet-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .bio-bullet-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          font-size: 0.98rem;
+          line-height: 1.75;
+          color: var(--text-secondary);
+        }
+        .bio-bullet-marker {
+          color: var(--primary);
+          font-size: 0.9rem;
+          font-weight: 700;
+          line-height: 1.75;
+          flex-shrink: 0;
+        }
+        .bio-bullet-text {
+          flex: 1;
+        }
+        .bio-label {
+          color: var(--text-color);
+          font-weight: 700;
+        }
+
+        /* Highlight Badges / Tech Pills */
+        .bio-tech-pill {
+          display: inline-block;
+          padding: 1px 9px;
+          border-radius: 16px;
+          font-size: 0.82rem;
+          font-weight: 600;
+          background: rgba(56, 189, 248, 0.12);
+          color: #38bdf8;
+          border: 1px solid rgba(56, 189, 248, 0.32);
+          margin: 0 3px;
+          vertical-align: baseline;
+          white-space: nowrap;
+          box-shadow: 0 0 8px rgba(56, 189, 248, 0.1);
+        }
+        .light-mode .bio-tech-pill {
+          background: rgba(2, 132, 199, 0.08);
+          border-color: rgba(2, 132, 199, 0.28);
+          color: #0284c7;
+          box-shadow: none;
+        }
+
+        .bio-highlight-strong {
+          color: var(--text-color);
+          font-weight: 700;
+        }
+
         .bio-para {
           font-size: 1.025rem;
-          line-height: 1.7;
+          line-height: 1.8;
           color: var(--text-secondary);
           margin-bottom: 16px;
         }
@@ -342,12 +619,13 @@ const ProfilePage = () => {
           flex-shrink: 0;
         }
 
-        /* Timeline Grid Layout */
+        /* Timeline Grid Layout - Align items start prevents empty space in shorter column */
         .timeline-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 32px;
           margin-top: 20px;
+          align-items: start;
         }
 
         .timeline-column {
@@ -361,6 +639,8 @@ const ProfilePage = () => {
           -webkit-backdrop-filter: blur(24px);
           box-shadow: var(--card-shadow);
           transition: var(--transition);
+          height: fit-content;
+          align-self: start;
         }
 
         .timeline-column:hover {

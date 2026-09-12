@@ -589,10 +589,10 @@ const defaultData: PortfolioData = {
             "ML Engineer",
             "Software Engineer"
         ],
-        description: "Passionate Data Scientist and AI Developer dedicated to building scalable, intelligent solutions."
+        description: "A CSE student focused on Intelligent Systems & Data Science."
     },
     about: {
-        bio: "I am a Computer Science and Engineering student majoring in Intelligent Systems and Data Science at East West University.\n\nPassionate about AI innovation, research, and hackathon projects. Skilled in deep learning, computer vision, NLP, and ML deployment with strong analytical and research abilities.\n\nMy journey in AI and Data Science revolves around developing intelligent systems that solve real-world problems. With a strong foundation in Computer Science, I aim to contribute to research, innovation, and impactful projects. | (FastAPI Verified 2026)",
+        bio: "AI Engineer at Neuroxyte and Computer Science & Engineering graduate from East West University. Passionate about AI innovation, hackathons, and developing data-driven systems that solve complex real-world problems.\n\n**Engineering Focus**\n- **Production AI Systems:** Architecting Multi-Agent RAG platforms, production LLM pipelines, and computer vision applications.\n- **System Deployment:** Scaling AI microservices and optimizing model latency for real-time inference.\n\n**Research Focus**\n- **Medical Imaging & Vision:** Diagnostics, interpretable machine learning using Grad-CAM, and Vision-Language Transformers.\n- **Academic Contribution:** Bridging production-grade engineering with explainable AI research.",
         age: "24",
         projects: "15+",
         bioLinks: [
