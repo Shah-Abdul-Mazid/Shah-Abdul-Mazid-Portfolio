@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Mail, Phone, Linkedin, Github } from 'lucide-react';
+import { MapPin, Mail, Phone, Linkedin, Github, GraduationCap } from 'lucide-react';
 import { visualCvData } from '../../../data/visualCvData';
 import './visual-cv.css';
 
@@ -37,6 +37,9 @@ export const VisualCV: React.FC = () => {
                         <span className="v2-contact-item"><Phone size={11} /> {personal.phone}</span>
                         <span className="v2-contact-item"><Linkedin size={11} /> <a href={personal.linkedin} target="_blank" rel="noreferrer">LinkedIn</a></span>
                         <span className="v2-contact-item"><Github size={11} /> <a href={personal.github} target="_blank" rel="noreferrer">GitHub</a></span>
+                        {personal.scholar && (
+                            <span className="v2-contact-item"><GraduationCap size={11} /> <a href={personal.scholar} target="_blank" rel="noreferrer">Google Scholar</a></span>
+                        )}
                     </div>
                 </div>
                 <div className="v2-header-right">
@@ -154,7 +157,22 @@ export const VisualCV: React.FC = () => {
                     <div className="v2-section">
                         <h3 className="v2-sec-heading">Publication</h3>
                         <div className="v2-bold">{publication.title}</div>
-                        <div className="v2-small"><b>{publication.year}</b> — {publication.conference}</div>
+                        {publication.authors && (
+                            <div className="v2-small" style={{ marginTop: '2px', color: '#4b5563' }}>
+                                <b>Authors:</b> {publication.authors}
+                            </div>
+                        )}
+                        <div className="v2-small" style={{ marginTop: '2px' }}>
+                            {publication.conference}
+                        </div>
+                        {publication.doi && (
+                            <div className="v2-small" style={{ marginTop: '2px' }}>
+                                <b>DOI:</b>{' '}
+                                <a href={publication.url || `https://doi.org/${publication.doi}`} target="_blank" rel="noreferrer" className="v2-link">
+                                    {publication.doi}
+                                </a>
+                            </div>
+                        )}
                     </div>
 
                     <div className="v2-section">

@@ -8,6 +8,7 @@ export interface VisualCvData {
         phone: string;
         linkedin: string;
         github: string;
+        scholar?: string;
         avatarUrl: string;
     };
     summary: string;
@@ -20,7 +21,14 @@ export interface VisualCvData {
     researchInterests: string[];
     careerFocus: string[];
     experience: { role: string; company: string; location: string; period: string; points: string[] }[];
-    publication: { title: string; year: string; conference: string };
+    publication: {
+        title: string;
+        authors?: string;
+        year: string;
+        conference: string;
+        doi?: string;
+        url?: string;
+    };
     certifications: string[];
     competitions: { title: string; organizer: string; year: string }[];
     projects: { title: string; subtitle: string; description: string; points: string[]; tech: string[] }[];
@@ -37,6 +45,7 @@ export const visualCvData: VisualCvData = {
         phone: "+880 1531329222",
         linkedin: "https://www.linkedin.com/in/shahabdulmazid",
         github: "https://github.com/Shah-Abdul-Mazid",
+        scholar: "https://scholar.google.com/citations?user=TYkiwUgAAAAJ",
         avatarUrl: "/resume/FD=109767.jpg",
     },
     summary:
@@ -80,76 +89,90 @@ export const visualCvData: VisualCvData = {
     ],
     toolsAndPlatforms: [
         { category: "Models & APIs", items: ["OpenAI API", "Llama 2", "Mistral", "Claude API", "HuggingFace Models"] },
-        { category: "Vector DBs", items: ["Pinecone", "Weaviate", "Milvus", "Chroma", "FAISS"] },
+        { category: "Vector DBs & Search", items: ["Pinecone", "Weaviate", "Milvus", "Chroma", "FAISS"] },
         { category: "Deployment", items: ["Hugging Face Hub", "AWS SageMaker", "Docker Hub", "Streamlit Cloud"] },
         { category: "Dev Tools", items: ["VS Code", "Git", "GitHub", "Jupyter", "Google Colab", "Linux/Ubuntu"] },
-        { category: "Integrations", items: ["OpenAI API", "Google Maps", "Stripe", "Google Sheets", "Anthropic API"] },
+        { category: "APIs & Integrations", items: ["OpenAI API", "Google Maps", "Stripe", "Google Sheets", "Anthropic API"] },
     ],
     achievements: [
         "Published research on interpretable ML for agricultural disease diagnosis (ICCIT 2025)",
         "Built enterprise RAG platform processing 10,000+ documents with 95%+ accuracy",
         "Developed traffic detection system for real-world Bangladesh traffic conditions",
         "Designed multi-agent AI system handling complex enterprise workflows",
-        "9+ IBM and AWS certifications in AI/ML specialisations",
+        "9+ IBM and AWS certifications in AI/ML specializations",
     ],
     highlights: [
         { title: "Published Researcher", description: "MangoStack ensemble model published in ICCIT 2025" },
-        { title: "RAG Specialist", description: "Built enterprise platforms for document Q&A systems" },
-        { title: "Full-Stack AI", description: "End-to-end ML systems from training to production" },
-        { title: "Automation Expert", description: "n8n workflow automation for business efficiency" },
+        { title: "RAG Specialist", description: "Built enterprise platforms for document-based Q&A systems" },
+        { title: "Full-Stack AI", description: "End-to-end ML systems from training to production deployment" },
+        { title: "Automation Expert", description: "n8n workflow automation for business process efficiency" },
     ],
     researchInterests: [
-        "Generative AI, LLMs & RAG Architecture",
-        "Multi-Agent AI Systems & Autonomous Workflows",
-        "Healthcare AI & Medical Image Diagnosis",
-        "Computer Vision, Grad-CAM & Model Interpretability",
+        "Generative AI and Large Language Models",
+        "Retrieval-Augmented Generation",
+        "Multi-Agent AI Systems",
+        "Healthcare AI",
+        "Computer Vision and Medical Imaging",
+        "Natural Language Processing",
+        "Intelligent Recommendation Systems",
+        "Model Interpretability",
     ],
     careerFocus: [
         "AI/ML Engineering",
         "Generative AI",
-        "RAG Systems",
-        "Computer Vision",
+        "LLM and RAG Systems",
         "AI Research",
+        "Computer Vision",
         "Data Science",
     ],
     experience: [
+        {
+            role: "AI Engineer",
+            company: "Neuroxyte",
+            location: "Narayanganj, Dhaka Division, Bangladesh",
+            period: "July 2026 – Current",
+            points: [
+                "Developed and deployed AI/ML solutions using Generative AI, LLMs, RAG, and intelligent automation.",
+                "Built AI-powered applications and backend services using Python and FastAPI for scalable model integration.",
+                "Designed and implemented LLM-based workflows, conversational AI systems, and retrieval-augmented applications.",
+                "Integrated external APIs, AI models, and third-party services to deliver end-to-end AI solutions.",
+                "Optimized AI workflows and model pipelines for improved reliability, scalability, and operational efficiency.",
+                "Researched and applied emerging techniques in Generative AI, LLMs, RAG, and AI automation.",
+            ],
+        },
         {
             role: "AI Engineer",
             company: "Softvence Agency",
             location: "Dhaka, Bangladesh",
             period: "Feb 2026 – May 2026",
             points: [
-                "Developed RAG-based chatbots using Large Language Models for intelligent Q&A.",
-                "Built scalable FastAPI backend services for AI model deployment.",
-                "Developed Text-to-Speech and voice generation systems.",
-                "Automated workflows using n8n for operational efficiency.",
+                "Developed RAG-based chatbots using Large Language Models for intelligent question answering.",
+                "Built scalable FastAPI backend services for AI model deployment and integration.",
+                "Developed Text-to-Speech and voice generation systems for interactive applications.",
+                "Automated workflows using n8n to improve operational efficiency.",
                 "Integrated APIs and external services for end-to-end AI solutions.",
-                "Researched and implemented emerging GenAI and LLM techniques.",
-            ],
-        },
-        {
-            role: "Campus Ambassador",
-            company: "eShikhon",
-            location: "Dhaka, Bangladesh",
-            period: "Jan 2022 – Jan 2025",
-            points: [
-                "Represented the organisation at East West University.",
-                "Organised technology workshops and student events.",
-                "Promoted digital learning and technology initiatives.",
+                "Researched and implemented emerging Generative AI, LLM, and RAG techniques.",
             ],
         },
     ],
     publication: {
         title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
+        authors: "Raiyan Gani, Yusuf Salehin, Md. Shakil Bhuiyan, Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Shamim Ripon",
         year: "2025",
-        conference: "28th International Conference on Computer and Information Technology (ICCIT).",
+        conference: "2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240.",
+        doi: "10.1109/ICCIT68739.2025.11490181",
+        url: "https://doi.org/10.1109/ICCIT68739.2025.11490181",
     },
     certifications: [
         "IBM Deep Learning with PyTorch, Keras and TensorFlow",
         "DeepLearning.AI TensorFlow Developer",
-        "IBM Machine Learning & AI Engineering",
-        "IBM RAG, Agentic AI & AI Developer",
+        "IBM Machine Learning",
+        "IBM RAG and Agentic AI",
+        "Building AI Agents and Agentic Workflows",
+        "IBM AI Developer",
         "AWS Generative AI and AI Agents with Amazon Bedrock",
+        "IBM AI Engineering",
+        "IBM Data Science",
     ],
     competitions: [
         { title: "Network War", organizer: "EWU Telecommunication Club", year: "2024" },
@@ -160,57 +183,65 @@ export const visualCvData: VisualCvData = {
         {
             title: "Nexus Intelligence",
             subtitle: "Enterprise Multi-Agent AI Platform",
-            description: "Built a full-stack enterprise AI platform for secure Q&A over private documents, spreadsheets, and web content.",
+            description: "Built a full-stack enterprise AI platform for secure question answering over private documents, spreadsheets, and web content.",
             points: [
                 "Implemented RAG and multi-agent architecture.",
                 "Integrated Pinecone vector search and live data routing.",
-                "Added feedback memory, JWT auth, and PII detection.",
+                "Added feedback memory, JWT authentication, and PII detection.",
                 "Developed Next.js frontend and FastAPI backend.",
             ],
-            tech: ["FastAPI", "Next.js", "React", "TypeScript", "OpenAI", "Pinecone", "AWS"],
+            tech: ["FastAPI", "Next.js", "React", "TypeScript", "OpenAI", "Pinecone", "RAG", "AWS"],
         },
         {
             title: "HR Policies RAG Chatbot",
             subtitle: "AI-Powered Document Q&A",
-            description: "AI chatbot to answer HR policy questions from PDF documents using semantic retrieval and LLMs.",
+            description: "Developed an AI chatbot capable of answering HR policy questions from PDF documents using semantic retrieval and LLM generation.",
             points: [
-                "Implemented PDF processing and vector retrieval.",
+                "Implemented PDF processing and document retrieval.",
+                "Used vector search and sentence embeddings.",
                 "Developed interactive Streamlit interface.",
             ],
-            tech: ["Python", "FastAPI", "Streamlit", "Pinecone", "Llama 2"],
+            tech: ["Python", "FastAPI", "Streamlit", "Pinecone", "Llama 2", "NLP"],
         },
         {
             title: "Bangladesh Traffic Flow Dataset",
             subtitle: "Deep Learning Vehicle Detection",
-            description: "Deep learning system for vehicle detection under Bangladesh traffic conditions.",
+            description: "Developed a deep learning system for vehicle detection and classification under Bangladesh traffic conditions.",
             points: [
-                "Implemented YOLO-based object detection & Grad-CAM.",
-                "Built inference using Streamlit and Gradio.",
+                "Implemented YOLO-based object detection.",
+                "Applied Grad-CAM/EigenCAM for model interpretation.",
+                "Built interactive inference using Streamlit and Gradio.",
             ],
             tech: ["PyTorch", "YOLO", "OpenCV", "NumPy", "Pandas"],
         },
         {
-            title: "Brain Tumor Detection",
+            title: "Brain Tumor Detection and Classification",
             subtitle: "MobDenseNet with CBAM Attention",
-            description: "Hybrid deep learning model combining MobileNet, DenseNet, and CBAM attention for MRI brain tumor classification.",
+            description: "Developed a hybrid deep learning model combining MobileNet and DenseNet with CBAM attention for MRI-based brain tumor classification.",
             points: [
-                "Preprocessing, augmentation, and classification pipeline.",
-                "Applied Grad-CAM interpretability & Streamlit deploy.",
+                "Implemented preprocessing, augmentation, and classification.",
+                "Evaluated accuracy, precision, recall, and F1-score.",
+                "Applied Grad-CAM for model interpretability.",
+                "Deployed the model using Streamlit.",
             ],
             tech: ["PyTorch", "MobileNet", "DenseNet", "CBAM", "Streamlit"],
         },
         {
             title: "WhatsUpIn",
-            subtitle: "AI Travel Recommendation Engine",
-            description: "Automated AI travel recommendation platform generating personalized itineraries.",
-            points: ["Integrated OpenAI, n8n, Google Maps, and Stripe."],
+            subtitle: "AI-Powered Travel Recommendation Engine",
+            description: "Developed an automated AI travel recommendation platform generating personalized travel plans.",
+            points: [
+                "Integrated OpenAI for itinerary generation.",
+                "Automated workflows using n8n.",
+                "Integrated Google Maps, Google Sheets, and Stripe.",
+            ],
             tech: ["OpenAI", "n8n", "Google Maps", "Stripe"],
         },
     ],
     profiles: [
-        { label: "Portfolio", url: "https://shah-abdul-mazid-portfolio.vercel.app", text: "shah-abdul-mazid-portfolio.vercel.app" },
-        { label: "GitHub", url: "https://github.com/Shah-Abdul-Mazid", text: "github.com/Shah-Abdul-Mazid" },
-        { label: "LinkedIn", url: "https://www.linkedin.com/in/shahabdulmazid", text: "linkedin.com/in/shahabdulmazid" },
+        { label: "Portfolio", url: "https://shah-abdul-mazid-portfolio.vercel.app/home", text: "Portfolio Profile" },
+        { label: "GitHub", url: "https://github.com/Shah-Abdul-Mazid", text: "Github Profile" },
+        { label: "LinkedIn", url: "https://www.linkedin.com/in/shahabdulmazid", text: "LinkedIn Profile" },
         { label: "Nexus Intelligence", url: "https://ai-rag-project-llm-based.vercel.app/auth/login", text: "Live Demo" },
     ],
 };
