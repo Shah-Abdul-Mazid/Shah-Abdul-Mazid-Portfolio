@@ -29,6 +29,14 @@ export interface VisualCvData {
         doi?: string;
         url?: string;
     };
+    publications?: {
+        title: string;
+        authors?: string;
+        year: string;
+        conference: string;
+        doi?: string;
+        url?: string;
+    }[];
     certifications: string[];
     competitions: { title: string; organizer: string; year: string }[];
     projects: { title: string; subtitle: string; description: string; points: string[]; tech: string[] }[];
@@ -132,26 +140,22 @@ export const visualCvData: VisualCvData = {
             location: "Narayanganj, Dhaka Division, Bangladesh",
             period: "July 2026 – Current",
             points: [
-                "Developed and deployed AI/ML solutions using Generative AI, LLMs, RAG, and intelligent automation.",
-                "Built AI-powered applications and backend services using Python and FastAPI for scalable model integration.",
-                "Designed and implemented LLM-based workflows, conversational AI systems, and retrieval-augmented applications.",
-                "Integrated external APIs, AI models, and third-party services to deliver end-to-end AI solutions.",
-                "Optimized AI workflows and model pipelines for improved reliability, scalability, and operational efficiency.",
-                "Researched and applied emerging techniques in Generative AI, LLMs, RAG, and AI automation.",
+                "Develop and deploy AI solutions using Generative AI, LLMs, RAG, and intelligent automation.",
+                "Build AI applications and scalable backend services using Python and FastAPI.",
+                "Design LLM-based workflows, conversational AI systems, and retrieval-augmented applications.",
+                "Integrate AI models, external APIs, and third-party services to deliver reliable end-to-end solutions.",
             ],
         },
         {
             role: "AI Engineer",
             company: "Softvence Agency",
             location: "Dhaka, Bangladesh",
-            period: "Feb 2026 – May 2026",
+            period: "Feb 2026 – July 2026",
             points: [
                 "Developed RAG-based chatbots using Large Language Models for intelligent question answering.",
-                "Built scalable FastAPI backend services for AI model deployment and integration.",
-                "Developed Text-to-Speech and voice generation systems for interactive applications.",
-                "Automated workflows using n8n to improve operational efficiency.",
-                "Integrated APIs and external services for end-to-end AI solutions.",
-                "Researched and implemented emerging Generative AI, LLM, and RAG techniques.",
+                "Built FastAPI backend services and integrated AI models and external APIs.",
+                "Developed Text-to-Speech and voice generation systems for interactive AI applications.",
+                "Automated business workflows using n8n and implemented Generative AI and RAG solutions.",
             ],
         },
     ],
@@ -163,6 +167,24 @@ export const visualCvData: VisualCvData = {
         doi: "10.1109/ICCIT68739.2025.11490181",
         url: "https://doi.org/10.1109/ICCIT68739.2025.11490181",
     },
+    publications: [
+        {
+            title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
+            authors: "Raiyan Gani, Yusuf Salehin, Md. Shakil Bhuiyan, Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Shamim Ripon",
+            year: "2025",
+            conference: "2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240.",
+            doi: "10.1109/ICCIT68739.2025.11490181",
+            url: "https://doi.org/10.1109/ICCIT68739.2025.11490181",
+        },
+        {
+            title: "Uncertainty-Aware Chest Pathology Detection with Vision and Language Transformers",
+            authors: "Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Mahia Mehrun Safa, Md. Ashikur Rahman Anik, Md. Omor Faruk Sejan, Khandhakar Shatu Moni, Md. Sazzad Hossain, Md. Adnan Morshed, Ahmed Wasif Reza",
+            year: "2026",
+            conference: "Innovations in Data Analytics, Springer Nature, 2026, pp. 397–417.",
+            doi: "10.1007/978-3-032-27845-6_34",
+            url: "https://doi.org/10.1007/978-3-032-27845-6_34",
+        },
+    ],
     certifications: [
         "IBM Deep Learning with PyTorch, Keras and TensorFlow",
         "DeepLearning.AI TensorFlow Developer",
@@ -183,59 +205,47 @@ export const visualCvData: VisualCvData = {
         {
             title: "Nexus Intelligence",
             subtitle: "Enterprise Multi-Agent AI Platform",
-            description: "Built a full-stack enterprise AI platform for secure question answering over private documents, spreadsheets, and web content.",
+            description: "Built a full-stack enterprise AI platform for secure Q&A across private documents, spreadsheets, and web data.",
             points: [
-                "Implemented RAG and multi-agent architecture.",
-                "Integrated Pinecone vector search and live data routing.",
-                "Added feedback memory, JWT authentication, and PII detection.",
-                "Developed Next.js frontend and FastAPI backend.",
+                "Implemented RAG, multi-agent routing, Pinecone retrieval, feedback memory, JWT authentication, and PII detection.",
             ],
-            tech: ["FastAPI", "Next.js", "React", "TypeScript", "OpenAI", "Pinecone", "RAG", "AWS"],
+            tech: ["FastAPI", "Next.js", "React", "TypeScript", "OpenAI", "Pinecone", "AWS"],
         },
         {
             title: "HR Policies RAG Chatbot",
             subtitle: "AI-Powered Document Q&A",
-            description: "Developed an AI chatbot capable of answering HR policy questions from PDF documents using semantic retrieval and LLM generation.",
+            description: "Built a citation-aware chatbot that answers HR policy questions from organizational PDF documents using RAG.",
             points: [
-                "Implemented PDF processing and document retrieval.",
-                "Used vector search and sentence embeddings.",
-                "Developed interactive Streamlit interface.",
+                "Implemented PDF processing, semantic search, vector retrieval, and LLM-based response generation.",
             ],
-            tech: ["Python", "FastAPI", "Streamlit", "Pinecone", "Llama 2", "NLP"],
+            tech: ["Python", "FastAPI", "Streamlit", "Pinecone", "Llama 2", "Sentence Transformers"],
         },
         {
             title: "Bangladesh Traffic Flow Dataset",
             subtitle: "Deep Learning Vehicle Detection",
-            description: "Developed a deep learning system for vehicle detection and classification under Bangladesh traffic conditions.",
+            description: "Developed a computer vision system for vehicle detection and classification under Bangladesh traffic conditions.",
             points: [
-                "Implemented YOLO-based object detection.",
-                "Applied Grad-CAM/EigenCAM for model interpretation.",
-                "Built interactive inference using Streamlit and Gradio.",
+                "Implemented YOLO detection with Grad-CAM/EigenCAM-based model interpretation and interactive inference.",
             ],
-            tech: ["PyTorch", "YOLO", "OpenCV", "NumPy", "Pandas"],
+            tech: ["PyTorch", "YOLO", "OpenCV", "NumPy", "Pandas", "Streamlit", "Gradio"],
         },
         {
             title: "Brain Tumor Detection and Classification",
             subtitle: "MobDenseNet with CBAM Attention",
-            description: "Developed a hybrid deep learning model combining MobileNet and DenseNet with CBAM attention for MRI-based brain tumor classification.",
+            description: "Developed a hybrid MobileNetV2–DenseNet121 model with CBAM attention for MRI-based brain tumor classification.",
             points: [
-                "Implemented preprocessing, augmentation, and classification.",
-                "Evaluated accuracy, precision, recall, and F1-score.",
-                "Applied Grad-CAM for model interpretability.",
-                "Deployed the model using Streamlit.",
+                "Applied preprocessing, augmentation, classification, and Grad-CAM for explainable predictions.",
             ],
-            tech: ["PyTorch", "MobileNet", "DenseNet", "CBAM", "Streamlit"],
+            tech: ["PyTorch", "MobileNetV2", "DenseNet121", "CBAM", "Grad-CAM", "Streamlit"],
         },
         {
             title: "WhatsUpIn",
             subtitle: "AI-Powered Travel Recommendation Engine",
-            description: "Developed an automated AI travel recommendation platform generating personalized travel plans.",
+            description: "Built an AI travel platform that generates personalized itineraries and automates travel-related workflows.",
             points: [
-                "Integrated OpenAI for itinerary generation.",
-                "Automated workflows using n8n.",
-                "Integrated Google Maps, Google Sheets, and Stripe.",
+                "Integrated OpenAI, n8n, Google Maps, Google Sheets, and Stripe for end-to-end automation.",
             ],
-            tech: ["OpenAI", "n8n", "Google Maps", "Stripe"],
+            tech: ["OpenAI", "n8n", "APIs", "Google Maps", "Google Sheets", "Stripe"],
         },
     ],
     profiles: [

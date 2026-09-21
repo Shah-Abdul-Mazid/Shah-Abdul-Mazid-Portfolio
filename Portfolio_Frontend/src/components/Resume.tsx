@@ -527,33 +527,38 @@ const Resume = () => {
                                     <div className="v2-sec">
                                         <h3 className="v2-sec-heading">Professional Experience</h3>
                                         <div className="v2-item">
-                                            <div className="v2-bold">AI Engineer <span className="v2-right-date">Feb 2026 — July 2026</span></div>
-                                            <div className="v2-sub">Softvence Agency — Dhaka, Bangladesh</div>
+                                            <div className="v2-bold">AI Engineer <span className="v2-right-date">July 2026 — Current</span></div>
+                                            <div className="v2-sub">Neuroxyte — Narayanganj, Dhaka Division, Bangladesh</div>
                                             <ul className="v2-ul">
-                                                <li>Developed RAG-based chatbots using Large Language Models for intelligent question answering.</li>
-                                                <li>Built scalable FastAPI backend services for AI model deployment and integration.</li>
-                                                <li>Developed Text-to-Speech and voice generation systems for interactive applications.</li>
-                                                <li>Automated workflows using n8n to improve operational efficiency.</li>
-                                                <li>Integrated APIs and external services for end-to-end AI solutions.</li>
-                                                <li>Researched and implemented emerging Generative AI, LLM, and RAG techniques.</li>
+                                                <li>Develop and deploy AI solutions using Generative AI, LLMs, RAG, and intelligent automation.</li>
+                                                <li>Build AI applications and scalable backend services using Python and FastAPI.</li>
+                                                <li>Design LLM-based workflows, conversational AI systems, and retrieval-augmented applications.</li>
+                                                <li>Integrate AI models, external APIs, and third-party services to deliver reliable end-to-end solutions.</li>
                                             </ul>
                                         </div>
 
                                         <div className="v2-item">
-                                            <div className="v2-bold">Campus Ambassador <span className="v2-right-date">Jan 2022 — Jan 2025</span></div>
-                                            <div className="v2-sub">eShikhon — Dhaka, Bangladesh</div>
+                                            <div className="v2-bold">AI Engineer <span className="v2-right-date">Feb 2026 — July 2026</span></div>
+                                            <div className="v2-sub">Softvence Agency — Dhaka, Bangladesh</div>
                                             <ul className="v2-ul">
-                                                <li>Represented the organization at East West University.</li>
-                                                <li>Organized technology workshops and student events.</li>
-                                                <li>Promoted digital learning and technology-focused initiatives.</li>
+                                                <li>Developed RAG-based chatbots using Large Language Models for intelligent question answering.</li>
+                                                <li>Built FastAPI backend services and integrated AI models and external APIs.</li>
+                                                <li>Developed Text-to-Speech and voice generation systems for interactive AI applications.</li>
+                                                <li>Automated business workflows using n8n and implemented Generative AI and RAG solutions.</li>
                                             </ul>
                                         </div>
                                     </div>
 
                                     <div className="v2-sec">
                                         <h3 className="v2-sec-heading">Publication</h3>
-                                        <div className="v2-bold">MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis</div>
-                                        <div className="v2-small"><b>2025</b> — 28th International Conference on Computer and Information Technology (ICCIT).</div>
+                                        <div className="v2-item" style={{ marginBottom: '8px' }}>
+                                            <div className="v2-bold">MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis</div>
+                                            <div className="v2-small"><b>2025</b> — 2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240.</div>
+                                        </div>
+                                        <div className="v2-item">
+                                            <div className="v2-bold">Uncertainty-Aware Chest Pathology Detection with Vision and Language Transformers</div>
+                                            <div className="v2-small"><b>2026</b> — Innovations in Data Analytics, Springer Nature, 2026, pp. 397–417.</div>
+                                        </div>
                                     </div>
 
                                     <div className="v2-sec">
@@ -594,55 +599,46 @@ const Resume = () => {
 
                                         <div className="v2-item">
                                             <div className="v2-bold">Nexus Intelligence — Enterprise Multi-Agent AI Platform</div>
-                                            <p className="v2-small">Built a full-stack enterprise AI platform for secure question answering over private documents, spreadsheets, and web content.</p>
+                                            <p className="v2-small">Built a full-stack enterprise AI platform for secure Q&A across private documents, spreadsheets, and web data.</p>
                                             <ul className="v2-ul">
-                                                <li>Implemented RAG and multi-agent architecture.</li>
-                                                <li>Integrated Pinecone vector search and live data routing.</li>
-                                                <li>Added feedback memory, JWT authentication, and PII detection.</li>
-                                                <li>Developed Next.js frontend and FastAPI backend.</li>
-                                                <li><b>Tech:</b> FastAPI, Next.js, React, TypeScript, OpenAI, Pinecone, RAG, AWS.</li>
+                                                <li>Implemented RAG, multi-agent routing, Pinecone retrieval, feedback memory, JWT authentication, and PII detection.</li>
+                                                <li><b>Tech:</b> FastAPI, Next.js, React, TypeScript, OpenAI, Pinecone, AWS.</li>
                                             </ul>
                                         </div>
 
                                         <div className="v2-item">
                                             <div className="v2-bold">HR Policies RAG Chatbot — AI-Powered Document Q&A</div>
-                                            <p className="v2-small">Developed an AI chatbot capable of answering HR policy questions from PDF documents using semantic retrieval and LLM generation.</p>
+                                            <p className="v2-small">Built a citation-aware chatbot that answers HR policy questions from organizational PDF documents using RAG.</p>
                                             <ul className="v2-ul">
-                                                <li>Implemented PDF processing and document retrieval.</li>
-                                                <li>Used vector search and sentence embeddings.</li>
-                                                <li>Developed interactive Streamlit interface.</li>
-                                                <li><b>Tech:</b> Python, FastAPI, Streamlit, Pinecone, Llama 2, NLP.</li>
+                                                <li>Implemented PDF processing, semantic search, vector retrieval, and LLM-based response generation.</li>
+                                                <li><b>Tech:</b> Python, FastAPI, Streamlit, Pinecone, Llama 2, Sentence Transformers.</li>
                                             </ul>
                                         </div>
 
                                         <div className="v2-item">
-                                            <div className="v2-bold">Bangladesh Traffic Flow Dataset — Vehicle Detection</div>
-                                            <p className="v2-small">Developed a deep learning system for vehicle detection and classification under Bangladesh traffic conditions.</p>
+                                            <div className="v2-bold">Bangladesh Traffic Flow Dataset — Deep Learning Vehicle Detection</div>
+                                            <p className="v2-small">Developed a computer vision system for vehicle detection and classification under Bangladesh traffic conditions.</p>
                                             <ul className="v2-ul">
-                                                <li>Implemented YOLO-based object detection.</li>
-                                                <li>Applied Grad-CAM/EigenCAM for model interpretation.</li>
-                                                <li>Built interactive inference using Streamlit and Gradio.</li>
-                                                <li><b>Tech:</b> PyTorch, YOLO, OpenCV, NumPy, Pandas.</li>
+                                                <li>Implemented YOLO detection with Grad-CAM/EigenCAM-based model interpretation and interactive inference.</li>
+                                                <li><b>Tech:</b> PyTorch, YOLO, OpenCV, NumPy, Pandas, Streamlit, Gradio.</li>
                                             </ul>
                                         </div>
 
                                         <div className="v2-item">
-                                            <div className="v2-bold">Brain Tumor Detection — MobDenseNet with CBAM</div>
-                                            <p className="v2-small">Developed a hybrid deep learning model combining MobileNet and DenseNet with CBAM attention for MRI brain tumor classification.</p>
+                                            <div className="v2-bold">Brain Tumor Detection and Classification — MobDenseNet with CBAM</div>
+                                            <p className="v2-small">Developed a hybrid MobileNetV2–DenseNet121 model with CBAM attention for MRI-based brain tumor classification.</p>
                                             <ul className="v2-ul">
-                                                <li>Implemented preprocessing, augmentation, and classification.</li>
-                                                <li>Evaluated accuracy, precision, recall, and F1-score.</li>
-                                                <li>Applied Grad-CAM for model interpretability.</li>
+                                                <li>Applied preprocessing, augmentation, classification, and Grad-CAM for explainable predictions.</li>
+                                                <li><b>Tech:</b> PyTorch, MobileNetV2, DenseNet121, CBAM, Grad-CAM, Streamlit.</li>
                                             </ul>
                                         </div>
 
                                         <div className="v2-item">
-                                            <div className="v2-bold">WhatsUpIn — AI Travel Recommendation Engine</div>
-                                            <p className="v2-small">Developed an automated AI travel recommendation platform generating personalized travel plans.</p>
+                                            <div className="v2-bold">WhatsUpIn — AI-Powered Travel Recommendation Engine</div>
+                                            <p className="v2-small">Built an AI travel platform that generates personalized itineraries and automates travel-related workflows.</p>
                                             <ul className="v2-ul">
-                                                <li>Integrated OpenAI for itinerary generation.</li>
-                                                <li>Automated workflows using n8n.</li>
-                                                <li>Integrated Google Maps, Google Sheets, and Stripe.</li>
+                                                <li>Integrated OpenAI, n8n, Google Maps, Google Sheets, and Stripe for end-to-end automation.</li>
+                                                <li><b>Tech:</b> OpenAI, n8n, APIs, Google Maps, Google Sheets, Stripe.</li>
                                             </ul>
                                         </div>
                                     </div>

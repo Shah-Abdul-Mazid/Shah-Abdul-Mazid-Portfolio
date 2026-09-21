@@ -37,6 +37,11 @@ export interface ATSCvData {
         year: string;
         venue: string;
     };
+    publications?: {
+        title: string;
+        year: string;
+        venue: string;
+    }[];
     certifications: {
         name: string;
         issuer: string;
@@ -124,16 +129,26 @@ export const atsCvData: ATSCvData = {
     experience: [
         {
             role: "AI Engineer",
+            company: "Neuroxyte",
+            location: "Narayanganj, Dhaka Division, Bangladesh",
+            period: "July 2026 -- Current",
+            points: [
+                "Develop and deploy AI solutions using Generative AI, LLMs, RAG, and intelligent automation.",
+                "Build AI applications and scalable backend services using Python and FastAPI.",
+                "Design LLM-based workflows, conversational AI systems, and retrieval-augmented applications.",
+                "Integrate AI models, external APIs, and third-party services to deliver reliable end-to-end solutions.",
+            ],
+        },
+        {
+            role: "AI Engineer",
             company: "Softvence Agency",
             location: "Dhaka, Bangladesh",
-            period: "Feb 2026 -- May 2026",
+            period: "Feb 2026 -- July 2026",
             points: [
-                "Developed Retrieval-Augmented Generation (RAG) chatbots using Large Language Models for intelligent question-answering systems.",
-                "Built scalable backend APIs using FastAPI for AI model deployment, integration, and application development.",
-                "Designed and implemented voice generation and Text-to-Speech systems for interactive AI applications.",
-                "Automated workflows using n8n, reducing manual tasks and improving operational efficiency.",
-                "Integrated multiple APIs and external services to build end-to-end AI-powered solutions.",
-                "Researched and implemented emerging Generative AI, LLM, RAG, and AI agent techniques.",
+                "Developed RAG-based chatbots using Large Language Models for intelligent question answering.",
+                "Built FastAPI backend services and integrated AI models and external APIs.",
+                "Developed Text-to-Speech and voice generation systems for interactive AI applications.",
+                "Automated business workflows using n8n and implemented Generative AI and RAG solutions.",
             ],
         },
         {
@@ -176,56 +191,65 @@ export const atsCvData: ATSCvData = {
             title: "Nexus Intelligence",
             subtitle: "Enterprise Multi-Agent AI Platform",
             points: [
-                "Built a full-stack enterprise AI platform that transforms private company documents, spreadsheets, and web content into secure and grounded answers.",
-                "Implemented multi-agent architecture, Retrieval-Augmented Generation, Pinecone vector search, live data routing, feedback memory, JWT authentication, and PII compliance.",
-                "Developed Next.js frontend and FastAPI backend with AWS EC2 and PM2 deployment support.",
+                "Built a full-stack enterprise AI platform for secure Q&A across private documents, spreadsheets, and web data.",
+                "Implemented RAG, multi-agent routing, Pinecone retrieval, feedback memory, JWT authentication, and PII detection.",
             ],
-            technologies: ["FastAPI", "Next.js", "React", "TypeScript", "OpenAI API", "Pinecone", "RAG", "Multi-Agent AI", "JWT", "AWS", "EC2", "PM2"],
+            technologies: ["FastAPI", "Next.js", "React", "TypeScript", "OpenAI", "Pinecone", "AWS"],
         },
         {
             title: "HR Policies RAG Chatbot",
-            subtitle: "AI-Powered Document Q&A System",
+            subtitle: "AI-Powered Document Q&A",
             points: [
-                "Developed an AI-powered RAG chatbot that answers HR policy questions by retrieving relevant PDF content and generating context-aware responses.",
-                "Implemented semantic search, vector retrieval, document processing, and LLM-based response generation.",
+                "Built a citation-aware chatbot that answers HR policy questions from organizational PDF documents using RAG.",
+                "Implemented PDF processing, semantic search, vector retrieval, and LLM-based response generation.",
             ],
-            technologies: ["RAG", "LLMs", "FastAPI", "Streamlit", "Pinecone", "Llama 2", "NLP", "Sentence Transformers", "Python"],
+            technologies: ["Python", "FastAPI", "Streamlit", "Pinecone", "Llama 2", "Sentence Transformers"],
         },
         {
             title: "WhatsUpIn",
-            subtitle: "AI-Powered Personalized Travel Recommendation Engine",
+            subtitle: "AI-Powered Travel Recommendation Engine",
             points: [
-                "Developed an automated AI-powered travel engine that generates personalized travel itineraries.",
-                "Integrated AI, mapping, payment, spreadsheet, and workflow automation services.",
+                "Built an AI travel platform that generates personalized itineraries and automates travel-related workflows.",
+                "Integrated OpenAI, n8n, Google Maps, Google Sheets, and Stripe for end-to-end automation.",
             ],
-            technologies: ["n8n", "Python", "OpenAI API", "Google Maps API", "Google Sheets", "Stripe API"],
+            technologies: ["OpenAI", "n8n", "APIs", "Google Maps", "Google Sheets", "Stripe"],
         },
         {
-            title: "Bangladesh Traffic Flow Dataset Using Machine Learning",
-            subtitle: "Deep Learning Vehicle Detection & Classification",
+            title: "Bangladesh Traffic Flow Dataset",
+            subtitle: "Deep Learning Vehicle Detection",
             points: [
-                "Developed a deep learning solution for vehicle detection and classification under Bangladesh traffic conditions.",
-                "Applied YOLO-based object detection and Grad-CAM/EigenCAM for model interpretability.",
-                "Deployed an interactive inference application using Streamlit and Gradio.",
+                "Developed a computer vision system for vehicle detection and classification under Bangladesh traffic conditions.",
+                "Implemented YOLO detection with Grad-CAM/EigenCAM-based model interpretation and interactive inference.",
             ],
-            technologies: ["PyTorch", "YOLO", "OpenCV", "NumPy", "Pandas", "Plotly", "Streamlit", "Gradio", "Matplotlib", "EigenCAM"],
+            technologies: ["PyTorch", "YOLO", "OpenCV", "NumPy", "Pandas", "Streamlit", "Gradio"],
         },
         {
-            title: "Brain Tumor Detection and Classification with MobDenseNet Hybrid Model",
-            subtitle: "MRI Medical Imaging Classification",
+            title: "Brain Tumor Detection and Classification",
+            subtitle: "MobDenseNet with CBAM Attention",
             points: [
-                "Developed a hybrid deep learning architecture combining MobileNet and DenseNet with CBAM attention for brain tumor classification from MRI images.",
-                "Applied preprocessing, normalization, augmentation, model evaluation, and Grad-CAM-based interpretability.",
-                "Evaluated models using accuracy, precision, recall, and F1-score.",
+                "Developed a hybrid MobileNetV2–DenseNet121 model with CBAM attention for MRI-based brain tumor classification.",
+                "Applied preprocessing, augmentation, classification, and Grad-CAM for explainable predictions.",
             ],
-            technologies: ["PyTorch", "Deep Learning", "Computer Vision", "Medical Imaging", "CNN", "MobileNet", "DenseNet", "CBAM", "Grad-CAM", "Streamlit"],
+            technologies: ["PyTorch", "MobileNetV2", "DenseNet121", "CBAM", "Grad-CAM", "Streamlit"],
         },
     ],
     publication: {
         title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
         year: "2025",
-        venue: "Published at the 28th International Conference on Computer and Information Technology (ICCIT 2025).",
+        venue: "Published at the 2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240. DOI: 10.1109/ICCIT68739.2025.11490181",
     },
+    publications: [
+        {
+            title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
+            year: "2025",
+            venue: "Published at the 2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240. DOI: 10.1109/ICCIT68739.2025.11490181",
+        },
+        {
+            title: "Uncertainty-Aware Chest Pathology Detection with Vision and Language Transformers",
+            year: "2026",
+            venue: "Published in Innovations in Data Analytics, Springer Nature, 2026, pp. 397–417. DOI: 10.1007/978-3-032-27845-6_34",
+        },
+    ],
     certifications: [
         { name: "IBM Deep Learning with PyTorch, Keras and TensorFlow", issuer: "IBM", date: "May 2026" },
         { name: "DeepLearning.AI TensorFlow Developer", issuer: "DeepLearning.AI", date: "May 2026" },

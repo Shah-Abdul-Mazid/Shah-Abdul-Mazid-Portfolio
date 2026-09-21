@@ -156,23 +156,27 @@ export const VisualCV: React.FC = () => {
 
                     <div className="v2-section">
                         <h3 className="v2-sec-heading">Publication</h3>
-                        <div className="v2-bold">{publication.title}</div>
-                        {publication.authors && (
-                            <div className="v2-small" style={{ marginTop: '2px', color: '#4b5563' }}>
-                                <b>Authors:</b> {publication.authors}
+                        {(visualCvData.publications || [publication]).map((pub, pIdx) => (
+                            <div key={pIdx} style={{ marginBottom: pIdx < ((visualCvData.publications || [publication]).length - 1) ? '8px' : '0' }}>
+                                <div className="v2-bold">{pub.title}</div>
+                                {pub.authors && (
+                                    <div className="v2-small" style={{ marginTop: '2px', color: '#4b5563' }}>
+                                        <b>Authors:</b> {pub.authors}
+                                    </div>
+                                )}
+                                <div className="v2-small" style={{ marginTop: '2px' }}>
+                                    {pub.conference}
+                                </div>
+                                {pub.doi && (
+                                    <div className="v2-small" style={{ marginTop: '2px' }}>
+                                        <b>DOI:</b>{' '}
+                                        <a href={pub.url || `https://doi.org/${pub.doi}`} target="_blank" rel="noreferrer" className="v2-link">
+                                            {pub.doi}
+                                        </a>
+                                    </div>
+                                )}
                             </div>
-                        )}
-                        <div className="v2-small" style={{ marginTop: '2px' }}>
-                            {publication.conference}
-                        </div>
-                        {publication.doi && (
-                            <div className="v2-small" style={{ marginTop: '2px' }}>
-                                <b>DOI:</b>{' '}
-                                <a href={publication.url || `https://doi.org/${publication.doi}`} target="_blank" rel="noreferrer" className="v2-link">
-                                    {publication.doi}
-                                </a>
-                            </div>
-                        )}
+                        ))}
                     </div>
 
                     <div className="v2-section">

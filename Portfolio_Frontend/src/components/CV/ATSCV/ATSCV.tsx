@@ -99,11 +99,15 @@ export const ATSCV: React.FC = () => {
             {/* Publication */}
             <section className="ats-section">
                 <h2 className="ats-section-title">Publication</h2>
-                <div className="ats-item-top">
-                    <span className="ats-bold">{publication.title}</span>
-                    <span className="ats-date-badge">{publication.year}</span>
-                </div>
-                <p className="ats-small-desc" style={{ margin: '2px 0 0' }}>{publication.venue}</p>
+                {(atsCvData.publications || [publication]).map((pub, idx) => (
+                    <div key={idx} style={{ marginBottom: idx < ((atsCvData.publications || [publication]).length - 1) ? '8px' : '0' }}>
+                        <div className="ats-item-top">
+                            <span className="ats-bold">{pub.title}</span>
+                            <span className="ats-date-badge">{pub.year}</span>
+                        </div>
+                        <p className="ats-small-desc" style={{ margin: '2px 0 0' }}>{pub.venue}</p>
+                    </div>
+                ))}
             </section>
 
             {/* Certifications */}

@@ -197,6 +197,26 @@ export interface PortfolioData {
 
 const defaultPapers: PaperItem[] = [
     {
+        title: "Uncertainty-Aware Chest Pathology Detection with Vision and Language Transformers",
+        authors: "Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Mahia Mehrun Safa, Md. Ashikur Rahman Anik, Md. Omor Faruk Sejan, Khandhakar Shatu Moni, Md. Sazzad Hossain, Md. Adnan Morshed, Ahmed Wasif Reza",
+        venue: "Innovations in Data Analytics",
+        publisher: "Springer Nature",
+        year: "2026",
+        link: "https://doi.org/10.1007/978-3-032-27845-6_34",
+        doi: "10.1007/978-3-032-27845-6_34",
+        type: "book-chapter"
+    },
+    {
+        title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
+        authors: "Raiyan Gani, Yusuf Salehin, Md. Shakil Bhuiyan, Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Shamim Ripon",
+        venue: "2025 28th International Conference on Computer and Information Technology (ICCIT)",
+        publisher: "IEEE",
+        year: "2025",
+        link: "https://doi.org/10.1109/ICCIT68739.2025.11490181",
+        doi: "10.1109/ICCIT68739.2025.11490181",
+        type: "conference"
+    },
+    {
         title: "BDFlower: Growth stage flower image dataset for precision agriculture and floriculture",
         authors: "Aritra Das, Mohammad Rifat Ahmmad Rashid, Md Rakibul Hasan, Karib Shams, Raihan Ul Islam",
         venue: "Data in Brief",
@@ -637,15 +657,29 @@ const defaultData: PortfolioData = {
     work: [
         { 
             role: 'AI Engineer', 
-            company: 'Softvence Agency', 
-            startDate: '2026-02-01', 
+            company: 'Neuroxyte', 
+            startDate: '2026-07-01', 
             endDate: '', 
             details: [
-                'Developing and deploying AI-driven solutions, including automation systems, AI chatbots, and RAG-based applications.',
-                'Designing and implementing scalable backend architectures using FastAPI and modern AI frameworks.',
-                'Working with LLMs, NLP pipelines, and vector databases to build intelligent, production-ready systems.',
-                'Contributing to research-oriented projects and integrating cutting-edge AI technologies into real-world applications.'
-            ]
+                'Develop and deploy AI solutions using Generative AI, LLMs, RAG, and intelligent automation.',
+                'Build AI applications and scalable backend services using Python and FastAPI.',
+                'Design LLM-based workflows, conversational AI systems, and retrieval-augmented applications.',
+                'Integrate AI models, external APIs, and third-party services to deliver reliable end-to-end solutions.'
+            ],
+            logoUrl: 'https://res.cloudinary.com/dxjv3zwse/image/upload/v1788380316/portfolio_uploads/stream_k1cgqb.jpg'
+        },
+        { 
+            role: 'AI Engineer', 
+            company: 'Softvence Agency', 
+            startDate: '2026-02-01', 
+            endDate: '2026-07-31', 
+            details: [
+                'Developed RAG-based chatbots using Large Language Models for intelligent question answering.',
+                'Built FastAPI backend services and integrated AI models and external APIs.',
+                'Developed Text-to-Speech and voice generation systems for interactive AI applications.',
+                'Automated business workflows using n8n and implemented Generative AI and RAG solutions.'
+            ],
+            logoUrl: 'https://res.cloudinary.com/dxjv3zwse/image/upload/v1776650708/portfolio_uploads/stream_jar9z5.png'
         },
         { 
             role: 'Campus Ambassador', 
@@ -653,14 +687,71 @@ const defaultData: PortfolioData = {
             startDate: '2022-01-01', 
             endDate: '2025-12-30', 
             details: [
-                'Represented organization as campus lead.',
-                'Organized technical workshops and knowledge sessions.',
-                'Collaborated with cross-functional teams for student outreach.'
+                'Represented organization on campus and promoted digital learning initiatives.',
+                'Organized technical workshops, events, and student engagement programs.',
+                'Collaborated with students and organizers to increase awareness of digital education programs.'
             ],
-            appointmentLetterUrl: '/data/eshikhon-appointment-letter.pdf'
+            appointmentLetterUrl: '/data/eshikhon-appointment-letter.pdf',
+            logoUrl: 'https://res.cloudinary.com/dxjv3zwse/image/upload/v1775337263/portfolio_uploads/stream_ypzkjw.png'
         }
     ],
-    projects: [],
+    projects: [
+        {
+            title: "Nexus Intelligence",
+            desc: "Built a full-stack enterprise AI platform for secure Q&A across private documents, spreadsheets, and web data.",
+            tags: ["FastAPI", "Next.js", "React", "TypeScript", "OpenAI", "Pinecone", "AWS"],
+            showcase: 1,
+            projectUrl: "https://ai-rag-project-llm-based.vercel.app/auth/login",
+            githubUrl: "https://github.com/Shah-Abdul-Mazid/AI_RAG_PROJECT_LLM_BASED",
+            role: "Full-Stack AI Engineer",
+            category: "active",
+            status: "ACTIVE",
+            details: "Implemented RAG, multi-agent routing, Pinecone retrieval, feedback memory, JWT authentication, and PII detection."
+        },
+        {
+            title: "HR Policies RAG Chatbot",
+            desc: "Built a citation-aware chatbot that answers HR policy questions from organizational PDF documents using RAG.",
+            tags: ["Python", "FastAPI", "Streamlit", "Pinecone", "Llama 2", "Sentence Transformers"],
+            showcase: 2,
+            role: "AI Engineer",
+            category: "active",
+            status: "ACTIVE",
+            details: "Implemented PDF processing, semantic search, vector retrieval, and LLM-based response generation."
+        },
+        {
+            title: "Bangladesh Traffic Flow Dataset",
+            desc: "Developed a computer vision system for vehicle detection and classification under Bangladesh traffic conditions.",
+            tags: ["PyTorch", "YOLO", "OpenCV", "NumPy", "Pandas", "Streamlit", "Gradio"],
+            showcase: 3,
+            projectUrl: "https://shahabdulmazid-ml-project.streamlit.app/",
+            githubUrl: "https://github.com/Shah-Abdul-Mazid/CSE475FinalProject",
+            role: "Computer Vision Researcher",
+            category: "active",
+            status: "ACTIVE",
+            details: "Implemented YOLO detection with Grad-CAM/EigenCAM-based model interpretation and interactive inference."
+        },
+        {
+            title: "Brain Tumor Detection and Classification",
+            desc: "Developed a hybrid MobileNetV2–DenseNet121 model with CBAM attention for MRI-based brain tumor classification.",
+            tags: ["PyTorch", "MobileNetV2", "DenseNet121", "CBAM", "Grad-CAM", "Streamlit"],
+            showcase: 4,
+            githubUrl: "https://github.com/Shah-Abdul-Mazid/CapstoneProjectFinal",
+            role: "Deep Learning Researcher",
+            category: "past",
+            status: "COMPLETE",
+            details: "Applied preprocessing, augmentation, classification, and Grad-CAM for explainable predictions."
+        },
+        {
+            title: "WhatsUpIn",
+            desc: "Built an AI travel platform that generates personalized itineraries and automates travel-related workflows.",
+            tags: ["OpenAI", "n8n", "APIs", "Google Maps", "Google Sheets", "Stripe"],
+            showcase: 5,
+            role: "AI Automation Engineer",
+            category: "active",
+            status: "ACTIVE",
+            details: "Integrated OpenAI, n8n, Google Maps, Google Sheets, and Stripe for end-to-end automation."
+        }
+    ],
     papers: defaultPapers,
 
     activities: [
