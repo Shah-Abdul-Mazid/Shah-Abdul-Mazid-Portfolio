@@ -46,9 +46,9 @@ export const ResumeSelectorPage: React.FC = () => {
                                 <Link to="/resume/visual" className="rv-btn rv-solid" style={{ width: '100%', justifyContent: 'center', padding: '12px', background: '#2563eb', color: '#fff', borderRadius: '10px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                                     <Eye size={16} /> View Visual CV
                                 </Link>
-                                <a href="/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf" download style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', width: '100%', marginTop: '10px', fontSize: '0.82rem', color: '#94a3b8', textDecoration: 'none' }}>
-                                    <Download size={14} /> Download PDF Version 2
-                                </a>
+                                <Link to="/resume/visual" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', width: '100%', marginTop: '10px', fontSize: '0.82rem', color: '#94a3b8', textDecoration: 'none' }}>
+                                    <Download size={14} /> View & Download PDF Version 2
+                                </Link>
                             </div>
                         </div>
 
@@ -75,9 +75,9 @@ export const ResumeSelectorPage: React.FC = () => {
                                 <Link to="/resume/ats" className="rv-btn rv-solid" style={{ width: '100%', justifyContent: 'center', padding: '12px', background: '#059669', color: '#fff', borderRadius: '10px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                                     <Eye size={16} /> View ATS CV
                                 </Link>
-                                <a href="/resume/Shah_Abdul_Mazid_ATS_CV_Version_1.pdf" download style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', width: '100%', marginTop: '10px', fontSize: '0.82rem', color: '#94a3b8', textDecoration: 'none' }}>
-                                    <Download size={14} /> Download PDF Version 1
-                                </a>
+                                <Link to="/resume/ats" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', width: '100%', marginTop: '10px', fontSize: '0.82rem', color: '#94a3b8', textDecoration: 'none' }}>
+                                    <Download size={14} /> View & Download PDF Version 1
+                                </Link>
                             </div>
                         </div>
                     </div>

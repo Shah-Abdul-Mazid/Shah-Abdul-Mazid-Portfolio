@@ -17,6 +17,8 @@ const Resume = () => {
     const [busy, setBusy] = useState(false);
     const [showAts, setShowAts] = useState(false);
     const [showPdfViewer, setShowPdfViewer] = useState(false);
+    const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
+    const [viewerLoading, setViewerLoading] = useState(false);
     const [cvType, setCvType] = useState<'v1_ats' | 'v2_visual' | 'europass'>('v2_visual');
 
     // Static compiled PDF & TeX paths
@@ -28,14 +30,8 @@ const Resume = () => {
     const activePdf = cvType === 'v1_ats' ? PDF_V1 : PDF_V2;
     const activeTex = cvType === 'v1_ats' ? TEX_V1 : TEX_V2;
 
-    const downloadStaticPdf = () => {
-        const link = document.createElement('a');
-        link.href = activePdf;
-        link.download = cvType === 'v1_ats'
-            ? 'Shah_Abdul_Mazid_ATS_CV_Version_1.pdf'
-            : 'Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
-        link.click();
-    };
+
+
 
     const downloadTex = () => {
         const link = document.createElement('a');
@@ -127,6 +123,41 @@ const Resume = () => {
         window.print();
     };
 
+    const handleViewPdf = async () => {
+        setShowPdfViewer(true);
+        setViewerLoading(true);
+        if (sheetRef.current) {
+            try {
+                const opt = {
+                    margin: [13.2, 0, 13.2, 0],
+                    filename: `${data.hero.name.replace(/\s+/g, '_')}_Resume.pdf`,
+                    image: { type: 'jpeg', quality: 1.0 },
+                    html2canvas: { scale: 3, useCORS: true, letterRendering: true, scrollX: 0, scrollY: 0, windowWidth: 794 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['css', 'legacy'] }
+                };
+                sheetRef.current.classList.add('pdf-export');
+                const blob: Blob = await (html2pdf() as any).set(opt).from(sheetRef.current).outputPdf('blob');
+                if (sheetRef.current) sheetRef.current.classList.remove('pdf-export');
+                const url = URL.createObjectURL(blob);
+                if (pdfBlobUrl) URL.revokeObjectURL(pdfBlobUrl);
+                setPdfBlobUrl(url);
+            } catch (err) {
+                console.error("PDF preview generation error:", err);
+                if (sheetRef.current) sheetRef.current.classList.remove('pdf-export');
+            }
+        }
+        setViewerLoading(false);
+    };
+
+    const handleCloseViewer = () => {
+        setShowPdfViewer(false);
+        if (pdfBlobUrl) {
+            URL.revokeObjectURL(pdfBlobUrl);
+            setPdfBlobUrl(null);
+        }
+    };
+
     const em = data.contact.email || '';
     const ph = data.contact.phone || '';
     const city = 'Dhaka, Bangladesh';
@@ -164,21 +195,19 @@ const Resume = () => {
                 <button onClick={() => setShowAts(true)} className="rv-btn rv-solid" style={{ background: '#10b981', border: 'none' }}>
                     <Zap size={14} fill="white" /> Check ATS Score
                 </button>
-                <button onClick={() => setShowPdfViewer(true)} className="rv-btn rv-solid" style={{ background: '#8b5cf6', color: 'white', border: 'none' }}>
+                <button onClick={handleViewPdf} className="rv-btn rv-solid" style={{ background: '#8b5cf6', color: 'white', border: 'none' }}>
                     <Eye size={14} /> View PDF
                 </button>
-                <button onClick={downloadStaticPdf} className="rv-btn rv-solid" style={{ background: '#f59e0b', color: 'white', border: 'none' }}>
-                    <FileDown size={14} /> Download PDF
+                <button onClick={downloadPDF} disabled={busy} className="rv-btn rv-solid" style={{ background: '#f59e0b', color: 'white', border: 'none' }}>
+                    {busy ? <Loader size={14} className="rv-spin" /> : <FileDown size={14} />}
+                    {busy ? 'Generating…' : 'Download PDF'}
                 </button>
                 {cvType !== 'europass' && (
                     <button onClick={downloadTex} className="rv-btn rv-solid" style={{ background: '#0284c7', color: 'white', border: 'none' }}>
                         <Download size={14} /> Download .tex
                     </button>
                 )}
-                <button onClick={downloadPDF} disabled={busy} className="rv-btn rv-solid" style={{ background: '#e11d48', color: 'white', border: 'none' }}>
-                    {busy ? <Loader size={14} className="rv-spin" /> : <Download size={14} />}
-                    {busy ? 'Generating…' : 'Generate PDF'}
-                </button>
+                
                 <button onClick={downloadDynamic} className="rv-btn rv-solid" style={{ background: '#3b82f6', color: 'white', border: 'none' }}>
                     <Printer size={14} /> Print CV
                 </button>
@@ -186,35 +215,39 @@ const Resume = () => {
 
             {/* ===== PDF VIEWER MODAL ===== */}
             {showPdfViewer && (
-                <div className="pdf-viewer-overlay" onClick={(e) => { if (e.target === e.currentTarget) setShowPdfViewer(false); }}>
+                <div className="pdf-viewer-overlay" onClick={(e) => { if (e.target === e.currentTarget) handleCloseViewer(); }}>
                     <div className="pdf-viewer-modal">
                         <div className="pdf-viewer-header">
                             <div className="pdf-viewer-title">
                                 <Eye size={16} />
-                                <span>{cvType === 'v1_ats' ? 'Version 1: ATS CV' : cvType === 'v2_visual' ? 'Version 2: Visual CV (2-Column)' : 'Version 3: Europass CV'}</span>
+                                <span>{cvType === 'v1_ats' ? 'Version 1: ATS CV' : cvType === 'v2_visual' ? 'Version 2: Visual CV (2-Column)' : 'Version 3: Europass CV'} (Live Preview)</span>
                             </div>
                             <div className="pdf-viewer-actions">
-                                <a href={activePdf} download className="pdf-viewer-dl-btn">
-                                    <FileDown size={15} /> Download
-                                </a>
-                                <button onClick={() => setShowPdfViewer(false)} className="pdf-viewer-close">
+                                <button onClick={downloadPDF} disabled={busy} className="pdf-viewer-dl-btn" style={{ cursor: 'pointer', border: 'none' }}>
+                                    <FileDown size={15} /> {busy ? 'Generating…' : 'Download'}
+                                </button>
+                                <button onClick={handleCloseViewer} className="pdf-viewer-close">
                                     <X size={18} />
                                 </button>
                             </div>
                         </div>
                         <div className="pdf-viewer-body">
-                            <iframe
-                                src={`${activePdf}#toolbar=1&navpanes=0&scrollbar=1`}
-                                title="Resume PDF Viewer"
-                                className="pdf-viewer-iframe"
-                                allowFullScreen
-                            />
-                            <div className="pdf-viewer-fallback">
-                                <p>Your browser cannot display the PDF inline.</p>
-                                <a href={activePdf} target="_blank" rel="noopener noreferrer" className="rv-btn rv-solid" style={{ background: '#8b5cf6', color: 'white', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
-                                    <Eye size={14} /> Open PDF in new tab
-                                </a>
-                            </div>
+                            {viewerLoading ? (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '10px', color: '#94a3b8', padding: '40px' }}>
+                                    <Loader size={20} className="rv-spin" /> Generating live PDF preview…
+                                </div>
+                            ) : pdfBlobUrl ? (
+                                <iframe
+                                    src={`${pdfBlobUrl}#toolbar=1&navpanes=0&scrollbar=1`}
+                                    title="Resume PDF Viewer"
+                                    className="pdf-viewer-iframe"
+                                    allowFullScreen
+                                />
+                            ) : (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: '#94a3b8', padding: '40px' }}>
+                                    Failed to generate preview. Please use Download PDF instead.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -494,10 +527,10 @@ const Resume = () => {
 
                                     <div className="v2-sec">
                                         <h3 className="v2-sec-heading">Professional Highlights</h3>
-                                        <div className="v2-item"><b>Published Researcher:</b> MangoStack ensemble model published in ICCIT 2025</div>
-                                        <div className="v2-item"><b>RAG Specialist:</b> Built enterprise platforms for document-based Q&A systems</div>
-                                        <div className="v2-item"><b>Full-Stack AI:</b> End-to-end ML systems from training to production deployment</div>
-                                        <div className="v2-item"><b>Automation Expert:</b> n8n workflow automation for business process efficiency</div>
+                                        <div className="v2-item"><b>Published Research:</b> Two publications in medical imaging and agricultural AI, including ICCIT 2025 and Springer.</div>
+                                        <div className="v2-item"><b>Generative AI &amp; RAG:</b> Built enterprise document Q&amp;A, retrieval-augmented, and multi-agent AI systems.</div>
+                                        <div className="v2-item"><b>End-to-End AI:</b> Developed ML systems spanning model development, backend integration, and production deployment.</div>
+                                        <div className="v2-item"><b>AI Automation:</b> Built n8n-based workflows integrating AI models, APIs, and external services.</div>
                                     </div>
 
                                     <div className="v2-sec">

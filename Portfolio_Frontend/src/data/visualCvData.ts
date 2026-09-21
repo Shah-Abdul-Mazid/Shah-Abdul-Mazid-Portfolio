@@ -110,10 +110,10 @@ export const visualCvData: VisualCvData = {
         "9+ IBM and AWS certifications in AI/ML specializations",
     ],
     highlights: [
-        { title: "Published Researcher", description: "MangoStack ensemble model published in ICCIT 2025" },
-        { title: "RAG Specialist", description: "Built enterprise platforms for document-based Q&A systems" },
-        { title: "Full-Stack AI", description: "End-to-end ML systems from training to production deployment" },
-        { title: "Automation Expert", description: "n8n workflow automation for business process efficiency" },
+        { title: "Published Research", description: "Two publications in medical imaging and agricultural AI, including ICCIT 2025 and Springer." },
+        { title: "Generative AI & RAG", description: "Built enterprise document Q&A, retrieval-augmented, and multi-agent AI systems." },
+        { title: "End-to-End AI", description: "Developed ML systems spanning model development, backend integration, and production deployment." },
+        { title: "AI Automation", description: "Built n8n-based workflows integrating AI models, APIs, and external services." },
     ],
     researchInterests: [
         "Generative AI and Large Language Models",

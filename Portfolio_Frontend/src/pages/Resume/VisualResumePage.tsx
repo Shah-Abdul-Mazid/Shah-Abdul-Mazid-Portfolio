@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
@@ -10,46 +10,59 @@ import html2pdf from 'html2pdf.js';
 export const VisualResumePage: React.FC = () => {
     const [showPdfViewer, setShowPdfViewer] = useState(false);
     const [generating, setGenerating] = useState(false);
+    const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
+    const [viewerLoading, setViewerLoading] = useState(false);
     const cvRef = useRef<HTMLDivElement>(null);
 
-    const pdfPath = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
     const texPath = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.tex';
+
+    const getHtml2PdfOpts = () => ({
+        margin: [10, 10, 10, 10],
+        filename: 'Shah_Abdul_Mazid_Visual_CV_Version_2.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] },
+    });
 
     const handleDownloadPdf = async () => {
         setGenerating(true);
-        try {
-            // First try downloading static file
-            const res = await fetch(pdfPath, { method: 'HEAD' });
-            if (res.ok && res.headers.get('content-type')?.includes('pdf')) {
-                const link = document.createElement('a');
-                link.href = pdfPath;
-                link.download = 'Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
-                link.click();
-                setGenerating(false);
-                return;
-            }
-        } catch (e) {
-            // Fallback to html2pdf live generation
-        }
-
-        // Live PDF Generation Fallback using html2pdf
         if (cvRef.current) {
             try {
-                const opt = {
-                    margin: [10, 10, 10, 10],
-                    filename: 'Shah_Abdul_Mazid_Visual_CV_Version_2.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak: { mode: ['css', 'legacy'] },
-                };
-                await (html2pdf() as any).set(opt).from(cvRef.current).save();
+                await (html2pdf() as any).set(getHtml2PdfOpts()).from(cvRef.current).save();
             } catch (err) {
                 console.error("Live PDF Generation error:", err);
                 window.print();
             }
         }
         setGenerating(false);
+    };
+
+    const handleViewPdf = useCallback(async () => {
+        setShowPdfViewer(true);
+        setViewerLoading(true);
+        if (cvRef.current) {
+            try {
+                const blob: Blob = await (html2pdf() as any)
+                    .set(getHtml2PdfOpts())
+                    .from(cvRef.current)
+                    .outputPdf('blob');
+                const url = URL.createObjectURL(blob);
+                if (pdfBlobUrl) URL.revokeObjectURL(pdfBlobUrl);
+                setPdfBlobUrl(url);
+            } catch (err) {
+                console.error("PDF preview generation error:", err);
+            }
+        }
+        setViewerLoading(false);
+    }, [pdfBlobUrl]);
+
+    const handleCloseViewer = () => {
+        setShowPdfViewer(false);
+        if (pdfBlobUrl) {
+            URL.revokeObjectURL(pdfBlobUrl);
+            setPdfBlobUrl(null);
+        }
     };
 
     return (
@@ -63,7 +76,7 @@ export const VisualResumePage: React.FC = () => {
                             <ArrowLeft size={16} /> Change Resume Version
                         </Link>
                         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                            <button onClick={() => setShowPdfViewer(true)} className="rv-btn" style={{ background: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                            <button onClick={handleViewPdf} className="rv-btn" style={{ background: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                                 <Eye size={14} /> View PDF
                             </button>
                             <button onClick={handleDownloadPdf} disabled={generating} className="rv-btn" style={{ background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -79,26 +92,36 @@ export const VisualResumePage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* PDF Viewer Modal */}
+                    {/* PDF Viewer Modal — Live Generated */}
                     {showPdfViewer && (
-                        <div className="pdf-viewer-overlay" onClick={(e) => { if (e.target === e.currentTarget) setShowPdfViewer(false); }}>
+                        <div className="pdf-viewer-overlay" onClick={(e) => { if (e.target === e.currentTarget) handleCloseViewer(); }}>
                             <div className="pdf-viewer-modal">
                                 <div className="pdf-viewer-header">
                                     <div className="pdf-viewer-title">
                                         <Eye size={16} />
-                                        <span>Visual CV — Version 2 (PDF)</span>
+                                        <span>Visual CV — Version 2 (Live Preview)</span>
                                     </div>
                                     <div className="pdf-viewer-actions">
                                         <button onClick={handleDownloadPdf} className="pdf-viewer-dl-btn" style={{ cursor: 'pointer', border: 'none' }}>
                                             <FileDown size={15} /> Download PDF
                                         </button>
-                                        <button onClick={() => setShowPdfViewer(false)} className="pdf-viewer-close">
+                                        <button onClick={handleCloseViewer} className="pdf-viewer-close">
                                             <X size={18} />
                                         </button>
                                     </div>
                                 </div>
                                 <div className="pdf-viewer-body" style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <iframe src={`${pdfPath}#toolbar=1&navpanes=0&scrollbar=1`} title="Visual CV PDF" className="pdf-viewer-iframe" style={{ flex: 1, border: 'none' }} />
+                                    {viewerLoading ? (
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '10px', color: '#94a3b8', padding: '40px' }}>
+                                            <Loader size={20} className="rv-spin" /> Generating live PDF preview…
+                                        </div>
+                                    ) : pdfBlobUrl ? (
+                                        <iframe src={`${pdfBlobUrl}#toolbar=1&navpanes=0&scrollbar=1`} title="Visual CV PDF" className="pdf-viewer-iframe" style={{ flex: 1, border: 'none' }} />
+                                    ) : (
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: '#94a3b8', padding: '40px' }}>
+                                            Failed to generate preview. Please use Download PDF instead.
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
