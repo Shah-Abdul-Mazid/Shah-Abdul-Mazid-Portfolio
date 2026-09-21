@@ -527,7 +527,7 @@ const Resume = () => {
                                     <div className="v2-sec">
                                         <h3 className="v2-sec-heading">Professional Experience</h3>
                                         <div className="v2-item">
-                                            <div className="v2-bold">AI Engineer <span className="v2-right-date">Feb 2026 — May 2026</span></div>
+                                            <div className="v2-bold">AI Engineer <span className="v2-right-date">Feb 2026 — July 2026</span></div>
                                             <div className="v2-sub">Softvence Agency — Dhaka, Bangladesh</div>
                                             <ul className="v2-ul">
                                                 <li>Developed RAG-based chatbots using Large Language Models for intelligent question answering.</li>
