@@ -46,6 +46,10 @@ export const VisualCV: React.FC = () => {
         return publications;
     }, [portfolioData?.papers, publications]);
 
+    /* Fit max 2 featured publications on Page 2 right column so A4 layout never breaks */
+    const displayedPublications = useMemo(() => dynamicPublications.slice(0, 2), [dynamicPublications]);
+    const remainingPubCount = dynamicPublications.length - displayedPublications.length;
+
     /* Dynamic achievements (publication summary auto-scales, other 4 bullets preserved) */
     const dynamicAchievements = useMemo(() =>
         getUpdatedAchievements(portfolioData?.papers, portfolioData?.certifications, achievements),
@@ -286,7 +290,7 @@ export const VisualCV: React.FC = () => {
 
                         {/* Publication */}
                         <h3 className="v2-sec-heading">Publication</h3>
-                        {dynamicPublications.map((pub, i) => (
+                        {displayedPublications.map((pub, i) => (
                             <div key={i} className="v2-pub-item">
                                 <div className="v2-pub-title">{pub.title}</div>
                                 {pub.authors && (
@@ -310,6 +314,15 @@ export const VisualCV: React.FC = () => {
                                 )}
                             </div>
                         ))}
+                        {remainingPubCount > 0 && (
+                            <div style={{ fontSize: '7.5pt', color: 'var(--v2-muted)', margin: '3px 0 8px 0', fontStyle: 'italic' }}>
+                                + {remainingPubCount} more publication{remainingPubCount > 1 ? 's' : ''} ({personal.scholar ? (
+                                    <a href={personal.scholar} target="_blank" rel="noreferrer" className="v2-link" style={{ textDecoration: 'underline' }}>
+                                        view on Google Scholar
+                                    </a>
+                                ) : 'view on portfolio'})
+                            </div>
+                        )}
 
                         {/* Certifications */}
                         <h3 className="v2-sec-heading">Certifications</h3>

@@ -20,6 +20,13 @@ export function inferField(paper: PaperItem): string {
 function shortenVenue(paper: PaperItem): string {
     const v = paper.venue || '';
     const y = paper.year ? ` ${paper.year}` : '';
+
+    // Auto-extract acronyms in parentheses like "... (ICCIT)" or "... (CVPR)"
+    const acronymMatch = v.match(/\(([A-Za-z0-9\-\s]+)\)/);
+    if (acronymMatch && acronymMatch[1].trim().length <= 10) {
+        return `${acronymMatch[1].trim()}${y}`;
+    }
+
     if (/ICCIT/i.test(v)) return `ICCIT${y}`;
     if (/Innovations in Data Analytics/i.test(v)) return `Springer ICIDA${y}`;
     if (/Scientific Reports/i.test(v)) return `Nature Scientific Reports${y}`;
