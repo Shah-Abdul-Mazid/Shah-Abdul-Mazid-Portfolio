@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { MapPin, Mail, Phone, Linkedin, Github, GraduationCap } from 'lucide-react';
 import { visualCvData } from '../../../data/visualCvData';
 import { usePortfolio } from '../../../context/PortfolioContext';
+import { buildDynamicAchievements } from '../../../utils/buildAchievements';
 import './visual-cv.css';
 
 export const VisualCV: React.FC = () => {
@@ -45,43 +46,15 @@ export const VisualCV: React.FC = () => {
         return publications;
     }, [portfolioData?.papers, publications]);
 
-    /* Dynamic achievements derived from portfolio data */
-    const dynamicAchievements = useMemo(() => {
-        const items: string[] = [];
-
-        // Publications → bullet per own paper
-        if (portfolioData?.papers && portfolioData.papers.length > 0) {
-            const myPapers = portfolioData.papers.filter(
-                p => !p.authors || p.authors.toLowerCase().includes('mazid') || p.authors.toLowerCase().includes('shah')
-            );
-            myPapers.slice(0, 2).forEach(p => {
-                const venue = p.venue ? ` (${p.venue}${p.year ? ` ${p.year}` : ''})` : '';
-                items.push(`Published "${p.title.length > 70 ? p.title.slice(0, 67) + '…' : p.title}"${venue}`);
-            });
-        }
-
-        // Featured projects → top-showcased ones
-        if (portfolioData?.projects && portfolioData.projects.length > 0) {
-            const topProjects = [...portfolioData.projects]
-                .sort((a, b) => (b.showcase ?? 0) - (a.showcase ?? 0))
-                .slice(0, 2);
-            topProjects.forEach(proj => {
-                if (proj.result) {
-                    items.push(`${proj.title}: ${proj.result}`);
-                } else if (proj.desc) {
-                    const short = proj.desc.length > 90 ? proj.desc.slice(0, 87) + '…' : proj.desc;
-                    items.push(`Developed ${proj.title} — ${short}`);
-                }
-            });
-        }
-
-        // Certifications count
-        if (portfolioData?.certifications && portfolioData.certifications.length > 0) {
-            items.push(`${portfolioData.certifications.length}+ professional certifications in AI/ML specializations`);
-        }
-
-        return items.length >= 3 ? items.slice(0, 5) : achievements;
-    }, [portfolioData?.papers, portfolioData?.projects, portfolioData?.certifications, achievements]);
+    /* Dynamic achievements derived from portfolio data (shared utility) */
+    const dynamicAchievements = useMemo(() =>
+        buildDynamicAchievements(
+            portfolioData?.papers,
+            portfolioData?.projects,
+            portfolioData?.certifications,
+            achievements,
+        ),
+    [portfolioData?.papers, portfolioData?.projects, portfolioData?.certifications, achievements]);
 
     /* Dynamic highlights derived from portfolio data */
     const dynamicHighlights = useMemo(() => {
