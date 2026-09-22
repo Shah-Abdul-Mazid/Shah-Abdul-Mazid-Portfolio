@@ -75,8 +75,7 @@ export interface CVData {
     researchInterests: string[];
     careerFocus: string[];
     experience: CVExperienceItem[];
-    publication: CVPublicationItem;
-    publications?: CVPublicationItem[];
+    publications: CVPublicationItem[];
     certifications: string[];
     competitions: CVCompetitionItem[];
     projects: CVProjectItem[];

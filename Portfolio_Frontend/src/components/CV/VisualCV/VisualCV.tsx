@@ -19,14 +19,21 @@ export const VisualCV: React.FC = () => {
         researchInterests,
         careerFocus,
         experience,
-        publication,
+        publications,
         certifications,
         competitions,
         projects,
         profiles,
     } = visualCvData;
 
-    const dynamicPublications = useMemo(() => {
+    const dynamicPublications: {
+        title: string;
+        authors?: string;
+        year: string;
+        conference: string;
+        doi?: string;
+        url?: string;
+    }[] = useMemo(() => {
         if (portfolioData?.papers && portfolioData.papers.length > 0) {
             const myPapers = portfolioData.papers.filter(
                 p => !p.authors || p.authors.toLowerCase().includes('mazid') || p.authors.toLowerCase().includes('shah')
@@ -41,8 +48,8 @@ export const VisualCV: React.FC = () => {
                 url: p.link || (p.doi ? `https://doi.org/${p.doi}` : '')
             }));
         }
-        return visualCvData.publications || [publication];
-    }, [portfolioData?.papers, publication]);
+        return publications;
+    }, [portfolioData?.papers, publications]);
 
     return (
         <div className="v2-cv-paper">

@@ -3,7 +3,7 @@ import { atsCvData } from '../../../data/atsCvData';
 import './ats-cv.css';
 
 export const ATSCV: React.FC = () => {
-    const { personal, summary, skills, experience, education, projects, publication, certifications, competitions, onlineProfiles, languages } = atsCvData;
+    const { personal, summary, skills, experience, education, projects, publications, certifications, competitions, onlineProfiles, languages } = atsCvData;
 
     return (
         <div className="ats-cv-paper">
@@ -99,8 +99,8 @@ export const ATSCV: React.FC = () => {
             {/* Publication */}
             <section className="ats-section">
                 <h2 className="ats-section-title">Publication</h2>
-                {(atsCvData.publications || [publication]).map((pub, idx) => (
-                    <div key={idx} style={{ marginBottom: idx < ((atsCvData.publications || [publication]).length - 1) ? '8px' : '0' }}>
+                {publications.map((pub, idx) => (
+                    <div key={idx} style={{ marginBottom: idx < (publications.length - 1) ? '8px' : '0' }}>
                         <div className="ats-item-top">
                             <span className="ats-bold">{pub.title}</span>
                             <span className="ats-date-badge">{pub.year}</span>

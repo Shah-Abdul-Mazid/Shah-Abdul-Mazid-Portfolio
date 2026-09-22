@@ -1,12 +1,11 @@
 import React, { useMemo } from 'react';
-import { cvData } from '../../data/cvData';
+import { cvData, type CVPublicationItem } from '../../data/cvData';
 import { usePortfolio } from '../../context/PortfolioContext';
 
 export const CVPublication: React.FC = () => {
     const { data: portfolioData } = usePortfolio();
-    const { publication, publications } = cvData;
 
-    const pubs = useMemo(() => {
+    const pubs: CVPublicationItem[] = useMemo(() => {
         if (portfolioData?.papers && portfolioData.papers.length > 0) {
             const myPapers = portfolioData.papers.filter(
                 p => !p.authors || p.authors.toLowerCase().includes('mazid') || p.authors.toLowerCase().includes('shah')
@@ -21,8 +20,8 @@ export const CVPublication: React.FC = () => {
                 url: p.link || (p.doi ? `https://doi.org/${p.doi}` : '')
             }));
         }
-        return publications || [publication];
-    }, [portfolioData?.papers, publications, publication]);
+        return cvData.publications;
+    }, [portfolioData?.papers]);
 
     return (
         <section className="cv-section">

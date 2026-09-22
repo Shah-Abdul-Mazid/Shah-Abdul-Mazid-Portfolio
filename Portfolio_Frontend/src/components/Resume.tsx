@@ -23,9 +23,7 @@ const Resume = () => {
     const [viewerLoading, setViewerLoading] = useState(false);
     const [cvType, setCvType] = useState<'v1_ats' | 'v2_visual' | 'europass'>('v2_visual');
 
-    // Static compiled PDF & TeX paths
-    const PDF_V1 = '/resume/Shah_Abdul_Mazid_ATS_CV_Version_1.pdf';
-    const PDF_V2 = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
+    // Static compiled TeX paths
     const TEX_V1 = '/resume/Shah_Abdul_Mazid_ATS_CV_Version_1.tex';
     const TEX_V2 = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.tex';
 

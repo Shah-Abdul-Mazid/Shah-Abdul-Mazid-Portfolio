@@ -21,15 +21,7 @@ export interface VisualCvData {
     researchInterests: string[];
     careerFocus: string[];
     experience: { role: string; company: string; location: string; period: string; points: string[] }[];
-    publication: {
-        title: string;
-        authors?: string;
-        year: string;
-        conference: string;
-        doi?: string;
-        url?: string;
-    };
-    publications?: {
+    publications: {
         title: string;
         authors?: string;
         year: string;

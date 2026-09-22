@@ -1,4 +1,4 @@
-import { PaperItem } from '../context/PortfolioContext';
+import type { PaperItem } from '../context/PortfolioContext';
 
 export const escapeLatex = (text: string): string => {
     if (!text) return '';

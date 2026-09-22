@@ -32,12 +32,7 @@ export interface ATSCvData {
         points: string[];
         technologies: string[];
     }[];
-    publication: {
-        title: string;
-        year: string;
-        venue: string;
-    };
-    publications?: {
+    publications: {
         title: string;
         year: string;
         venue: string;
@@ -233,11 +228,6 @@ export const atsCvData: ATSCvData = {
             technologies: ["PyTorch", "MobileNetV2", "DenseNet121", "CBAM", "Grad-CAM", "Streamlit"],
         },
     ],
-    publication: {
-        title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
-        year: "2025",
-        venue: "Published at the 2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240. DOI: 10.1109/ICCIT68739.2025.11490181",
-    },
     publications: [
         {
             title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
