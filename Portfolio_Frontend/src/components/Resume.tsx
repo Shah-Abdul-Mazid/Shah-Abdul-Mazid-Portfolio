@@ -4,6 +4,8 @@ import { Download, Loader, Printer, CheckCircle2, AlertCircle, Info, X, Zap, Mai
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
+import { downloadUpdatedVisualCvTex } from '../utils/latexSync';
+
 const fmtDate = (s: string) => {
     if (!s) return 'Present';
     const d = new Date(s);
@@ -27,18 +29,16 @@ const Resume = () => {
     const TEX_V1 = '/resume/Shah_Abdul_Mazid_ATS_CV_Version_1.tex';
     const TEX_V2 = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.tex';
 
-    const activePdf = cvType === 'v1_ats' ? PDF_V1 : PDF_V2;
     const activeTex = cvType === 'v1_ats' ? TEX_V1 : TEX_V2;
 
-
-
-
     const downloadTex = () => {
+        if (cvType === 'v2_visual') {
+            downloadUpdatedVisualCvTex(data.papers || []);
+            return;
+        }
         const link = document.createElement('a');
         link.href = activeTex;
-        link.download = cvType === 'v1_ats'
-            ? 'Shah_Abdul_Mazid_ATS_CV_Version_1.tex'
-            : 'Shah_Abdul_Mazid_Visual_CV_Version_2.tex';
+        link.download = 'Shah_Abdul_Mazid_ATS_CV_Version_1.tex';
         link.click();
     };
 

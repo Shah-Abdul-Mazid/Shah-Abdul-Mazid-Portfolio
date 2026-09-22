@@ -70,9 +70,27 @@ async def save_portfolio(
     if deleted_paths:
         for p_type, p_value in deleted_paths:
             background_tasks.add_task(delete_upload_file, p_type, p_value)
+
+    # 4. Automatically sync LaTeX CV with updated publications
+    papers = data.get("papers", [])
+    if papers:
+        from app.utils.latex_sync import update_visual_cv_latex
+        background_tasks.add_task(update_visual_cv_latex, papers)
             
     return {
         "success": True, 
-        "message": "Portfolio saved and cleanup triggered!", 
+        "message": "Portfolio saved, cleanup triggered, and CV LaTeX updated!", 
         "cleaned": len(deleted_paths)
     }
+
+@router.post("/sync-cv")
+async def sync_cv_latex(
+    data: dict = Body(...),
+    admin=Depends(get_admin_user)
+):
+    """Manually trigger synchronization of Visual CV LaTeX file with portfolio publications."""
+    from app.utils.latex_sync import update_visual_cv_latex
+    papers = data.get("papers", [])
+    success = update_visual_cv_latex(papers)
+    return {"success": success, "message": "Visual CV LaTeX synchronized with publications."}
+

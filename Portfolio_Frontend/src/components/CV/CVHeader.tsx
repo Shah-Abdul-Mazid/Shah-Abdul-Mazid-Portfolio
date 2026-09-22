@@ -1,5 +1,4 @@
-import React from 'react';
-import { MapPin, Mail, Phone, Linkedin, Github } from 'lucide-react';
+import { MapPin, Mail, Phone, Linkedin, Github, GraduationCap } from 'lucide-react';
 import { cvData } from '../../data/cvData';
 
 export const CVHeader: React.FC = () => {
@@ -36,6 +35,14 @@ export const CVHeader: React.FC = () => {
                             GitHub
                         </a>
                     </span>
+                    {personal.scholar && (
+                        <span className="cv-contact-item">
+                            <GraduationCap size={11} />{' '}
+                            <a href={personal.scholar} target="_blank" rel="noopener noreferrer">
+                                Google Scholar
+                            </a>
+                        </span>
+                    )}
                 </div>
             </div>
             <div className="cv-header-avatar-box">

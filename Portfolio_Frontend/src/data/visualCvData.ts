@@ -62,7 +62,7 @@ export const visualCvData: VisualCvData = {
         { category: "Languages", items: ["Python", "Java", "C/C++", "JavaScript", "TypeScript", "SQL"] },
         { category: "AI / ML", items: ["Machine Learning", "Deep Learning", "Transfer Learning", "Model Evaluation", "Data Preprocessing"] },
         { category: "Generative AI", items: ["Generative AI", "LLMs", "RAG", "Prompt Engineering", "AI Agents", "Agentic AI", "Multi-Agent Systems"] },
-        { category: "NLP", items: ["Natural Language Processing", "Semantic Search", "Vector Search", "Embeddings", "Sentence Transformers", "AI Chatbots"] },
+        { category: "NLP", items: ["Natural Language Processing", "Semantic Search", "Vector Search", "Embeddings", "Sentence Transformers", "Document Q&A", "AI Chatbots"] },
         { category: "Computer Vision", items: ["Object Detection", "Image Classification", "Medical Imaging", "YOLO", "OpenCV", "Grad-CAM", "CBAM Attention"] },
         { category: "Frameworks", items: ["PyTorch", "TensorFlow", "Keras", "Scikit-learn", "NumPy", "Pandas", "Matplotlib", "Plotly"] },
         { category: "Backend", items: ["FastAPI", "REST APIs", "JWT Authentication", "API Integration", "PDF Processing"] },
@@ -159,14 +159,6 @@ export const visualCvData: VisualCvData = {
             ],
         },
     ],
-    publication: {
-        title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
-        authors: "Raiyan Gani, Yusuf Salehin, Md. Shakil Bhuiyan, Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Shamim Ripon",
-        year: "2025",
-        conference: "2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240.",
-        doi: "10.1109/ICCIT68739.2025.11490181",
-        url: "https://doi.org/10.1109/ICCIT68739.2025.11490181",
-    },
     publications: [
         {
             title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",

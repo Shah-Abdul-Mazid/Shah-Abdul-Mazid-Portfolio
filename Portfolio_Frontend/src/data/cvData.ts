@@ -28,8 +28,11 @@ export interface CVProjectItem {
 
 export interface CVPublicationItem {
     title: string;
+    authors?: string;
     year: string;
     conference: string;
+    doi?: string;
+    url?: string;
 }
 
 export interface CVCompetitionItem {
@@ -59,6 +62,7 @@ export interface CVData {
         phone: string;
         linkedin: string;
         github: string;
+        scholar?: string;
         avatarUrl: string;
     };
     summary: string;
@@ -89,6 +93,7 @@ export const cvData: CVData = {
         phone: "+880 1531329222",
         linkedin: "https://www.linkedin.com/in/shahabdulmazid",
         github: "https://github.com/Shah-Abdul-Mazid",
+        scholar: "https://scholar.google.com/citations?user=TYkiwUgAAAAJ",
         avatarUrl: "/resume/FD=109767.jpg",
     },
     summary:
@@ -97,7 +102,7 @@ export const cvData: CVData = {
         { category: "Languages", items: ["Python", "Java", "C/C++", "JavaScript", "TypeScript", "SQL"] },
         { category: "AI / ML", items: ["Machine Learning", "Deep Learning", "Transfer Learning", "Model Evaluation", "Data Preprocessing"] },
         { category: "Generative AI", items: ["Generative AI", "LLMs", "RAG", "Prompt Engineering", "AI Agents", "Agentic AI", "Multi-Agent Systems"] },
-        { category: "NLP", items: ["Natural Language Processing", "Semantic Search", "Vector Search", "Embeddings", "Sentence Transformers", "AI Chatbots"] },
+        { category: "NLP", items: ["Natural Language Processing", "Semantic Search", "Vector Search", "Embeddings", "Sentence Transformers", "Document Q&A", "AI Chatbots"] },
         { category: "Computer Vision", items: ["Object Detection", "Image Classification", "Medical Imaging", "YOLO", "OpenCV", "Grad-CAM", "CBAM Attention"] },
         { category: "Frameworks", items: ["PyTorch", "TensorFlow", "Keras", "Scikit-learn", "NumPy", "Pandas", "Matplotlib", "Plotly"] },
         { category: "Backend", items: ["FastAPI", "REST APIs", "JWT Authentication", "API Integration", "PDF Processing"] },
@@ -132,36 +137,40 @@ export const cvData: CVData = {
     ],
     toolsAndPlatforms: [
         { category: "Models & APIs", items: ["OpenAI API", "Llama 2", "Mistral", "Claude API", "HuggingFace Models"] },
-        { category: "Vector DBs", items: ["Pinecone", "Weaviate", "Milvus", "Chroma", "FAISS"] },
+        { category: "Vector DBs & Search", items: ["Pinecone", "Weaviate", "Milvus", "Chroma", "FAISS"] },
         { category: "Deployment", items: ["Hugging Face Hub", "AWS SageMaker", "Docker Hub", "Streamlit Cloud"] },
         { category: "Dev Tools", items: ["VS Code", "Git", "GitHub", "Jupyter", "Google Colab", "Linux/Ubuntu"] },
-        { category: "Integrations", items: ["OpenAI API", "Google Maps", "Stripe", "Google Sheets", "Anthropic API"] },
+        { category: "APIs & Integrations", items: ["OpenAI API", "Google Maps", "Stripe", "Google Sheets", "Anthropic API"] },
     ],
     achievements: [
         "Published research on interpretable ML for agricultural disease diagnosis (ICCIT 2025)",
         "Built enterprise RAG platform processing 10,000+ documents with 95%+ accuracy",
         "Developed traffic detection system for real-world Bangladesh traffic conditions",
         "Designed multi-agent AI system handling complex enterprise workflows",
-        "9+ IBM and AWS certifications in AI/ML specialisations",
+        "9+ IBM and AWS certifications in AI/ML specializations",
     ],
     highlights: [
-        { title: "Published Researcher", description: "MangoStack ensemble model published in ICCIT 2025" },
-        { title: "RAG Specialist", description: "Built enterprise platforms for document Q&A systems" },
-        { title: "Full-Stack AI", description: "End-to-end ML systems from training to production" },
-        { title: "Automation Expert", description: "n8n workflow automation for business efficiency" },
+        { title: "Published Research", description: "Two publications in medical imaging and agricultural AI, including ICCIT 2025 and Springer." },
+        { title: "Generative AI & RAG", description: "Built enterprise document Q&A, retrieval-augmented, and multi-agent AI systems." },
+        { title: "End-to-End AI", description: "Developed ML systems spanning model development, backend integration, and production deployment." },
+        { title: "AI Automation", description: "Built n8n-based workflows integrating AI models, APIs, and external services." },
     ],
     researchInterests: [
-        "Generative AI, LLMs & RAG Architecture",
-        "Multi-Agent AI Systems & Autonomous Workflows",
-        "Healthcare AI & Medical Image Diagnosis",
-        "Computer Vision, Grad-CAM & Model Interpretability",
+        "Generative AI and Large Language Models",
+        "Retrieval-Augmented Generation",
+        "Multi-Agent AI Systems",
+        "Healthcare AI",
+        "Computer Vision and Medical Imaging",
+        "Natural Language Processing",
+        "Intelligent Recommendation Systems",
+        "Model Interpretability",
     ],
     careerFocus: [
         "AI/ML Engineering",
         "Generative AI",
-        "RAG Systems",
-        "Computer Vision",
+        "LLM and RAG Systems",
         "AI Research",
+        "Computer Vision",
         "Data Science",
     ],
     experience: [
@@ -189,41 +198,35 @@ export const cvData: CVData = {
                 "Automated business workflows using n8n and implemented Generative AI and RAG solutions.",
             ],
         },
-        {
-            role: "Campus Ambassador",
-            company: "eShikhon",
-            location: "Dhaka, Bangladesh",
-            period: "Jan 2022 – Jan 2025",
-            points: [
-                "Represented the organisation at East West University.",
-                "Organised technology workshops and student events.",
-                "Promoted digital learning and technology initiatives.",
-            ],
-        },
     ],
-    publication: {
-        title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
-        year: "2025",
-        conference: "2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240.",
-    },
     publications: [
         {
             title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
+            authors: "Raiyan Gani, Yusuf Salehin, Md. Shakil Bhuiyan, Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Shamim Ripon",
             year: "2025",
-            conference: "2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240. DOI: 10.1109/ICCIT68739.2025.11490181",
+            conference: "2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240.",
+            doi: "10.1109/ICCIT68739.2025.11490181",
+            url: "https://doi.org/10.1109/ICCIT68739.2025.11490181",
         },
         {
             title: "Uncertainty-Aware Chest Pathology Detection with Vision and Language Transformers",
+            authors: "Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Mahia Mehrun Safa, Md. Ashikur Rahman Anik, Md. Omor Faruk Sejan, Khandhakar Shatu Moni, Md. Sazzad Hossain, Md. Adnan Morshed, Ahmed Wasif Reza",
             year: "2026",
-            conference: "Innovations in Data Analytics, Springer Nature, 2026, pp. 397–417. DOI: 10.1007/978-3-032-27845-6_34",
+            conference: "Innovations in Data Analytics, Springer Nature, 2026, pp. 397–417.",
+            doi: "10.1007/978-3-032-27845-6_34",
+            url: "https://doi.org/10.1007/978-3-032-27845-6_34",
         },
     ],
     certifications: [
         "IBM Deep Learning with PyTorch, Keras and TensorFlow",
         "DeepLearning.AI TensorFlow Developer",
-        "IBM Machine Learning & AI Engineering",
-        "IBM RAG, Agentic AI & AI Developer",
+        "IBM Machine Learning",
+        "IBM RAG and Agentic AI",
+        "Building AI Agents and Agentic Workflows",
+        "IBM AI Developer",
         "AWS Generative AI and AI Agents with Amazon Bedrock",
+        "IBM AI Engineering",
+        "IBM Data Science",
     ],
     competitions: [
         { title: "Network War", organizer: "EWU Telecommunication Club", year: "2024" },
@@ -278,9 +281,9 @@ export const cvData: CVData = {
         },
     ],
     profiles: [
-        { label: "Portfolio", url: "https://shah-abdul-mazid-portfolio.vercel.app", text: "shah-abdul-mazid-portfolio.vercel.app" },
-        { label: "GitHub", url: "https://github.com/Shah-Abdul-Mazid", text: "github.com/Shah-Abdul-Mazid" },
-        { label: "LinkedIn", url: "https://www.linkedin.com/in/shahabdulmazid", text: "linkedin.com/in/shahabdulmazid" },
+        { label: "Portfolio", url: "https://shah-abdul-mazid-portfolio.vercel.app/home", text: "Portfolio Profile" },
+        { label: "GitHub", url: "https://github.com/Shah-Abdul-Mazid", text: "Github Profile" },
+        { label: "LinkedIn", url: "https://www.linkedin.com/in/shahabdulmazid", text: "LinkedIn Profile" },
         { label: "Nexus Intelligence", url: "https://ai-rag-project-llm-based.vercel.app/auth/login", text: "Live Demo" },
     ],
 };

@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { MapPin, Mail, Phone, Linkedin, Github, GraduationCap } from 'lucide-react';
 import { visualCvData } from '../../../data/visualCvData';
+import { usePortfolio } from '../../../context/PortfolioContext';
 import './visual-cv.css';
 
 export const VisualCV: React.FC = () => {
+    const { data: portfolioData } = usePortfolio();
+
     const {
         personal,
         summary,
@@ -22,6 +25,24 @@ export const VisualCV: React.FC = () => {
         projects,
         profiles,
     } = visualCvData;
+
+    const dynamicPublications = useMemo(() => {
+        if (portfolioData?.papers && portfolioData.papers.length > 0) {
+            const myPapers = portfolioData.papers.filter(
+                p => !p.authors || p.authors.toLowerCase().includes('mazid') || p.authors.toLowerCase().includes('shah')
+            );
+            const selected = myPapers.length > 0 ? myPapers : portfolioData.papers;
+            return selected.map(p => ({
+                title: p.title,
+                authors: p.authors || 'Shah Abdul Mazid',
+                year: p.year,
+                conference: `${p.venue || ''}${p.publisher ? `, ${p.publisher}` : ''}`,
+                doi: p.doi || '',
+                url: p.link || (p.doi ? `https://doi.org/${p.doi}` : '')
+            }));
+        }
+        return visualCvData.publications || [publication];
+    }, [portfolioData?.papers, publication]);
 
     return (
         <div className="v2-cv-paper">
@@ -156,8 +177,8 @@ export const VisualCV: React.FC = () => {
 
                     <div className="v2-section">
                         <h3 className="v2-sec-heading">Publication</h3>
-                        {(visualCvData.publications || [publication]).map((pub, pIdx) => (
-                            <div key={pIdx} style={{ marginBottom: pIdx < ((visualCvData.publications || [publication]).length - 1) ? '8px' : '0' }}>
+                        {dynamicPublications.map((pub, pIdx) => (
+                            <div key={pIdx} style={{ marginBottom: pIdx < (dynamicPublications.length - 1) ? '8px' : '0' }}>
                                 <div className="v2-bold">{pub.title}</div>
                                 {pub.authors && (
                                     <div className="v2-small" style={{ marginTop: '2px', color: '#4b5563' }}>
