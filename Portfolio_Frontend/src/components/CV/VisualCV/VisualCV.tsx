@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { MapPin, Mail, Phone, Linkedin, Github, GraduationCap } from 'lucide-react';
 import { visualCvData } from '../../../data/visualCvData';
 import { usePortfolio } from '../../../context/PortfolioContext';
-import { buildDynamicAchievements } from '../../../utils/buildAchievements';
 import './visual-cv.css';
 
 export const VisualCV: React.FC = () => {
@@ -45,62 +44,6 @@ export const VisualCV: React.FC = () => {
         }
         return publications;
     }, [portfolioData?.papers, publications]);
-
-    /* Dynamic achievements derived from portfolio data (shared utility) */
-    const dynamicAchievements = useMemo(() =>
-        buildDynamicAchievements(
-            portfolioData?.papers,
-            portfolioData?.projects,
-            portfolioData?.certifications,
-            achievements,
-        ),
-    [portfolioData?.papers, portfolioData?.projects, portfolioData?.certifications, achievements]);
-
-    /* Dynamic highlights derived from portfolio data */
-    const dynamicHighlights = useMemo(() => {
-        const items: { title: string; description: string }[] = [];
-
-        // Publications highlight
-        if (portfolioData?.papers && portfolioData.papers.length > 0) {
-            const myPapers = portfolioData.papers.filter(
-                p => !p.authors || p.authors.toLowerCase().includes('mazid') || p.authors.toLowerCase().includes('shah')
-            );
-            const venues = [...new Set(myPapers.map(p => p.venue).filter(Boolean))].slice(0, 2).join(' and ');
-            if (myPapers.length > 0) {
-                items.push({
-                    title: 'Published Research',
-                    description: `${myPapers.length} publication${myPapers.length > 1 ? 's' : ''} in AI/ML${venues ? `, including ${venues}` : ''}.`,
-                });
-            }
-        }
-
-        // Top project highlights (with result or desc)
-        if (portfolioData?.projects && portfolioData.projects.length > 0) {
-            const topProjs = [...portfolioData.projects]
-                .sort((a, b) => (b.showcase ?? 0) - (a.showcase ?? 0))
-                .slice(0, 2);
-            topProjs.forEach(proj => {
-                const desc = proj.result || proj.impact || proj.desc || '';
-                if (desc) {
-                    items.push({
-                        title: proj.title,
-                        description: desc.length > 120 ? desc.slice(0, 117) + '…' : desc,
-                    });
-                }
-            });
-        }
-
-        // Work experience highlight
-        if (portfolioData?.work && portfolioData.work.length > 0) {
-            const latest = portfolioData.work[0];
-            items.push({
-                title: `${latest.role} at ${latest.company}`,
-                description: latest.details?.[0] || `Working as ${latest.role} at ${latest.company}.`,
-            });
-        }
-
-        return items.length >= 3 ? items.slice(0, 4) : highlights;
-    }, [portfolioData?.papers, portfolioData?.projects, portfolioData?.work, highlights]);
 
     /* Split projects: 3 in Page 2 Left Column, 2 in Page 2 Right Column */
     const leftProjects = useMemo(() => projects.slice(0, 3), [projects]);
@@ -244,7 +187,7 @@ export const VisualCV: React.FC = () => {
                         {/* Key Achievements */}
                         <h3 className="v2-sec-heading">Key Achievements</h3>
                         <ul className="v2-ul">
-                            {dynamicAchievements.map((ach, i) => (
+                            {achievements.map((ach, i) => (
                                 <li key={i}>{ach}</li>
                             ))}
                         </ul>
@@ -264,7 +207,7 @@ export const VisualCV: React.FC = () => {
 
                         {/* Professional Highlights */}
                         <h3 className="v2-sec-heading v2-sec-heading-first">Professional Highlights</h3>
-                        {dynamicHighlights.map((hl, i) => (
+                        {highlights.map((hl, i) => (
                             <div key={i} className="v2-highlight-item">
                                 <b>{hl.title}:</b> {hl.description}
                             </div>
