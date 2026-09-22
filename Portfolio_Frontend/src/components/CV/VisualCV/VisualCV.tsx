@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { MapPin, Mail, Phone, Linkedin, Github, GraduationCap } from 'lucide-react';
 import { visualCvData } from '../../../data/visualCvData';
 import { usePortfolio } from '../../../context/PortfolioContext';
+import { getUpdatedAchievements, getUpdatedHighlights } from '../../../utils/buildAchievements';
 import './visual-cv.css';
 
 export const VisualCV: React.FC = () => {
@@ -44,6 +45,18 @@ export const VisualCV: React.FC = () => {
         }
         return publications;
     }, [portfolioData?.papers, publications]);
+
+    /* Dynamic achievements (publication summary auto-scales, other 4 bullets preserved) */
+    const dynamicAchievements = useMemo(() =>
+        getUpdatedAchievements(portfolioData?.papers, portfolioData?.certifications, achievements),
+        [portfolioData?.papers, portfolioData?.certifications, achievements]
+    );
+
+    /* Dynamic highlights (research card auto-scales, other 3 cards preserved) */
+    const dynamicHighlights = useMemo(() =>
+        getUpdatedHighlights(portfolioData?.papers, highlights),
+        [portfolioData?.papers, highlights]
+    );
 
     /* Split projects: 3 in Page 2 Left Column, 2 in Page 2 Right Column */
     const leftProjects = useMemo(() => projects.slice(0, 3), [projects]);
@@ -187,7 +200,7 @@ export const VisualCV: React.FC = () => {
                         {/* Key Achievements */}
                         <h3 className="v2-sec-heading">Key Achievements</h3>
                         <ul className="v2-ul">
-                            {achievements.map((ach, i) => (
+                            {dynamicAchievements.map((ach, i) => (
                                 <li key={i}>{ach}</li>
                             ))}
                         </ul>
@@ -207,7 +220,7 @@ export const VisualCV: React.FC = () => {
 
                         {/* Professional Highlights */}
                         <h3 className="v2-sec-heading v2-sec-heading-first">Professional Highlights</h3>
-                        {highlights.map((hl, i) => (
+                        {dynamicHighlights.map((hl, i) => (
                             <div key={i} className="v2-highlight-item">
                                 <b>{hl.title}:</b> {hl.description}
                             </div>

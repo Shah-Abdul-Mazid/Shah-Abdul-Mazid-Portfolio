@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import VisualCV from '../../components/CV/VisualCV/VisualCV';
-import { ArrowLeft, Download, Eye, FileDown, Loader, Printer, X } from 'lucide-react';
+import { ArrowLeft, Download, FileDown, Loader, Printer } from 'lucide-react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { downloadUpdatedVisualCvTex } from '../../utils/latexSync';
 import { jsPDF } from 'jspdf';
@@ -99,10 +99,7 @@ async function generatePdfBlob(element: HTMLElement): Promise<Blob> {
 
 export const VisualResumePage: React.FC = () => {
     const { data: portfolioData } = usePortfolio();
-    const [showPdfViewer, setShowPdfViewer] = useState(false);
     const [generating, setGenerating] = useState(false);
-    const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
-    const [viewerLoading, setViewerLoading] = useState(false);
     const cvRef = useRef<HTMLDivElement>(null);
 
     const handleDownloadPdf = useCallback(async () => {
@@ -110,12 +107,18 @@ export const VisualResumePage: React.FC = () => {
         setGenerating(true);
 
         try {
-            const res = await fetch(PDF_FILE_PATH, { method: 'HEAD' });
-            if (res.ok) {
+            const res = await fetch(PDF_FILE_PATH);
+            const contentType = res.headers.get('content-type') || '';
+            if (res.ok && !contentType.includes('text/html')) {
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = PDF_FILE_PATH;
+                a.href = url;
                 a.download = PDF_FILENAME;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
                 setGenerating(false);
                 return;
             }
@@ -130,7 +133,9 @@ export const VisualResumePage: React.FC = () => {
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = PDF_FILENAME;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
                 setTimeout(() => URL.revokeObjectURL(url), 5000);
             }
         } catch (err) {
@@ -139,45 +144,6 @@ export const VisualResumePage: React.FC = () => {
         }
         setGenerating(false);
     }, [generating]);
-
-    const handleViewPdf = useCallback(async () => {
-        if (viewerLoading) return;
-        setShowPdfViewer(true);
-        setViewerLoading(true);
-
-        try {
-            const res = await fetch(PDF_FILE_PATH, { method: 'HEAD' });
-            if (res.ok) {
-                setPdfBlobUrl(PDF_FILE_PATH);
-                setViewerLoading(false);
-                return;
-            }
-        } catch {
-            // Fall through to dynamic generator
-        }
-
-        try {
-            if (cvRef.current) {
-                const blob = await generatePdfBlob(cvRef.current);
-                const url = URL.createObjectURL(blob);
-                if (pdfBlobUrl && pdfBlobUrl.startsWith('blob:')) URL.revokeObjectURL(pdfBlobUrl);
-                setPdfBlobUrl(url);
-            }
-        } catch (err) {
-            console.error('Visual CV PDF preview error:', err);
-        }
-        setViewerLoading(false);
-    }, [pdfBlobUrl, viewerLoading]);
-
-    const handleCloseViewer = () => {
-        setShowPdfViewer(false);
-        if (pdfBlobUrl) {
-            if (pdfBlobUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(pdfBlobUrl);
-            }
-            setPdfBlobUrl(null);
-        }
-    };
 
     const handleDownloadTex = () => {
         downloadUpdatedVisualCvTex(portfolioData.papers || []);
@@ -195,17 +161,8 @@ export const VisualResumePage: React.FC = () => {
                         </Link>
                         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                             <button
-                                onClick={handleViewPdf}
-                                disabled={generating || viewerLoading}
-                                className="rv-btn"
-                                style={{ background: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: (generating || viewerLoading) ? 0.7 : 1 }}
-                            >
-                                {viewerLoading ? <Loader size={14} className="rv-spin" /> : <Eye size={14} />}
-                                {viewerLoading ? 'Generating…' : 'View PDF'}
-                            </button>
-                            <button
                                 onClick={handleDownloadPdf}
-                                disabled={generating || viewerLoading}
+                                disabled={generating}
                                 className="rv-btn"
                                 style={{ background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: generating ? 0.7 : 1 }}
                             >
@@ -228,46 +185,6 @@ export const VisualResumePage: React.FC = () => {
                             </button>
                         </div>
                     </div>
-
-                    {/* PDF Viewer Modal — Live Generated */}
-                    {showPdfViewer && (
-                        <div className="pdf-viewer-overlay" onClick={(e) => { if (e.target === e.currentTarget) handleCloseViewer(); }}>
-                            <div className="pdf-viewer-modal">
-                                <div className="pdf-viewer-header">
-                                    <div className="pdf-viewer-title">
-                                        <Eye size={16} />
-                                        <span>Visual CV — Version 2 (Live Preview)</span>
-                                    </div>
-                                    <div className="pdf-viewer-actions">
-                                        <button onClick={handleDownloadPdf} disabled={generating} className="pdf-viewer-dl-btn" style={{ cursor: 'pointer', border: 'none' }}>
-                                            <FileDown size={15} /> Download PDF
-                                        </button>
-                                        <button onClick={handleCloseViewer} className="pdf-viewer-close">
-                                            <X size={18} />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="pdf-viewer-body" style={{ display: 'flex', flexDirection: 'column' }}>
-                                    {viewerLoading ? (
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '10px', color: '#94a3b8', padding: '40px' }}>
-                                            <Loader size={20} className="rv-spin" /> Generating live PDF preview…
-                                        </div>
-                                    ) : pdfBlobUrl ? (
-                                        <iframe
-                                            src={`${pdfBlobUrl}#toolbar=1&navpanes=0&scrollbar=1`}
-                                            title="Visual CV PDF"
-                                            className="pdf-viewer-iframe"
-                                            style={{ flex: 1, border: 'none' }}
-                                        />
-                                    ) : (
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: '#ef4444', padding: '40px' }}>
-                                            Failed to generate preview. Please use Download PDF instead.
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
                     {/* Main Visual CV Component */}
                     <div ref={cvRef}>
