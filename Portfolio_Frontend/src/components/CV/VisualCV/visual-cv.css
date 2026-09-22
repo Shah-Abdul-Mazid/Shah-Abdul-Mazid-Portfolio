@@ -1,6 +1,11 @@
 /* =========================================================
-   VISUAL CV (VERSION 2) DESIGN SYSTEM & STYLING
+   VISUAL CV (VERSION 2) — Pixel-accurate to Overleaf LaTeX
+   Font: Fira Sans (matching LaTeX FiraSans package)
+   Colors: navy #243B5A, blue #2F527F, lightblue #EEF3F8
+   A4 Dimensions: 210mm x 297mm
    ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&display=swap');
 
 :root {
   --v2-primary: #243B5A;
@@ -8,77 +13,103 @@
   --v2-light-bg: #EEF3F8;
   --v2-text: #333333;
   --v2-muted: #555555;
-  --v2-border: #243B5A;
   --v2-bg: #ffffff;
-  --v2-link: #2563eb;
-  --v2-font: 'Source Sans Pro', 'Inter', system-ui, sans-serif;
+  --v2-link: #000000;
+  --v2-font: 'Fira Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
-.v2-cv-paper {
+/* ── Container wrapping both pages ── */
+.v2-cv-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
   width: 100%;
-  max-width: 820px;
-  margin: 0 auto;
+}
+
+/* ── Individual A4 Page (strictly 210mm x 297mm) ── */
+.v2-page {
+  width: 210mm;
+  min-width: 210mm;
+  max-width: 210mm;
+  height: 297mm;
+  min-height: 297mm;
+  max-height: 297mm;
   background: var(--v2-bg);
   color: var(--v2-text);
   font-family: var(--v2-font);
-  font-size: 11.5px;
-  line-height: 1.4;
-  padding: 24px;
+  font-size: 9.6pt;
+  line-height: 1.35;
   box-sizing: border-box;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border-radius: 6px;
+  padding: 10mm 11mm;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
 }
 
-/* Header Band */
+/* ── Header navy block ── */
 .v2-header-band {
   background: var(--v2-primary);
-  color: #ffffff;
-  padding: 16px 20px;
+  color: #fff;
+  padding: 4.5mm 5.5mm;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 4px;
-  margin-bottom: 12px;
-  gap: 14px;
+  box-sizing: border-box;
+  border-radius: 1px;
 }
 
 .v2-header-info {
   flex: 1;
+  min-width: 0;
+  padding-right: 4mm;
 }
 
 .v2-name {
-  font-size: 22px;
+  font-size: 22pt;
   font-weight: 700;
-  margin: 0 0 3px 0;
+  margin: 0 0 1.2mm 0;
   color: #ffffff;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
+  line-height: 1.1;
 }
 
 .v2-subtitle {
-  font-size: 13.5px;
-  font-weight: 600;
-  margin: 0 0 5px 0;
+  font-size: 12.5pt;
+  font-weight: 700;
+  margin: 0 0 2mm 0;
   color: var(--v2-light-bg);
+  line-height: 1.15;
 }
 
 .v2-tags {
-  font-size: 11px;
-  margin-bottom: 6px;
+  font-size: 8.5pt;
+  margin-bottom: 2.8mm;
   color: var(--v2-light-bg);
+  letter-spacing: 0.2px;
+  font-weight: 500;
 }
 
 .v2-contact-grid {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 10.5px;
+  flex-direction: column;
+  gap: 1.4mm;
+  font-size: 8pt;
   color: #ffffff;
+}
+
+.v2-contact-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5mm;
+  align-items: center;
 }
 
 .v2-contact-item {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
+  color: #ffffff;
 }
 
 .v2-contact-item a {
@@ -86,110 +117,239 @@
   text-decoration: none;
 }
 
+/* Avatar photo */
+.v2-header-photo {
+  width: 29mm;
+  min-width: 29mm;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 .v2-avatar {
-  width: 85px;
-  height: 105px;
+  width: 29mm;
+  height: 35mm;
   object-fit: cover;
-  border-radius: 4px;
-  border: 2px solid #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  display: block;
 }
 
-/* Section Headings */
-.v2-sec-heading {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--v2-primary);
-  border-bottom: 1.5px solid var(--v2-primary);
-  padding-bottom: 1px;
-  margin: 8px 0 5px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.v2-section {
-  margin-bottom: 10px;
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-}
-
-.v2-summary-box {
-  margin-bottom: 12px;
+/* ── Professional Summary ── */
+.v2-sec-summary {
+  margin-top: 3.5mm;
+  margin-bottom: 1.8mm;
 }
 
 .v2-summary-text {
-  font-size: 11.5px;
-  line-height: 1.42;
+  font-size: 9pt;
+  line-height: 1.38;
   color: var(--v2-text);
-  margin: 2px 0 0 0;
+  margin: 0 0 2.5mm 0;
+  text-align: justify;
 }
 
-/* 2 Column Layout */
-.v2-grid {
+/* ── Section headings (matching LaTeX \section) ── */
+.v2-sec-heading {
+  font-size: 10.4pt;
+  font-weight: 700;
+  color: var(--v2-primary);
+  border-bottom: 1px solid var(--v2-primary);
+  padding-bottom: 0.5mm;
+  margin: 2.8mm 0 1.8mm 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+
+/* Heading at the top of a column has zero top margin */
+.v2-sec-heading-top {
+  margin-top: 0;
+}
+
+.v2-sec-heading-first {
+  margin-top: 0;
+}
+
+/* ── Two-column natural flow (matching LaTeX multicols{2}, columnsep=7mm) ── */
+.v2-two-col {
   display: flex;
-  flex-direction: row;
-  gap: 14px;
+  gap: 7mm;
+  align-items: flex-start;
+  width: 100%;
 }
 
-.v2-col {
+.v2-col-left {
   flex: 1;
-  width: 48.5%;
+  width: calc(50% - 3.5mm);
   min-width: 0;
 }
 
-/* Items & Badges */
-.v2-item {
-  margin-bottom: 6px;
-  font-size: 11px;
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
+.v2-col-right {
+  flex: 1;
+  width: calc(50% - 3.5mm);
+  min-width: 0;
 }
 
-.v2-bold {
+/* ── Technical Skills ── */
+.v2-skill-entry {
+  font-size: 9pt;
+  margin-bottom: 2mm;
+  line-height: 1.35;
+}
+
+/* ── Education item ── */
+.v2-edu-item {
+  margin-bottom: 2.8mm;
+}
+
+.v2-edu-degree {
   font-weight: 700;
-  color: var(--v2-primary);
+  font-size: 9.3pt;
+  line-height: 1.24;
 }
 
-.v2-italic {
-  font-style: italic;
-  color: var(--v2-muted);
-}
-
-.v2-sub {
-  font-size: 10.5px;
-  color: var(--v2-muted);
-  font-style: italic;
+.v2-edu-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 1.5px;
+  align-items: baseline;
+  font-size: 9pt;
 }
 
-.v2-right-date {
+.v2-edu-inst {
+  font-style: italic;
+  color: var(--v2-muted);
+}
+
+.v2-edu-period {
   font-weight: 700;
-  font-style: normal;
-  color: var(--v2-text);
+  white-space: nowrap;
 }
 
-.v2-small {
-  font-size: 10.5px;
+.v2-edu-details {
+  font-size: 9pt;
   color: var(--v2-text);
-  margin: 1px 0 2px 0;
+  line-height: 1.24;
 }
 
+/* ── Languages (NO artificial blank space, normal section flow) ── */
+.v2-lang-entry {
+  font-size: 9pt;
+  margin-bottom: 1.6mm;
+  line-height: 1.32;
+}
+
+/* ── Lists (matching LaTeX itemize) ── */
 .v2-ul {
-  margin: 2px 0 0 12px;
+  margin: 0.8mm 0 0 3.8mm;
   padding: 0;
-  font-size: 10.5px;
-  line-height: 1.35;
+  font-size: 9pt;
+  line-height: 1.34;
+  list-style-type: disc;
 }
 
 .v2-ul li {
-  margin-bottom: 1.5px;
+  margin-bottom: 1.3mm;
+  padding-left: 0.5mm;
 }
 
-.v2-skill-entry {
-  font-size: 10.5px;
-  margin-bottom: 2.5px;
+/* ── Career focus ── */
+.v2-focus-item {
+  font-size: 9pt;
+  margin-bottom: 1.3mm;
+  line-height: 1.32;
+  color: var(--v2-text);
+}
+
+/* ── Professional highlights ── */
+.v2-highlight-item {
+  font-size: 9pt;
+  margin-bottom: 2mm;
   line-height: 1.35;
+}
+
+/* ── Experience ── */
+.v2-exp-item {
+  margin-bottom: 2.8mm;
+}
+
+.v2-exp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2mm;
+}
+
+.v2-exp-role {
+  font-size: 10pt;
+  font-weight: 700;
+}
+
+.v2-exp-period {
+  font-size: 9pt;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.v2-exp-company {
+  font-size: 9pt;
+  font-style: italic;
+  color: var(--v2-muted);
+  margin-bottom: 0.6mm;
+}
+
+/* ── Projects ── */
+.v2-project-item {
+  margin-bottom: 2.8mm;
+}
+
+.v2-project-title {
+  font-weight: 700;
+  font-size: 9.3pt;
+  line-height: 1.22;
+}
+
+.v2-project-subtitle {
+  font-style: italic;
+  font-size: 8.6pt;
+  color: var(--v2-muted);
+  margin-bottom: 0.5mm;
+  line-height: 1.2;
+}
+
+.v2-project-desc {
+  font-size: 8.6pt;
+  margin-bottom: 0.6mm;
+  line-height: 1.30;
+}
+
+/* ── Publications ── */
+.v2-pub-item {
+  margin-bottom: 2.5mm;
+  font-size: 8.6pt;
+  line-height: 1.30;
+}
+
+.v2-pub-title {
+  font-weight: 700;
+  font-size: 8.8pt;
+  line-height: 1.22;
+}
+
+.v2-pub-authors {
+  font-size: 8.4pt;
+  color: var(--v2-text);
+  line-height: 1.22;
+}
+
+.v2-pub-venue {
+  font-style: italic;
+  font-size: 8.4pt;
+  color: var(--v2-muted);
+  line-height: 1.22;
+}
+
+.v2-pub-doi {
+  font-size: 8.4pt;
 }
 
 .v2-link {
@@ -201,20 +361,50 @@
   text-decoration: underline;
 }
 
-/* Mobile & Tablet */
-@media (max-width: 768px) {
-  .v2-header-band {
-    flex-direction: column;
-    text-align: center;
+/* ── Competitions ── */
+.v2-comp-item {
+  font-size: 9pt;
+  margin-bottom: 1.4mm;
+  line-height: 1.32;
+}
+
+/* ── Profiles ── */
+.v2-profile-item {
+  font-size: 9pt;
+  margin-bottom: 1.2mm;
+  line-height: 1.32;
+}
+
+/* ── Responsive Screen adjustments ── */
+@media screen and (max-width: 820px) {
+  .v2-cv-container {
+    overflow-x: auto;
+    padding-bottom: 16px;
   }
-  .v2-contact-grid {
-    justify-content: center;
+}
+
+/* ── Print Styles ── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
   }
-  .v2-grid {
-    flex-direction: column;
-    gap: 0;
+  body {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
-  .v2-col {
-    width: 100%;
+  .v2-cv-container {
+    gap: 0 !important;
+  }
+  .v2-page {
+    box-shadow: none !important;
+    margin: 0 !important;
+    page-break-after: always;
+    break-after: page;
+  }
+  .v2-page:last-child {
+    page-break-after: auto;
+    break-after: auto;
   }
 }

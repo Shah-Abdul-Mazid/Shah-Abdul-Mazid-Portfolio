@@ -46,7 +46,7 @@ export const visualCvData: VisualCvData = {
         linkedin: "https://www.linkedin.com/in/shahabdulmazid",
         github: "https://github.com/Shah-Abdul-Mazid",
         scholar: "https://scholar.google.com/citations?user=TYkiwUgAAAAJ",
-        avatarUrl: "/resume/FD=109767.jpg",
+        avatarUrl: "/resume/FD-109767.jpg",
     },
     summary:
         "AI/ML Engineer with a B.Sc. in Computer Science and Engineering from East West University, majoring in Intelligent Systems and Data Science. Experienced in Generative AI, LLMs, RAG, Machine Learning, Deep Learning, Computer Vision, and NLP. Skilled in building AI applications using Python, PyTorch, TensorFlow, FastAPI, Pinecone, OpenAI APIs, and AWS. Passionate about AI research and developing intelligent solutions for real-world problems.",
