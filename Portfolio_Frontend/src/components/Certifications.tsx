@@ -1,6 +1,6 @@
 import { usePortfolio, } from '../context/PortfolioContext';
 import { Award, ExternalLink, Calendar, User, BadgeCheck } from 'lucide-react';
-import { getCredlyBadgesForCert, CREDLY_VERIFIED_BADGES } from '../utils/certBadges';
+import { getCredlyBadgeForCert, CREDLY_VERIFIED_BADGES } from '../utils/certBadges';
 
 const Certifications = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
     const { data } = usePortfolio();
@@ -24,22 +24,22 @@ const Certifications = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
 
                 <div className="cert-grid">
                     {certifications.map((cert, index) => {
-                        const credlyMatch = getCredlyBadgesForCert(cert);
-                        const hasBadge = credlyMatch !== null;
+                        const credlyBadge = getCredlyBadgeForCert(cert);
+                        const hasBadge = credlyBadge !== null;
                         return (
                         <div key={index} className="cert-card fade-in" ref={addToRefs}>
                             {/* Badge / Icon Box */}
                             <div className="cert-icon-box">
                                 {hasBadge ? (
                                     <a
-                                        href={credlyMatch.primaryBadge.publicUrl}
+                                        href={credlyBadge.publicUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="cert-badge-wrapper"
-                                        title={`Credly Verified Badge: ${credlyMatch.primaryBadge.name}`}
+                                        title={`Credly Verified Badge: ${credlyBadge.name}`}
                                     >
                                         <img
-                                            src={credlyMatch.primaryBadge.imageUrl}
+                                            src={credlyBadge.imageUrl}
                                             alt={`${cert.name} badge`}
                                             className="cert-badge-img"
                                         />

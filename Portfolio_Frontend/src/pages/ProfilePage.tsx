@@ -7,7 +7,7 @@ import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { usePortfolio } from '../context/PortfolioContext';
 import { formatDateLabel, sortRecentFirst } from '../utils/dateUtils';
 import { Github, ExternalLink, GraduationCap } from 'lucide-react';
-import { getCredlyBadgesForCert, CREDLY_VERIFIED_BADGES } from '../utils/certBadges';
+import { getCredlyBadgeForCert, CREDLY_VERIFIED_BADGES } from '../utils/certBadges';
 
 import { GITHUB_URL, SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL } from '../constants/researchLinks';
 
@@ -286,47 +286,44 @@ const ProfilePage = () => {
               <h2 className="section-heading line-below">Certifications & Licenses</h2>
               <div className="certifications-grid">
                 {certifications.map((cert, index) => {
-                  const credlyMatch = getCredlyBadgesForCert(cert);
-                  const hasBadges = credlyMatch !== null && credlyMatch.allBadges.length > 0;
+                  const credlyBadge = getCredlyBadgeForCert(cert);
+                  const hasBadge = credlyBadge !== null;
 
                   return (
-                    <div key={index} className={`cert-item-card ${hasBadges ? 'has-credly-badge' : ''}`}>
-                      {hasBadges ? (
-                        <div className="cert-card-badge-row">
-                          <div className="cert-badges-group">
-                            {credlyMatch.allBadges.map((badge, bIdx) => (
-                              <a
-                                key={bIdx}
-                                href={badge.publicUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="cert-badge-link"
-                                title={`Verified Credly Badge: ${badge.name}`}
-                              >
-                                <div className="cert-badge-container">
-                                  <img
-                                    src={badge.imageUrl}
-                                    alt={`${badge.name} badge`}
-                                    className="cert-card-badge-image"
-                                    loading="lazy"
-                                  />
-                                </div>
-                              </a>
-                            ))}
+                    <div key={index} className={`cert-item-card ${hasBadge ? 'has-credly-badge' : ''}`}>
+                      <div className="cert-item-top">
+                        {hasBadge ? (
+                          <a
+                            href={credlyBadge.publicUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="cert-badge-anchor"
+                            title={`Verify on Credly: ${credlyBadge.name}`}
+                          >
+                            <div className="cert-badge-frame">
+                              <img
+                                src={credlyBadge.imageUrl}
+                                alt={`${credlyBadge.name} badge`}
+                                className="cert-badge-image"
+                                loading="lazy"
+                              />
+                            </div>
+                          </a>
+                        ) : (
+                          <div className="cert-issuer-badge">
+                            {cert.issuer}
                           </div>
-                          <div className="cert-badge-meta">
-                            <span className="cert-item-date">{cert.date}</span>
-                            <span className="cert-verified-pill">
-                              <span className="verified-dot"></span> Credly
-                            </span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="cert-item-header">
-                          <span className="cert-regular-tag">{cert.issuer}</span>
+                        )}
+
+                        <div className="cert-meta-right">
                           <span className="cert-item-date">{cert.date}</span>
+                          {hasBadge && (
+                            <span className="cert-credly-tag">
+                              <span className="credly-dot"></span> Credly
+                            </span>
+                          )}
                         </div>
-                      )}
+                      </div>
 
                       <div className="cert-item-body">
                         <h3 className="cert-item-title">{cert.name}</h3>
@@ -347,15 +344,15 @@ const ProfilePage = () => {
                             Verify Credential <ExternalLink size={13} style={{ marginLeft: 4 }} />
                           </a>
                         )}
-                        {hasBadges && credlyMatch.primaryBadge.publicUrl && (
+                        {hasBadge && (
                           <a
-                            href={credlyMatch.primaryBadge.publicUrl}
+                            href={credlyBadge.publicUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="cert-credly-badge-link"
                             title="Verify on Credly"
                           >
-                            Credly Badge <ExternalLink size={11} style={{ marginLeft: 2 }} />
+                            Credly Badge <ExternalLink size={11} style={{ marginLeft: 3 }} />
                           </a>
                         )}
                       </div>
@@ -906,44 +903,60 @@ const ProfilePage = () => {
           opacity: 1;
         }
 
-        .cert-card-badge-row {
+        .cert-item-top {
           display: flex;
           justify-content: space-between;
           align-items: center;
           gap: 12px;
-          margin-bottom: 4px;
+          margin-bottom: 8px;
         }
 
-        .cert-badge-container {
-          width: 64px;
-          height: 64px;
+        .cert-badge-anchor {
+          display: inline-block;
+          text-decoration: none;
+        }
+
+        .cert-badge-frame {
+          width: 72px;
+          height: 72px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%);
-          border: 2px solid rgba(56, 189, 248, 0.25);
+          background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0.7) 100%);
+          border: 2px solid rgba(56, 189, 248, 0.3);
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 4px;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-          flex-shrink: 0;
-          transition: all 0.3s ease;
+          padding: 5px;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .cert-item-card:hover .cert-badge-container {
+        .cert-item-card:hover .cert-badge-frame {
           transform: scale(1.08) rotate(3deg);
           border-color: var(--primary);
-          box-shadow: 0 0 22px rgba(56, 189, 248, 0.45);
+          box-shadow: 0 0 24px rgba(56, 189, 248, 0.45);
         }
 
-        .cert-card-badge-image {
+        .cert-badge-image {
           width: 100%;
           height: 100%;
           object-fit: contain;
           border-radius: 50%;
-          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+          filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
         }
 
-        .cert-badge-meta {
+        .cert-issuer-badge {
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: var(--primary);
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          background: rgba(56, 189, 248, 0.08);
+          padding: 4px 12px;
+          border-radius: 100px;
+          border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .cert-meta-right {
           display: flex;
           flex-direction: column;
           align-items: flex-end;
@@ -961,7 +974,7 @@ const ProfilePage = () => {
           border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .cert-verified-pill {
+        .cert-credly-tag {
           display: inline-flex;
           align-items: center;
           gap: 5px;
@@ -976,7 +989,7 @@ const ProfilePage = () => {
           text-transform: uppercase;
         }
 
-        .verified-dot {
+        .credly-dot {
           width: 6px;
           height: 6px;
           border-radius: 50%;

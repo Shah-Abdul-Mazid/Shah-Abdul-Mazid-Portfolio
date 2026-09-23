@@ -7,8 +7,7 @@ export interface CredlyBadge {
 }
 
 /**
- * The user's exact 9 verified badges issued via Credly.
- * STRICT: No unofficial or fabricated badges are included.
+ * Exact 9 verified Credly badges from Shah Abdul Mazid's Credly profile.
  */
 export const CREDLY_VERIFIED_BADGES: CredlyBadge[] = [
   {
@@ -76,82 +75,57 @@ export const CREDLY_VERIFIED_BADGES: CredlyBadge[] = [
   }
 ];
 
-export interface CertBadgeMatch {
-  primaryBadge: CredlyBadge;
-  allBadges: CredlyBadge[];
-}
-
 /**
- * Returns verified Credly badge(s) for a certification.
- * If the certification does NOT have a verified Credly badge, returns null.
- * Strictly adheres to verified credentials without inventing unverified badges.
+ * Returns EXACTLY ONE verified Credly badge for a certification.
+ * STRICT: Each certification has at most ONE single badge. Never multiple.
+ * If no specific Credly badge is mapped, returns null.
  */
-export function getCredlyBadgesForCert(cert: {
+export function getCredlyBadgeForCert(cert: {
   name: string;
   issuer?: string;
   credentialId?: string;
   badgeUrl?: string;
-}): CertBadgeMatch | null {
-  // 1. Explicit badge URL provided from admin
+}): CredlyBadge | null {
+  // 1. Explicit badge URL manually set by admin
   if (cert.badgeUrl && cert.badgeUrl.trim() !== '') {
-    const customBadge: CredlyBadge = {
+    return {
       id: 'custom-badge',
       name: cert.name,
       issuer: cert.issuer || 'Verified Issuer',
       imageUrl: cert.badgeUrl,
       publicUrl: cert.badgeUrl
     };
-    return { primaryBadge: customBadge, allBadges: [customBadge] };
   }
 
-  const name = (cert.name || '').toLowerCase();
-  const issuer = (cert.issuer || '').toLowerCase();
-  const credId = (cert.credentialId || '').toUpperCase();
+  const name = (cert.name || '').trim().toLowerCase();
+  const issuer = (cert.issuer || '').trim().toLowerCase();
+  const credId = (cert.credentialId || '').trim().toUpperCase();
 
-  // 2. Google AI (Credential ID: AGNE8JCWOITV)
-  // Has 2 verified Credly badges: Google AI Fundamentals & Google AI for Brainstorming and Planning
-  if (name.includes('google ai') || credId === 'AGNE8JCWOITV' || (issuer.includes('google') && name.includes('ai'))) {
-    const b1 = CREDLY_VERIFIED_BADGES[0]; // Google AI Fundamentals
-    const b2 = CREDLY_VERIFIED_BADGES[1]; // Google AI for Brainstorming
-    return {
-      primaryBadge: b1,
-      allBadges: [b1, b2]
-    };
+  // 2. Google AI -> EXACTLY ONE: Google AI Fundamentals
+  if (name === 'google ai' || credId === 'AGNE8JCWOITV' || (name.includes('google') && name.includes('ai') && !name.includes('brainstorming'))) {
+    return CREDLY_VERIFIED_BADGES[0]; // Google AI Fundamentals
   }
 
-  // 3. IBM Data Science Professional Certificate
-  // Has primary Professional Certificate V3 badge + related course badges
-  if (name.includes('data science') && issuer.includes('ibm')) {
-    const profBadge = CREDLY_VERIFIED_BADGES[2]; // IBM Data Science Professional Certificate (V3)
-    const sqlBadge = CREDLY_VERIFIED_BADGES[3];  // Databases & SQL
-    const vizBadge = CREDLY_VERIFIED_BADGES[4];  // Data Visualization
-    const capstone = CREDLY_VERIFIED_BADGES[6];  // Applied Data Science Capstone
-    const career = CREDLY_VERIFIED_BADGES[7];    // Career Guide
-    return {
-      primaryBadge: profBadge,
-      allBadges: [profBadge, sqlBadge, vizBadge, capstone, career]
-    };
+  // 3. RAG for Generative AI Applications (IBM) -> Generative AI Essentials for Data Science
+  if ((name.includes('rag') && name.includes('generative ai')) || name.includes('rag for generative ai')) {
+    return CREDLY_VERIFIED_BADGES[5]; // Generative AI Essentials for Data Science
   }
 
-  // 4. IBM Generative AI Engineering / AI Essentials
-  if ((name.includes('generative ai') || name.includes('ai essentials')) && issuer.includes('ibm')) {
-    const aiEssV2 = CREDLY_VERIFIED_BADGES[8]; // AI Essentials V2
-    const genAiEss = CREDLY_VERIFIED_BADGES[5]; // Gen AI Essentials for Data Science
-    return {
-      primaryBadge: aiEssV2,
-      allBadges: [aiEssV2, genAiEss]
-    };
+  // 4. IBM Generative AI Engineering (IBM) -> Generative AI Essentials for Data Science
+  if (name.includes('generative ai engineering') || (name.includes('generative') && name.includes('engineering') && issuer.includes('ibm'))) {
+    return CREDLY_VERIFIED_BADGES[5]; // Generative AI Essentials for Data Science
   }
 
-  // 5. Data Science Foundations
-  if (name.includes('foundations') && issuer.includes('ibm')) {
-    const capstone = CREDLY_VERIFIED_BADGES[6];
-    return {
-      primaryBadge: capstone,
-      allBadges: [capstone]
-    };
+  // 5. IBM AI ENGINEERING -> EXACTLY ONE: Artificial Intelligence Essentials V2 (Badge ID: 676e65a6-de2b-481b-a559-610a6f7417fb)
+  if (name.includes('ai engineering') && issuer.includes('ibm')) {
+    return CREDLY_VERIFIED_BADGES[8]; // Artificial Intelligence Essentials V2
   }
 
-  // No verified Credly badge for this certification — return null (DO NOT FAKE)
+  // 6. IBM Data Science -> EXACTLY ONE: IBM Data Science Professional Certificate (V3)
+  if (name.includes('data science') && !name.includes('foundations') && issuer.includes('ibm')) {
+    return CREDLY_VERIFIED_BADGES[2]; // IBM Data Science Professional Certificate (V3)
+  }
+
+  // STRICT: No other certifications get a badge unless explicitly set.
   return null;
 }
