@@ -1400,10 +1400,81 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
 
                 @media (max-width: 768px) {
                     .projects-title { font-size: 2.2rem; }
-                    .project-item-header { padding: 20px; }
-                    .project-content-inner { padding: 0 20px 20px 20px; }
-                    .project-expanded-metadata { flex-direction: column; align-items: flex-start; }
-                    .project-expanded-tags { margin-left: 0; }
+                    .proj-timeline {
+                        padding-left: 24px;
+                    }
+                    .proj-timeline::before {
+                        left: 5px;
+                    }
+                    .proj-dot-wrap {
+                        left: -24px;
+                        width: 14px;
+                    }
+                    .proj-dot {
+                        width: 14px;
+                        height: 14px;
+                    }
+                    .proj-dot-inner {
+                        width: 6px;
+                        height: 6px;
+                    }
+                    .proj-card-header {
+                        padding: 16px 14px;
+                        gap: 10px;
+                    }
+                    .proj-card-inner {
+                        padding: 0 14px 16px 14px;
+                    }
+                    .proj-title {
+                        font-size: 1.05rem;
+                    }
+                    .recruiter-grid, .challenges-grid {
+                        grid-template-columns: 1fr;
+                        gap: 10px;
+                    }
+                    .tech-compact-row {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 6px;
+                    }
+                    .tech-compact-label {
+                        text-align: left;
+                        min-width: unset;
+                    }
+                    .project-actions-row {
+                        flex-direction: column;
+                        width: 100%;
+                    }
+                    .project-action-btn {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                    .project-expanded-metadata {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 8px;
+                    }
+                    .project-expanded-tags {
+                        margin-left: 0;
+                    }
+                    .group-title {
+                        font-size: 1.25rem;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .proj-card-header {
+                        flex-direction: column;
+                        align-items: flex-start;
+                    }
+                    .proj-header-right {
+                        align-self: flex-start;
+                        margin-top: 8px;
+                    }
+                    .proj-meta-top {
+                        flex-wrap: wrap;
+                        gap: 6px;
+                    }
                 }
             `}</style>
         </section>

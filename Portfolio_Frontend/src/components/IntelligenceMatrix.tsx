@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import lightModeBg from '../assets/Light_Mode.png';
-import nightModeBg from '../assets/Night_Mode.png';
+import lightModeBg from '../assets/Light_Mode.webp';
+import nightModeBg from '../assets/Night_Mode.webp';
 
 /**
  * ═══════════════════════════════════════════════════════════════════
@@ -138,19 +138,20 @@ const IntelligenceMatrix: React.FC = () => {
         window.addEventListener('mousemove', onMouseMove, { passive: true });
         window.addEventListener('mouseleave', onMouseLeave);
 
-        // ── 1. NEURAL NODES ──────────────────────────────────────────
-        const NODE_COUNT = Math.min(Math.max(Math.floor((W * H) / 14000), 60), 105);
+        // ── 1. NEURAL NODES (Calm & battery-friendly) ───────────────
+        const isMobile = W < 768;
+        const NODE_COUNT = isMobile ? 24 : Math.min(Math.max(Math.floor((W * H) / 28000), 32), 52);
         const nodes: Node[] = [];
 
         for (let i = 0; i < NODE_COUNT; i++) {
             nodes.push({
                 x: Math.random() * W,
                 y: Math.random() * H,
-                vx: (Math.random() - 0.5) * 0.40,
-                vy: (Math.random() - 0.5) * 0.40,
-                radius: Math.random() * 2.2 + 1.8,
+                vx: (Math.random() - 0.5) * 0.22,
+                vy: (Math.random() - 0.5) * 0.22,
+                radius: Math.random() * 1.6 + 1.2,
                 pulsePhase: Math.random() * Math.PI * 2,
-                pulseSpeed: 0.02 + Math.random() * 0.03,
+                pulseSpeed: 0.012 + Math.random() * 0.015,
                 colorIndex: i % DARK_PALETTE.length,
             });
         }
@@ -160,12 +161,12 @@ const IntelligenceMatrix: React.FC = () => {
         let pulseTimer = 0;
 
         const spawnPulse = (from: number, to: number, colorIndex: number) => {
-            if (pulses.length >= 28) return;
+            if (pulses.length >= (isMobile ? 8 : 14)) return;
             pulses.push({
                 fromIdx: from,
                 toIdx: to,
                 progress: 0,
-                speed: 0.018 + Math.random() * 0.022,
+                speed: 0.012 + Math.random() * 0.015,
                 colorIndex,
             });
         };
@@ -210,20 +211,20 @@ const IntelligenceMatrix: React.FC = () => {
             const cx = W / 2;
             const cy = H * 0.46;
 
-            // 2. AMBIENT SCIENTIFIC NEBULA MESH
-            const nebAlpha = lerp(0.09, 0.065, themeBlend);
+            // 2. AMBIENT SCIENTIFIC NEBULA MESH (Soft, subtle ambient lighting)
+            const nebAlpha = lerp(0.045, 0.035, themeBlend);
             [
-                { x: W * 0.22, y: H * 0.25, r: 460, cDark: '0, 247, 255', cLight: '2, 132, 199' },
-                { x: W * 0.78, y: H * 0.28, r: 500, cDark: '139, 92, 246', cLight: '124, 58, 237' },
-                { x: cx,       y: cy,        r: 380, cDark: '56, 189, 248', cLight: '37, 99, 235' },
-                { x: W * 0.50, y: H * 0.82, r: 480, cDark: '16, 185, 129', cLight: '5, 150, 105' },
+                { x: W * 0.22, y: H * 0.25, r: 420, cDark: '0, 247, 255', cLight: '2, 132, 199' },
+                { x: W * 0.78, y: H * 0.28, r: 450, cDark: '139, 92, 246', cLight: '124, 58, 237' },
+                { x: cx,       y: cy,        r: 350, cDark: '56, 189, 248', cLight: '37, 99, 235' },
+                { x: W * 0.50, y: H * 0.82, r: 400, cDark: '16, 185, 129', cLight: '5, 150, 105' },
             ].forEach(neb => {
-                const shiftX = Math.sin(frame * 0.002 + neb.r) * 25;
-                const shiftY = Math.cos(frame * 0.002 + neb.r) * 20;
+                const shiftX = Math.sin(frame * 0.0015 + neb.r) * 15;
+                const shiftY = Math.cos(frame * 0.0015 + neb.r) * 15;
                 const col = themeBlend > 0.5 ? neb.cLight : neb.cDark;
                 const grad = ctx.createRadialGradient(neb.x + shiftX, neb.y + shiftY, 0, neb.x + shiftX, neb.y + shiftY, neb.r);
                 grad.addColorStop(0, `rgba(${col}, ${nebAlpha})`);
-                grad.addColorStop(0.55, `rgba(${col}, ${nebAlpha * 0.35})`);
+                grad.addColorStop(0.55, `rgba(${col}, ${nebAlpha * 0.3})`);
                 grad.addColorStop(1, 'transparent');
                 ctx.fillStyle = grad;
                 ctx.beginPath();
@@ -231,10 +232,10 @@ const IntelligenceMatrix: React.FC = () => {
                 ctx.fill();
             });
 
-            // 3. HOLOGRAPHIC ROTATING AI HUD RINGS (The Iconic Tech Centerpiece)
+            // 3. HOLOGRAPHIC ROTATING AI HUD RINGS (Subtle, sleek, non-distracting)
             ctx.save();
-            const ringR = Math.min(W * 0.26, 260);
-            const ringAlpha = lerp(0.35, 0.45, themeBlend);
+            const ringR = Math.min(W * 0.24, 240);
+            const ringAlpha = lerp(0.18, 0.24, themeBlend);
             const ringDark = { r: 0, g: 247, b: 255 };
             const ringLight = { r: 2, g: 132, b: 199 };
             const ringRgb = lerpColor(ringDark, ringLight, themeBlend);
@@ -647,19 +648,19 @@ const IntelligenceMatrix: React.FC = () => {
                     width: 100vw;
                     height: 100vh;
                     height: 100dvh;
-                    background: rgba(2, 6, 23, 0.38);
+                    background: rgba(2, 6, 23, 0.58);
                     pointer-events: none;
                     transition: background 0.5s ease;
                 }
                 html.light-mode .im-overlay {
-                    background: rgba(220, 232, 255, 0.52);
+                    background: rgba(241, 245, 249, 0.72);
                 }
 
                 /* ─── Night / Light mode opacity ─── */
-                .im-bg-night { opacity: 0.72; }
+                .im-bg-night { opacity: 0.45; }
                 .im-bg-light { opacity: 0; pointer-events: none; }
                 html.light-mode .im-bg-night { opacity: 0; pointer-events: none; }
-                html.light-mode .im-bg-light { opacity: 0.52; }
+                html.light-mode .im-bg-light { opacity: 0.38; }
 
                 /* ─── Canvas ─── */
                 .im-canvas {

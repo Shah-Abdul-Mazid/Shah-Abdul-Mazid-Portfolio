@@ -1,5 +1,5 @@
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
-import avtarImg from '../assets/avtar.png';
+import avtarImg from '../assets/avtar.webp';
 
 import { SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL, GITHUB_URL } from '../constants/researchLinks';
 

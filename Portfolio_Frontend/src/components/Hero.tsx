@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { Link } from 'react-router-dom';
 import { Moon, Sun } from 'lucide-react';
-import avtarImg from '../assets/avtar.png';
+import avtarImg from '../assets/avtar.webp';
 
 
 const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {

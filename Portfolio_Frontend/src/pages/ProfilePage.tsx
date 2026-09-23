@@ -6,7 +6,7 @@ import IntelligenceMatrix from '../components/IntelligenceMatrix';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { usePortfolio } from '../context/PortfolioContext';
 import { formatDateLabel, sortRecentFirst } from '../utils/dateUtils';
-import { Github, ExternalLink, GraduationCap } from 'lucide-react';
+import { Github, ExternalLink, GraduationCap, BookOpen } from 'lucide-react';
 import { getCredlyBadgeForCert, CREDLY_VERIFIED_BADGES } from '../utils/certBadges';
 
 import { GITHUB_URL, SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL } from '../constants/researchLinks';
@@ -227,24 +227,57 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* Two-Column timeline layout */}
+          {/* Two-Column timeline layout: Education and Professional Experience side by side */}
           <div className="timeline-grid">
             {/* Education Column */}
             <div className="timeline-column">
               <h2 className="section-heading line-below">Education</h2>
               <div className="timeline">
                 <div className="timeline-line"></div>
-                {education.map((item, index) => (
-                  <div key={index} className="timeline-item">
-                    <div className="timeline-dot orange"></div>
-                    <div className="timeline-content">
-                      <span className="timeline-year">{item.year}</span>
-                      <h3 className="timeline-title">{item.degree}</h3>
-                      <p className="timeline-institution">{item.school}</p>
-                      {item.major && <p className="timeline-desc">{item.major}</p>}
+                {education.map((item, index) => {
+                  const isBSc = item.degree.toLowerCase().includes('b.sc') || item.degree.toLowerCase().includes('bachelor');
+                  return (
+                    <div key={index} className="timeline-item">
+                      <div className="timeline-dot orange"></div>
+                      <div className="timeline-content">
+                        <span className="timeline-year">{item.year}</span>
+                        <h3 className="timeline-title">{item.degree}</h3>
+                        <p className="timeline-institution">{item.school}</p>
+                        {item.major && <p className="timeline-desc">{item.major}</p>}
+
+                        {/* Major Academic Highlights for B.Sc. */}
+                        {isBSc && (
+                          <div className="education-coursework-container">
+                            <div className="coursework-group">
+                              <span className="coursework-group-title">
+                                <BookOpen size={13} style={{ display: 'inline', marginRight: 5, verticalAlign: 'text-bottom' }} />
+                                Major Compulsory Courses (AI &amp; Data Science):
+                              </span>
+                              <div className="coursework-badges">
+                                <span className="course-badge major">CSE303: Statistics for Data Science</span>
+                                <span className="course-badge major">CSE366: Artificial Intelligence</span>
+                                <span className="course-badge capstone">CSE400: Capstone Project (A / A+)</span>
+                              </div>
+                            </div>
+
+                            <div className="coursework-group" style={{ marginTop: '10px' }}>
+                              <span className="coursework-group-title">
+                                Major Elective &amp; Core Computing Courses:
+                              </span>
+                              <div className="coursework-badges">
+                                <span className="course-badge elective">CSE475: Machine Learning</span>
+                                <span className="course-badge elective">CSE477: Data Mining</span>
+                                <span className="course-badge elective">CSE438: Digital Image Processing</span>
+                                <span className="course-badge core">CSE246: Algorithms</span>
+                                <span className="course-badge core">CSE302: Database Systems</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -713,13 +746,13 @@ const ProfilePage = () => {
           flex-shrink: 0;
         }
 
-        /* Timeline Grid Layout - Align items start prevents empty space in shorter column */
+        /* Timeline Grid Layout - Equal Height & Aligned Columns */
         .timeline-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 32px;
           margin-top: 20px;
-          align-items: start;
+          align-items: stretch;
         }
 
         .timeline-column {
@@ -733,8 +766,11 @@ const ProfilePage = () => {
           -webkit-backdrop-filter: blur(24px);
           box-shadow: var(--card-shadow);
           transition: var(--transition);
-          height: fit-content;
-          align-self: start;
+          height: 100%;
+        }
+
+        .timeline-column .timeline {
+          flex: 1;
         }
 
         .timeline-column:hover {
@@ -851,6 +887,69 @@ const ProfilePage = () => {
         }
         .timeline-desc-bullet:last-child {
           margin-bottom: 0;
+        }
+
+        /* Education Coursework Badges */
+        .education-coursework-container {
+          margin-top: 14px;
+          padding: 14px 16px;
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid var(--border-color);
+        }
+
+        .coursework-group-title {
+          display: block;
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: var(--text-color);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin-bottom: 8px;
+        }
+
+        .coursework-badges {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .course-badge {
+          display: inline-block;
+          font-size: 0.78rem;
+          font-weight: 600;
+          padding: 3px 10px;
+          border-radius: 6px;
+          transition: all 0.2s ease;
+        }
+
+        .course-badge.major {
+          color: #38bdf8;
+          background: rgba(56, 189, 248, 0.08);
+          border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .course-badge.elective {
+          color: #a855f7;
+          background: rgba(168, 85, 247, 0.08);
+          border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .course-badge.capstone {
+          color: #10b981;
+          background: rgba(16, 185, 129, 0.08);
+          border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .course-badge.core {
+          color: var(--text-secondary);
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid var(--border-color);
+        }
+
+        .course-badge:hover {
+          transform: translateY(-1px);
+          filter: brightness(1.15);
         }
 
         /* Certifications Section */
@@ -1239,6 +1338,18 @@ const ProfilePage = () => {
           }
           .bio-card {
             padding: 24px 28px;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .profile-header {
+            padding: 20px 18px;
+          }
+          .bio-card {
+            padding: 20px 16px;
+          }
+          .timeline-column {
+            padding: 24px 16px;
           }
         }
       `}</style>

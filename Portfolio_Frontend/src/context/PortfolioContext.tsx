@@ -842,6 +842,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
                             ...apiData,
                             sections: { ...defaultData.sections, ...(apiData.sections || {}) },
                             contact: { ...defaultData.contact, ...(apiData.contact || {}) },
+                            skills: (apiData.skills && apiData.skills.length > 0) ? apiData.skills : defaultData.skills,
                             papers: (apiData.papers && apiData.papers.length > 0) ? apiData.papers : defaultData.papers
                         };
                         const sanitized = sanitizeData(merged);
@@ -863,6 +864,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
                         ...parsed,
                         sections: { ...defaultData.sections, ...(parsed.sections || {}) },
                         contact: { ...defaultData.contact, ...(parsed.contact || {}) },
+                        skills: (parsed.skills && parsed.skills.length > 0) ? parsed.skills : defaultData.skills,
                         papers: (parsed.papers && parsed.papers.length > 0) ? parsed.papers : defaultData.papers
                     };
                     setData(sanitizeData(merged));
