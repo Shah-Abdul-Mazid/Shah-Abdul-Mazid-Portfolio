@@ -57,6 +57,27 @@ async function generatePdfBlob(element: HTMLElement): Promise<Blob> {
 
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
 
+    const attachLinks = (pageEl: HTMLElement) => {
+        const pRect = pageEl.getBoundingClientRect();
+        if (pRect.width === 0 || pRect.height === 0) return;
+        const scaleX = 210 / pRect.width;
+        const scaleY = 297 / pRect.height;
+        const links = Array.from(pageEl.querySelectorAll('a')) as HTMLAnchorElement[];
+        for (const link of links) {
+            if (!link.href) continue;
+            const rects = Array.from(link.getClientRects());
+            for (const r of rects) {
+                const x = (r.left - pRect.left) * scaleX;
+                const y = (r.top - pRect.top) * scaleY;
+                const w = r.width * scaleX;
+                const h = r.height * scaleY;
+                if (w > 0 && h > 0) {
+                    pdf.link(x, y, w, h, { url: link.href });
+                }
+            }
+        }
+    };
+
     try {
         if (page1 && page2) {
             // Render Page 1 — exact 210mm x 297mm
@@ -68,6 +89,7 @@ async function generatePdfBlob(element: HTMLElement): Promise<Blob> {
                 backgroundColor: '#ffffff',
             });
             pdf.addImage(canvas1.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
+            attachLinks(page1);
 
             // Add Page 2 — exact 210mm x 297mm
             pdf.addPage();
@@ -79,6 +101,7 @@ async function generatePdfBlob(element: HTMLElement): Promise<Blob> {
                 backgroundColor: '#ffffff',
             });
             pdf.addImage(canvas2.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
+            attachLinks(page2);
         } else {
             const canvas = await html2canvas(element, {
                 scale: 2,
@@ -88,6 +111,7 @@ async function generatePdfBlob(element: HTMLElement): Promise<Blob> {
                 backgroundColor: '#ffffff',
             });
             pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
+            attachLinks(element);
         }
     } finally {
         // Always restore original srcs

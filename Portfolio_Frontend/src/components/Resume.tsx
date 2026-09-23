@@ -65,6 +65,27 @@ const Resume = () => {
     }, [data]);
 
     const downloadPDF = async () => {
+        if (cvType === 'v2_visual') {
+            try {
+                const res = await fetch('/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf');
+                const contentType = res.headers.get('content-type') || '';
+                if (res.ok && !contentType.includes('text/html')) {
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    setTimeout(() => URL.revokeObjectURL(url), 5000);
+                    return;
+                }
+            } catch (e) {
+                console.error("Direct Visual CV download error:", e);
+            }
+        }
+
         if (!sheetRef.current) return;
         setBusy(true);
         
@@ -122,6 +143,13 @@ const Resume = () => {
     };
 
     const handleViewPdf = async () => {
+        if (cvType === 'v2_visual') {
+            setShowPdfViewer(true);
+            setPdfBlobUrl('/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf');
+            setViewerLoading(false);
+            return;
+        }
+
         setShowPdfViewer(true);
         setViewerLoading(true);
         if (sheetRef.current) {
