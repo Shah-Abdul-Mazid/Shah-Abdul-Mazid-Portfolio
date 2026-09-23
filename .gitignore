@@ -26,3 +26,15 @@ dist-ssr
 
 server_backup/
 models/
+
+# Build cache
+.vite/
+
+# Large unoptimized source images — use WebP in src/assets/ instead
+# (public/ folder images like badges, PWA icons, and resume photos are kept)
+Portfolio_Frontend/src/assets/*.jpg
+Portfolio_Frontend/src/assets/*.jpeg
+Portfolio_Frontend/src/assets/*.JPG
+Portfolio_Frontend/src/assets/*.JPEG
+Portfolio_Frontend/src/assets/*.png
+Portfolio_Frontend/src/assets/*.PNG
