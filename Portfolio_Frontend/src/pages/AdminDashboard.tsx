@@ -2133,6 +2133,32 @@ const AdminDashboard = () => {
                                         <input type="text" value={cert.credentialUrl || ''} placeholder="https://..." onChange={e => updateListItem('certifications', i, 'credentialUrl', e.target.value)} />
                                     </div>
 
+                                    <div className="form-group" style={{ marginTop: '8px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            🏅 Credly Badge Image URL
+                                            <span style={{ fontSize: '0.65rem', color: '#9ca3af', fontWeight: 400 }}>
+                                                Paste the badge PNG/SVG URL from credly.com
+                                            </span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={(cert as any).badgeUrl || ''}
+                                            placeholder="https://images.credly.com/size/340x340/images/..."
+                                            onChange={e => updateListItem('certifications', i, 'badgeUrl', e.target.value)}
+                                        />
+                                        {(cert as any).badgeUrl && (
+                                            <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <img
+                                                    src={(cert as any).badgeUrl}
+                                                    alt="Badge Preview"
+                                                    style={{ width: '52px', height: '52px', borderRadius: '50%', border: '2px solid rgba(139,92,246,0.4)', objectFit: 'contain' }}
+                                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                                />
+                                                <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Badge preview</span>
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <div className="form-group">
                                         <label>Skills Earned (Comma separated)</label>
                                         <input 
@@ -2162,7 +2188,7 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                             ))}
-                            <button type="button" className="add-btn" onClick={() => addListItem('certifications', { name: '', issuer: '', date: '', credentialId: '', credentialUrl: '', links: [], skills: [] })}>
+                            <button type="button" className="add-btn" onClick={() => addListItem('certifications', { name: '', issuer: '', date: '', credentialId: '', credentialUrl: '', badgeUrl: '', links: [], skills: [] })}>
                                 <Plus size={16} /> Add Certification
                             </button>
                         </div>

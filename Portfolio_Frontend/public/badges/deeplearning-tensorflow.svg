@@ -1,0 +1,27 @@
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tfGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6F00"/>
+      <stop offset="100%" stop-color="#FFA000"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer Shield -->
+  <path d="M150 12 L260 52 C260 160 215 240 150 288 C85 240 40 160 40 52 Z" fill="url(#bgGrad)" stroke="#FF6F00" stroke-width="6"/>
+  <!-- Inner Ring -->
+  <path d="M150 26 C210 65 244 110 244 160 C244 220 200 256 150 274 C100 256 56 220 56 160 C56 110 90 65 150 26 Z" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,4" opacity="0.6"/>
+  <!-- TensorFlow Emblem T -->
+  <path d="M150 65 L210 100 L210 135 L175 115 L175 190 L125 190 L125 115 L90 135 L90 100 Z" fill="url(#tfGrad)"/>
+  <path d="M150 65 L210 100 L175 115 L150 100 Z" fill="#FF8F00"/>
+  <path d="M150 65 L90 100 L125 115 L150 100 Z" fill="#FFA000"/>
+  <path d="M125 115 L150 100 L150 190 L125 190 Z" fill="#FF6F00"/>
+  <path d="M175 115 L150 100 L150 190 L175 190 Z" fill="#FF8F00"/>
+  <!-- Ribbon banner -->
+  <rect x="50" y="200" width="200" height="30" rx="6" fill="#FF6F00"/>
+  <text x="150" y="219" font-family="system-ui, sans-serif" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="1.5">TENSORFLOW</text>
+  <text x="150" y="244" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#f8fafc" text-anchor="middle" letter-spacing="1">DEVELOPER</text>
+  <text x="150" y="260" font-family="system-ui, sans-serif" font-size="9" font-weight="600" fill="#94a3b8" text-anchor="middle">DeepLearning.AI</text>
+</svg>

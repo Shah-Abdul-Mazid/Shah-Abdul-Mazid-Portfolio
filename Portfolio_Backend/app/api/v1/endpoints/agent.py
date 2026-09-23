@@ -34,7 +34,9 @@ SYSTEM_PROMPT_TEMPLATE = (
     "1. Answer ONLY from the provided PORTFOLIO DATA — do not invent information.\n"
     "2. Answer the question directly — do NOT introduce yourself or give a menu.\n"
     "3. Be concise, warm and professional. Use plain text (no markdown symbols like ** or ##).\n"
-    "4. If the answer is not in the data, respond: 'I don't have that information in the portfolio. "
+    "4. FILTER carefully: if the user asks for 'recent', 'current', 'present', 'latest', or 'only' "
+    "a specific type — show ONLY the matching entries (e.g. jobs where endDate is 'Present' or empty).\n"
+    "5. If the answer is not in the data, respond: 'I don't have that information in the portfolio. "
     "Type exit to contact Shah Abdul Mazid directly.'\n\n"
     "PORTFOLIO DATA:\n{context}"
 )
@@ -356,9 +358,28 @@ def keyword_match(query: str, data: dict) -> dict | None:
     # ── Work Experience ──────────────────────────────────────────────────────
     if any(k in q for k in ["work", "job", "employment", "career", "company", "position",
                              "intern", "internship", "worked", "working", "occupation",
-                             "softvence", "eshikhon", "ambassador", "ai engineer"]):
-        resp = "Work Experience:\n\n"
-        for i, w in enumerate(work):
+                             "softvence", "eshikhon", "neuroxyte", "ambassador", "ai engineer"]):
+
+        # Check if the user wants only current/recent/present jobs
+        want_current = any(k in q for k in [
+            "recent", "current", "present", "latest", "now", "ongoing",
+            "right now", "currently", "today", "only recent", "only current"
+        ])
+
+        filtered = []
+        for w in work:
+            end = w.get("endDate") or ""
+            is_current = (not end) or (end.strip().lower() in ["present", "current", "now", ""])
+            if want_current and not is_current:
+                continue
+            filtered.append(w)
+
+        if not filtered:
+            filtered = work  # fallback to all if filter returns nothing
+
+        label = "Current / Recent Work Experience" if want_current else "Work Experience"
+        resp = f"{label}:\n\n"
+        for i, w in enumerate(filtered):
             end = w.get("endDate") or "Present"
             resp += f"{i+1}. {w.get('role')} at {w.get('company')}\n"
             resp += f"   Period: {w.get('startDate')} to {end}\n"

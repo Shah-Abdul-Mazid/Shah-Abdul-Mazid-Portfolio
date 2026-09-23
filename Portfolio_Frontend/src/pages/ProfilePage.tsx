@@ -7,6 +7,7 @@ import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { usePortfolio } from '../context/PortfolioContext';
 import { formatDateLabel, sortRecentFirst } from '../utils/dateUtils';
 import { Github, ExternalLink, GraduationCap } from 'lucide-react';
+import { getCredlyBadgesForCert, CREDLY_VERIFIED_BADGES } from '../utils/certBadges';
 
 import { GITHUB_URL, SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL } from '../constants/researchLinks';
 
@@ -284,26 +285,125 @@ const ProfilePage = () => {
             <div className="certifications-section">
               <h2 className="section-heading line-below">Certifications & Licenses</h2>
               <div className="certifications-grid">
-                {certifications.map((cert, index) => (
-                  <div key={index} className="cert-item-card">
-                    <div className="cert-item-header">
-                      <h3 className="cert-item-title">{cert.name}</h3>
-                      <span className="cert-item-date">{cert.date}</span>
+                {certifications.map((cert, index) => {
+                  const credlyMatch = getCredlyBadgesForCert(cert);
+                  const hasBadges = credlyMatch !== null && credlyMatch.allBadges.length > 0;
+
+                  return (
+                    <div key={index} className={`cert-item-card ${hasBadges ? 'has-credly-badge' : ''}`}>
+                      {hasBadges ? (
+                        <div className="cert-card-badge-row">
+                          <div className="cert-badges-group">
+                            {credlyMatch.allBadges.map((badge, bIdx) => (
+                              <a
+                                key={bIdx}
+                                href={badge.publicUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="cert-badge-link"
+                                title={`Verified Credly Badge: ${badge.name}`}
+                              >
+                                <div className="cert-badge-container">
+                                  <img
+                                    src={badge.imageUrl}
+                                    alt={`${badge.name} badge`}
+                                    className="cert-card-badge-image"
+                                    loading="lazy"
+                                  />
+                                </div>
+                              </a>
+                            ))}
+                          </div>
+                          <div className="cert-badge-meta">
+                            <span className="cert-item-date">{cert.date}</span>
+                            <span className="cert-verified-pill">
+                              <span className="verified-dot"></span> Credly
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="cert-item-header">
+                          <span className="cert-regular-tag">{cert.issuer}</span>
+                          <span className="cert-item-date">{cert.date}</span>
+                        </div>
+                      )}
+
+                      <div className="cert-item-body">
+                        <h3 className="cert-item-title">{cert.name}</h3>
+                        <p className="cert-item-issuer">{cert.issuer}</p>
+                        {cert.credentialId && (
+                          <p className="cert-item-id">Credential ID: {cert.credentialId}</p>
+                        )}
+                      </div>
+
+                      <div className="cert-item-footer">
+                        {cert.credentialUrl && (
+                          <a 
+                            href={cert.credentialUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="cert-item-link"
+                          >
+                            Verify Credential <ExternalLink size={13} style={{ marginLeft: 4 }} />
+                          </a>
+                        )}
+                        {hasBadges && credlyMatch.primaryBadge.publicUrl && (
+                          <a
+                            href={credlyMatch.primaryBadge.publicUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="cert-credly-badge-link"
+                            title="Verify on Credly"
+                          >
+                            Credly Badge <ExternalLink size={11} style={{ marginLeft: 2 }} />
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    <p className="cert-item-issuer">{cert.issuer}</p>
-                    {cert.credentialId && <p className="cert-item-id">Credential ID: {cert.credentialId}</p>}
-                    {cert.credentialUrl && (
-                      <a 
-                        href={cert.credentialUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="cert-item-link"
-                      >
-                        Verify Credential
-                      </a>
-                    )}
+                  );
+                })}
+              </div>
+
+              {/* ── Official Credly Badges Showcase ── */}
+              <div className="credly-profile-showcase">
+                <div className="credly-showcase-header">
+                  <div className="credly-showcase-title-row">
+                    <span className="credly-icon-badge">🏅</span>
+                    <div>
+                      <h3 className="credly-showcase-title">Credly Verified Digital Badges (9)</h3>
+                      <p className="credly-showcase-desc">
+                        Official, verifiable credentials issued via Credly for Google AI & IBM Data Science specializations.
+                      </p>
+                    </div>
                   </div>
-                ))}
+                  <a
+                    href="https://www.credly.com/users/shah-abdul-mazid"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="credly-profile-btn"
+                  >
+                    View Credly Profile <ExternalLink size={13} />
+                  </a>
+                </div>
+
+                <div className="credly-badges-grid">
+                  {CREDLY_VERIFIED_BADGES.map((b) => (
+                    <a
+                      key={b.id}
+                      href={b.publicUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="credly-single-badge-card"
+                      title={`Verify ${b.name} on Credly`}
+                    >
+                      <div className="credly-single-badge-img-wrap">
+                        <img src={b.imageUrl} alt={b.name} className="credly-single-badge-img" loading="lazy" />
+                      </div>
+                      <span className="credly-single-badge-name">{b.name}</span>
+                      <span className="credly-single-badge-issuer">{b.issuer}</span>
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -773,72 +873,347 @@ const ProfilePage = () => {
           background: var(--card-bg);
           border: 1px solid var(--border-color);
           padding: 24px;
-          border-radius: 16px;
+          border-radius: 20px;
           display: flex;
           flex-direction: column;
-          gap: 8px;
-          transition: var(--transition);
+          gap: 12px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .cert-item-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, var(--primary), #8b5cf6);
+          opacity: 0;
+          transition: opacity 0.3s ease;
         }
 
         .cert-item-card:hover {
-          transform: translateY(-2px);
-          border-color: var(--primary);
-          box-shadow: 0 10px 25px rgba(56, 189, 248, 0.15);
+          transform: translateY(-4px);
+          border-color: rgba(56, 189, 248, 0.5);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25), 0 0 20px rgba(56, 189, 248, 0.15);
         }
 
-        .cert-item-header {
+        .cert-item-card:hover::before {
+          opacity: 1;
+        }
+
+        .cert-card-badge-row {
           display: flex;
           justify-content: space-between;
-          align-items: flex-start;
+          align-items: center;
           gap: 12px;
+          margin-bottom: 4px;
         }
 
-        .cert-item-title {
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: var(--text-color);
-          line-height: 1.3;
+        .cert-badge-container {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%);
+          border: 2px solid rgba(56, 189, 248, 0.25);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+          flex-shrink: 0;
+          transition: all 0.3s ease;
+        }
+
+        .cert-item-card:hover .cert-badge-container {
+          transform: scale(1.08) rotate(3deg);
+          border-color: var(--primary);
+          box-shadow: 0 0 22px rgba(56, 189, 248, 0.45);
+        }
+
+        .cert-card-badge-image {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          border-radius: 50%;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .cert-badge-meta {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 6px;
         }
 
         .cert-item-date {
           font-size: 0.78rem;
           color: var(--text-secondary);
-          opacity: 0.8;
+          opacity: 0.85;
           white-space: nowrap;
           background: rgba(255, 255, 255, 0.05);
+          padding: 3px 10px;
+          border-radius: 100px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .cert-verified-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: #10b981;
+          background: rgba(16, 185, 129, 0.12);
+          border: 1px solid rgba(16, 185, 129, 0.3);
           padding: 2px 8px;
           border-radius: 100px;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+
+        .verified-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #10b981;
+          box-shadow: 0 0 6px #10b981;
+        }
+
+        .cert-item-body {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .cert-item-title {
+          font-size: 1.08rem;
+          font-weight: 700;
+          color: var(--text-color);
+          line-height: 1.35;
+          margin: 0;
         }
 
         .cert-item-issuer {
           font-size: 0.92rem;
           color: var(--primary);
           font-weight: 600;
+          margin: 0;
         }
 
         .cert-item-id {
-          font-size: 0.8rem;
+          font-size: 0.78rem;
           color: var(--text-secondary);
           opacity: 0.75;
           font-family: monospace;
+          margin: 0;
         }
 
         .cert-item-link {
           display: inline-flex;
           align-items: center;
+          gap: 4px;
           font-size: 0.82rem;
           font-weight: 600;
           color: var(--primary);
           text-decoration: none;
-          margin-top: auto;
-          padding-top: 8px;
           transition: var(--transition);
         }
         .cert-item-link:hover {
-          color: var(--text-color);
+          color: #ffffff;
           text-decoration: underline;
+        }
+
+        .cert-badges-group {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .cert-badge-link {
+          display: inline-block;
+          text-decoration: none;
+          transition: transform 0.25s ease;
+        }
+        .cert-badge-link:hover {
+          transform: scale(1.1) rotate(2deg);
+        }
+
+        .cert-regular-tag {
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: var(--primary);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          background: rgba(56, 189, 248, 0.08);
+          padding: 3px 10px;
+          border-radius: 100px;
+          border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .cert-item-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: auto;
+          padding-top: 12px;
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+
+        .cert-credly-badge-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 0.74rem;
+          font-weight: 700;
+          color: #f97316;
+          background: rgba(249, 115, 22, 0.1);
+          border: 1px solid rgba(249, 115, 22, 0.28);
+          padding: 3px 8px;
+          border-radius: 6px;
+          text-decoration: none;
+          transition: all 0.2s;
+        }
+        .cert-credly-badge-link:hover {
+          background: rgba(249, 115, 22, 0.22);
+          border-color: #f97316;
+          color: #ffedd5;
+        }
+
+        /* ── Official Credly Badges Showcase ── */
+        .credly-profile-showcase {
+          margin-top: 48px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-radius: 24px;
+          padding: 32px 28px;
+          backdrop-filter: blur(20px);
+        }
+
+        .credly-showcase-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+          flex-wrap: wrap;
+          gap: 16px;
+        }
+
+        .credly-showcase-title-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .credly-icon-badge {
+          font-size: 2rem;
+        }
+
+        .credly-showcase-title {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--text-color);
+          margin: 0 0 4px 0;
+        }
+
+        .credly-showcase-desc {
+          font-size: 0.85rem;
+          color: var(--text-secondary);
+          margin: 0;
+        }
+
+        .credly-profile-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: #fff;
+          background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+          padding: 8px 16px;
+          border-radius: 10px;
+          text-decoration: none;
+          transition: all 0.2s;
+          box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
+        }
+        .credly-profile-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(249, 115, 22, 0.45);
+        }
+
+        .credly-badges-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+          gap: 16px;
+        }
+
+        .credly-single-badge-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 16px 10px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: 16px;
+          text-decoration: none;
+          transition: all 0.25s ease;
+          text-align: center;
+        }
+        .credly-single-badge-card:hover {
+          transform: translateY(-4px);
+          background: rgba(255, 255, 255, 0.05);
+          border-color: rgba(249, 115, 22, 0.4);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 16px rgba(249, 115, 22, 0.25);
+        }
+
+        .credly-single-badge-img-wrap {
+          width: 72px;
+          height: 72px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 10px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1.5px solid rgba(255, 255, 255, 0.08);
+          padding: 4px;
+        }
+        .credly-single-badge-card:hover .credly-single-badge-img-wrap {
+          border-color: #f97316;
+        }
+
+        .credly-single-badge-img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          border-radius: 50%;
+        }
+
+        .credly-single-badge-name {
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: var(--text-color);
+          line-height: 1.3;
+          margin-bottom: 4px;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .credly-single-badge-issuer {
+          font-size: 0.65rem;
+          color: #f97316;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
 
         @media (max-width: 900px) {

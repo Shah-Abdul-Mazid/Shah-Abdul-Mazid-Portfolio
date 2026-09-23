@@ -131,6 +131,7 @@ export interface CertificationItem {
     date: string;
     credentialId?: string;
     credentialUrl?: string;
+    badgeUrl?: string;
     links?: { label: string; url: string }[];
     skills?: string[];
 }

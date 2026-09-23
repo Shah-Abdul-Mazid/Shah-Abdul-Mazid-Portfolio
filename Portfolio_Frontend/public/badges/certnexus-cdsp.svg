@@ -1,0 +1,25 @@
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cnGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="50%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="cnBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="100%" stop-color="#27272a"/>
+    </linearGradient>
+  </defs>
+  <!-- Gold Shield -->
+  <path d="M150 12 L260 52 C260 160 215 240 150 288 C85 240 40 160 40 52 Z" fill="url(#cnBg)" stroke="url(#cnGold)" stroke-width="8"/>
+  <path d="M150 30 L240 62 C240 152 202 222 150 264 C98 222 60 152 60 62 Z" fill="none" stroke="url(#cnGold)" stroke-width="2"/>
+  <!-- Central Emblem -->
+  <circle cx="150" cy="115" r="42" fill="url(#cnGold)" opacity="0.15"/>
+  <circle cx="150" cy="115" r="36" fill="none" stroke="url(#cnGold)" stroke-width="3"/>
+  <polygon points="150,88 158,106 177,106 162,118 168,136 150,124 132,136 138,118 123,106 142,106" fill="url(#cnGold)"/>
+  <!-- Banner -->
+  <rect x="44" y="175" width="212" height="34" rx="6" fill="url(#cnGold)"/>
+  <text x="150" y="196" font-family="system-ui, sans-serif" font-size="12" font-weight="900" fill="#09090b" text-anchor="middle" letter-spacing="1.5">DATA SCIENCE</text>
+  <text x="150" y="228" font-family="system-ui, sans-serif" font-size="11" font-weight="800" fill="#fef08a" text-anchor="middle" letter-spacing="1.2">PRACTITIONER (CDSP)</text>
+  <text x="150" y="246" font-family="system-ui, sans-serif" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle">CERTNEXUS CERTIFIED</text>
+</svg>
