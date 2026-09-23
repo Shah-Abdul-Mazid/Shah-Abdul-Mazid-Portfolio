@@ -3,14 +3,13 @@ import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import VisualCV from '../../components/CV/VisualCV/VisualCV';
-import { ArrowLeft, Download, FileDown, Loader, Printer } from 'lucide-react';
+import DownloadFileNameModal from '../../components/CV/DownloadFileNameModal';
+import { ArrowLeft, Download, FileDown, Loader } from 'lucide-react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { downloadUpdatedVisualCvTex } from '../../utils/latexSync';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
-
-const PDF_FILENAME = 'Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
 const PDF_FILE_PATH = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
 
 /** Fetch an image URL and return it as a base64 data URL */
@@ -124,11 +123,13 @@ async function generatePdfBlob(element: HTMLElement): Promise<Blob> {
 export const VisualResumePage: React.FC = () => {
     const { data: portfolioData } = usePortfolio();
     const [generating, setGenerating] = useState(false);
+    const [showNameModal, setShowNameModal] = useState(false);
     const cvRef = useRef<HTMLDivElement>(null);
 
-    const handleDownloadPdf = useCallback(async () => {
+    const handleExecuteDownload = useCallback(async (selectedFileName: string) => {
         if (generating) return;
         setGenerating(true);
+        setShowNameModal(false);
 
         try {
             const res = await fetch(PDF_FILE_PATH);
@@ -138,7 +139,7 @@ export const VisualResumePage: React.FC = () => {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = PDF_FILENAME;
+                a.download = selectedFileName;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -156,7 +157,7 @@ export const VisualResumePage: React.FC = () => {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = PDF_FILENAME;
+                a.download = selectedFileName;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -164,7 +165,6 @@ export const VisualResumePage: React.FC = () => {
             }
         } catch (err) {
             console.error('Visual CV PDF download error:', err);
-            window.print();
         }
         setGenerating(false);
     }, [generating]);
@@ -185,7 +185,7 @@ export const VisualResumePage: React.FC = () => {
                         </Link>
                         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                             <button
-                                onClick={handleDownloadPdf}
+                                onClick={() => setShowNameModal(true)}
                                 disabled={generating}
                                 className="rv-btn"
                                 style={{ background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: generating ? 0.7 : 1 }}
@@ -200,13 +200,6 @@ export const VisualResumePage: React.FC = () => {
                             >
                                 <Download size={14} /> Download .tex
                             </button>
-                            <button
-                                onClick={() => window.print()}
-                                className="rv-btn"
-                                style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                            >
-                                <Printer size={14} /> Print
-                            </button>
                         </div>
                     </div>
 
@@ -214,6 +207,16 @@ export const VisualResumePage: React.FC = () => {
                     <div ref={cvRef}>
                         <VisualCV />
                     </div>
+
+                    {/* Filename Selection Modal */}
+                    <DownloadFileNameModal
+                        isOpen={showNameModal}
+                        onClose={() => setShowNameModal(false)}
+                        onConfirmDownload={handleExecuteDownload}
+                        isGenerating={generating}
+                        cvVersionName="Visual CV"
+                        versionSpecificDefault="Shah_Abdul_Mazid_Visual_CV_Version_2.pdf"
+                    />
                 </div>
             </main>
             <Footer />

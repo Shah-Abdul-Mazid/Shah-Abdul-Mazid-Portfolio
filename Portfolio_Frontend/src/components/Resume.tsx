@@ -1,6 +1,6 @@
 import { useRef, useState, useMemo } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Download, Loader, Printer, CheckCircle2, AlertCircle, Info, X, Zap, Mail, MapPin, Globe, Briefcase, Eye, FileDown, Phone, Linkedin, Github } from 'lucide-react';
+import { Download, Loader, CheckCircle2, AlertCircle, Info, X, Zap, Mail, MapPin, Globe, Briefcase, Eye, FileDown, Phone, Linkedin, Github } from 'lucide-react';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
@@ -138,10 +138,6 @@ const Resume = () => {
         }
     };
 
-    const downloadDynamic = () => {
-        window.print();
-    };
-
     const handleViewPdf = async () => {
         if (cvType === 'v2_visual') {
             setShowPdfViewer(true);
@@ -233,10 +229,6 @@ const Resume = () => {
                         <Download size={14} /> Download .tex
                     </button>
                 )}
-                
-                <button onClick={downloadDynamic} className="rv-btn rv-solid" style={{ background: '#3b82f6', color: 'white', border: 'none' }}>
-                    <Printer size={14} /> Print CV
-                </button>
             </div>
 
             {/* ===== PDF VIEWER MODAL ===== */}

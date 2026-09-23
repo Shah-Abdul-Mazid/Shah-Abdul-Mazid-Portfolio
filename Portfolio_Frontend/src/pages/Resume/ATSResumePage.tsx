@@ -3,11 +3,10 @@ import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import ATSCV from '../../components/CV/ATSCV/ATSCV';
-import { ArrowLeft, Download, Eye, FileDown, Loader, Printer, X } from 'lucide-react';
+import DownloadFileNameModal from '../../components/CV/DownloadFileNameModal';
+import { ArrowLeft, Download, Eye, FileDown, Loader, X } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-
-const PDF_FILENAME = 'Shah_Abdul_Mazid_ATS_CV_Version_1.pdf';
 
 /** Fetch an image URL and return it as a base64 data URL */
 async function fetchImageAsBase64(url: string): Promise<string | null> {
@@ -96,32 +95,61 @@ async function generatePdfBlob(element: HTMLElement): Promise<Blob> {
         }
     }
 
+    try {
+        const pRect = element.getBoundingClientRect();
+        if (pRect.width > 0 && pRect.height > 0) {
+            const scaleX = contentW / pRect.width;
+            const scaleY = renderedH / pRect.height;
+            const links = Array.from(element.querySelectorAll('a')) as HTMLAnchorElement[];
+            const totalPages = (pdf as any).internal.getNumberOfPages();
+            for (const link of links) {
+                if (!link.href) continue;
+                const rects = Array.from(link.getClientRects());
+                for (const r of rects) {
+                    const totalY = (r.top - pRect.top) * scaleY;
+                    const pageIndex = Math.floor(totalY / contentH);
+                    const pageY = margin + (totalY % contentH);
+                    const pageX = margin + (r.left - pRect.left) * scaleX;
+                    const w = r.width * scaleX;
+                    const h = r.height * scaleY;
+                    if (pageIndex + 1 <= totalPages && w > 0 && h > 0) {
+                        pdf.setPage(pageIndex + 1);
+                        pdf.link(pageX, pageY, w, h, { url: link.href });
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.error('Error attaching links in ATS CV:', e);
+    }
+
     return pdf.output('blob');
 }
 
 export const ATSResumePage: React.FC = () => {
     const [showPdfViewer, setShowPdfViewer] = useState(false);
     const [generating, setGenerating] = useState(false);
+    const [showNameModal, setShowNameModal] = useState(false);
     const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
     const [viewerLoading, setViewerLoading] = useState(false);
     const cvRef = useRef<HTMLDivElement>(null);
 
     const texPath = '/resume/Shah_Abdul_Mazid_ATS_CV_Version_1.tex';
 
-    const handleDownloadPdf = useCallback(async () => {
+    const handleExecuteDownload = useCallback(async (selectedFileName: string) => {
         if (!cvRef.current || generating) return;
         setGenerating(true);
+        setShowNameModal(false);
         try {
             const blob = await generatePdfBlob(cvRef.current);
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = PDF_FILENAME;
+            a.download = selectedFileName;
             a.click();
             setTimeout(() => URL.revokeObjectURL(url), 5000);
         } catch (err) {
             console.error('ATS CV PDF download error:', err);
-            window.print();
         }
         setGenerating(false);
     }, [generating]);
@@ -170,7 +198,7 @@ export const ATSResumePage: React.FC = () => {
                                 {viewerLoading ? 'Generating…' : 'View PDF'}
                             </button>
                             <button
-                                onClick={handleDownloadPdf}
+                                onClick={() => setShowNameModal(true)}
                                 disabled={generating || viewerLoading}
                                 className="rv-btn"
                                 style={{ background: '#059669', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: generating ? 0.7 : 1 }}
@@ -186,15 +214,18 @@ export const ATSResumePage: React.FC = () => {
                             >
                                 <Download size={14} /> Download .tex
                             </a>
-                            <button
-                                onClick={() => window.print()}
-                                className="rv-btn"
-                                style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                            >
-                                <Printer size={14} /> Print
-                            </button>
                         </div>
                     </div>
+
+                    {/* Filename Selection Modal */}
+                    <DownloadFileNameModal
+                        isOpen={showNameModal}
+                        onClose={() => setShowNameModal(false)}
+                        onConfirmDownload={handleExecuteDownload}
+                        isGenerating={generating}
+                        cvVersionName="ATS CV"
+                        versionSpecificDefault="Shah_Abdul_Mazid_ATS_CV_Version_1.pdf"
+                    />
 
                     {/* PDF Viewer Modal — Live Generated */}
                     {showPdfViewer && (
@@ -206,7 +237,7 @@ export const ATSResumePage: React.FC = () => {
                                         <span>ATS CV — Version 1 (Live Preview)</span>
                                     </div>
                                     <div className="pdf-viewer-actions">
-                                        <button onClick={handleDownloadPdf} disabled={generating} className="pdf-viewer-dl-btn" style={{ cursor: 'pointer', border: 'none' }}>
+                                        <button onClick={() => setShowNameModal(true)} disabled={generating} className="pdf-viewer-dl-btn" style={{ cursor: 'pointer', border: 'none' }}>
                                             <FileDown size={15} /> Download PDF
                                         </button>
                                         <button onClick={handleCloseViewer} className="pdf-viewer-close">
