@@ -90,11 +90,6 @@ export function getUpdatedAchievements(
     certifications: CertificationItem[] | undefined,
     baseAchievements: string[],
 ): string[] {
-    // If baseAchievements are provided, respect them directly
-    if (baseAchievements && baseAchievements.length > 0) {
-        return baseAchievements;
-    }
-
     const myPapers = (papers ?? []).filter(
         p => !p.authors || p.authors.toLowerCase().includes('mazid') || p.authors.toLowerCase().includes('shah')
     );
@@ -102,7 +97,7 @@ export function getUpdatedAchievements(
     const pubBullet = generatePublicationBullet(myPapers);
 
     // Clone base achievements
-    const list = [...(baseAchievements || [])];
+    const list = [...baseAchievements];
 
     // Update bullet 1 (publications)
     if (list.length > 0) {
@@ -127,11 +122,6 @@ export function getUpdatedHighlights(
     papers: PaperItem[] | undefined,
     baseHighlights: { title: string; description: string }[],
 ): { title: string; description: string }[] {
-    // If baseHighlights are provided, respect them directly
-    if (baseHighlights && baseHighlights.length > 0) {
-        return baseHighlights;
-    }
-
     const myPapers = (papers ?? []).filter(
         p => !p.authors || p.authors.toLowerCase().includes('mazid') || p.authors.toLowerCase().includes('shah')
     );
