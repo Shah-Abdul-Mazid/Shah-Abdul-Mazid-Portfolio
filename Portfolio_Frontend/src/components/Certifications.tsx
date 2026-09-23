@@ -94,6 +94,16 @@ const Certifications = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                                                 Verify <ExternalLink size={14} />
                                             </a>
                                         )}
+                                        {hasBadge && (
+                                            <a
+                                                href={credlyBadge!.publicUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="cert-link-btn cert-credly-btn"
+                                            >
+                                                🏅 View on Credly <ExternalLink size={14} />
+                                            </a>
+                                        )}
                                         {cert.links?.map((link, lIdx) => (
                                             <a 
                                                 key={lIdx}
@@ -193,8 +203,8 @@ const Certifications = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
 
                 /* ── Badge image styling ── */
                 .cert-icon-box {
-                    width: 72px;
-                    height: 72px;
+                    width: 100px;
+                    height: 100px;
                     background: rgba(139, 92, 246, 0.05);
                     border-radius: 16px;
                     display: flex;
@@ -222,8 +232,8 @@ const Certifications = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                 }
 
                 .cert-badge-img {
-                    width: 52px;
-                    height: 52px;
+                    width: 82px;
+                    height: 82px;
                     object-fit: contain;
                     border-radius: 50%;
                     transition: transform 0.3s ease, filter 0.3s ease;
@@ -352,6 +362,18 @@ const Certifications = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                 .cert-link-btn:hover {
                     scale: 1.05;
                     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+                }
+
+                .cert-credly-btn {
+                    background: rgba(249, 115, 22, 0.15);
+                    color: #f97316;
+                    border: 1px solid rgba(249, 115, 22, 0.35);
+                }
+
+                .cert-credly-btn:hover {
+                    background: rgba(249, 115, 22, 0.28);
+                    border-color: #f97316;
+                    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
                 }
 
                 @media (max-width: 640px) {

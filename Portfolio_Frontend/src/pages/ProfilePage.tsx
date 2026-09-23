@@ -917,23 +917,23 @@ const ProfilePage = () => {
         }
 
         .cert-badge-frame {
-          width: 72px;
-          height: 72px;
+          width: 120px;
+          height: 120px;
           border-radius: 50%;
           background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0.7) 100%);
-          border: 2px solid rgba(56, 189, 248, 0.3);
+          border: 3px solid rgba(56, 189, 248, 0.4);
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 5px;
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+          padding: 8px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 6px rgba(56, 189, 248, 0.06);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .cert-item-card:hover .cert-badge-frame {
           transform: scale(1.08) rotate(3deg);
           border-color: var(--primary);
-          box-shadow: 0 0 24px rgba(56, 189, 248, 0.45);
+          box-shadow: 0 0 32px rgba(56, 189, 248, 0.5), 0 0 0 8px rgba(56, 189, 248, 0.1);
         }
 
         .cert-badge-image {
@@ -941,7 +941,7 @@ const ProfilePage = () => {
           height: 100%;
           object-fit: contain;
           border-radius: 50%;
-          filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
+          filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
         }
 
         .cert-issuer-badge {
