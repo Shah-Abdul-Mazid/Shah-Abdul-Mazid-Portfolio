@@ -11,7 +11,6 @@ import html2canvas from 'html2canvas';
 
 
 const PDF_FILENAME = 'Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
-const PDF_FILE_PATH = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
 
 /** Fetch an image URL and return it as a base64 data URL */
 async function fetchImageAsBase64(url: string): Promise<string | null> {
@@ -103,41 +102,19 @@ export const VisualResumePage: React.FC = () => {
     const cvRef = useRef<HTMLDivElement>(null);
 
     const handleDownloadPdf = useCallback(async () => {
-        if (generating) return;
+        if (!cvRef.current || generating) return;
         setGenerating(true);
 
         try {
-            const res = await fetch(PDF_FILE_PATH);
-            const contentType = res.headers.get('content-type') || '';
-            if (res.ok && !contentType.includes('text/html')) {
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = PDF_FILENAME;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-                setGenerating(false);
-                return;
-            }
-        } catch {
-            // Fall through to dynamic generator
-        }
-
-        try {
-            if (cvRef.current) {
-                const blob = await generatePdfBlob(cvRef.current);
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = PDF_FILENAME;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-            }
+            const blob = await generatePdfBlob(cvRef.current);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = PDF_FILENAME;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
         } catch (err) {
             console.error('Visual CV PDF download error:', err);
             window.print();

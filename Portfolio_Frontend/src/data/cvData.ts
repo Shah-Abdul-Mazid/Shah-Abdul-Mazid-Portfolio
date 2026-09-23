@@ -142,17 +142,18 @@ export const cvData: CVData = {
         { category: "APIs & Integrations", items: ["OpenAI API", "Google Maps", "Stripe", "Google Sheets", "Anthropic API"] },
     ],
     achievements: [
-        "Published research on interpretable ML for agricultural disease diagnosis (ICCIT 2025)",
-        "Built enterprise RAG platform processing 10,000+ documents with 95%+ accuracy",
-        "Developed traffic detection system for real-world Bangladesh traffic conditions",
-        "Designed multi-agent AI system handling complex enterprise workflows",
-        "9+ IBM and AWS certifications in AI/ML specializations",
+        "Published two research works spanning medical imaging and agricultural AI",
+        "Built enterprise document Q&A, RAG, and knowledge retrieval systems",
+        "Developed ML systems for real-world Bangladesh traffic conditions",
+        "Designed multi-agent AI systems for complex enterprise workflows",
+        "Built end-to-end AI solutions from model development to production deployment",
     ],
+
     highlights: [
-        { title: "Published Research", description: "Two publications in medical imaging and agricultural AI, including ICCIT 2025 and Springer." },
-        { title: "Generative AI & RAG", description: "Built enterprise document Q&A, retrieval-augmented, and multi-agent AI systems." },
-        { title: "End-to-End AI", description: "Developed ML systems spanning model development, backend integration, and production deployment." },
-        { title: "AI Automation", description: "Built n8n-based workflows integrating AI models, APIs, and external services." },
+        {title: "Published Research",description:"Two publications spanning medical imaging and agricultural AI, including IEEE ICCIT 2025 and Springer ICIDA 2025."},
+        {title: "Generative AI & RAG",description:"Built enterprise document Q&A, retrieval-augmented, and multi-agent AI systems."},
+        {title: "End-to-End AI",description:"Developed ML systems from model development and evaluation to backend integration and deployment."},
+        {title: "AI Automation",description:"Built n8n-based workflows integrating AI models, APIs, and external services."},
     ],
     researchInterests: [
         "Generative AI and Large Language Models",

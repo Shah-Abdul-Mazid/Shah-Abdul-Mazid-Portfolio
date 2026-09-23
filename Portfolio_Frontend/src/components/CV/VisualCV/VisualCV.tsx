@@ -204,7 +204,7 @@ export const VisualCV: React.FC = () => {
                         {/* Key Achievements */}
                         <h3 className="v2-sec-heading">Key Achievements</h3>
                         <ul className="v2-ul">
-                            {dynamicAchievements.map((ach, i) => (
+                            {(achievements || dynamicAchievements).map((ach, i) => (
                                 <li key={i}>{ach}</li>
                             ))}
                         </ul>
@@ -224,7 +224,7 @@ export const VisualCV: React.FC = () => {
 
                         {/* Professional Highlights */}
                         <h3 className="v2-sec-heading v2-sec-heading-first">Professional Highlights</h3>
-                        {dynamicHighlights.map((hl, i) => (
+                        {(highlights || dynamicHighlights).map((hl, i) => (
                             <div key={i} className="v2-highlight-item">
                                 <b>{hl.title}:</b> {hl.description}
                             </div>
