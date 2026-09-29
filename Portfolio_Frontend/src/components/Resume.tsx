@@ -535,17 +535,18 @@ const Resume = () => {
                                     <div className="v2-sec">
                                         <h3 className="v2-sec-heading">Key Achievements</h3>
                                         <ul className="v2-ul">
-                                            <li>Published research on interpretable ML for agricultural disease diagnosis (ICCIT 2025)</li>
-                                            <li>Built enterprise RAG platform processing 10,000+ documents with 95%+ accuracy</li>
+                                            <li>Published 2 research papers in agricultural AI and medical imaging (IEEE ICCIT 2025, Springer ICIDA 2026)</li>
+                                            <li>Built enterprise RAG platform processing 10,000+ documents with 95%+ retrieval accuracy</li>
                                             <li>Developed traffic detection system for real-world Bangladesh traffic conditions</li>
-                                            <li>Designed multi-agent AI system handling complex enterprise workflows</li>
-                                            <li>9+ IBM and AWS certifications in AI/ML specializations</li>
+                                            <li>Designed multi-agent AI systems for complex enterprise workflows and automation</li>
+                                            <li>Earned 17+ IBM and AWS certifications across AI, ML, Generative AI, and data science</li>
                                         </ul>
                                     </div>
+                                                                        
 
                                     <div className="v2-sec">
                                         <h3 className="v2-sec-heading">Professional Highlights</h3>
-                                        <div className="v2-item"><b>Published Research:</b> Two publications in medical imaging and agricultural AI, including ICCIT 2025 and Springer.</div>
+                                        <div className="v2-item"><b>Published Research:</b> Two publications in medical imaging and agricultural AI, including  IEEE ICCIT 2025 and Springer ICIDA 2025.</div>
                                         <div className="v2-item"><b>Generative AI &amp; RAG:</b> Built enterprise document Q&amp;A, retrieval-augmented, and multi-agent AI systems.</div>
                                         <div className="v2-item"><b>End-to-End AI:</b> Developed ML systems spanning model development, backend integration, and production deployment.</div>
                                         <div className="v2-item"><b>AI Automation:</b> Built n8n-based workflows integrating AI models, APIs, and external services.</div>

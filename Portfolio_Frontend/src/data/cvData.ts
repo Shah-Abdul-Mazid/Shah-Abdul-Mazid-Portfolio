@@ -142,14 +142,14 @@ export const cvData: CVData = {
         { category: "APIs & Integrations", items: ["OpenAI API", "Google Maps", "Stripe", "Google Sheets", "Anthropic API"] },
     ],
     achievements: [
-        "Published research on interpretable ML for agricultural disease diagnosis (ICCIT 2025)",
+        "Published 2 research papers in agricultural AI and medical imaging (ICCIT 2025, Springer ICIDA 2026)",
         "Built enterprise RAG platform processing 10,000+ documents with 95%+ accuracy",
         "Developed traffic detection system for real-world Bangladesh traffic conditions",
         "Designed multi-agent AI system handling complex enterprise workflows",
-        "9+ IBM and AWS certifications in AI/ML specializations",
+        "17+ IBM and AWS certifications in AI/ML specializations",
     ],
     highlights: [
-        { title: "Published Research", description: "Two publications in medical imaging and agricultural AI, including ICCIT 2025 and Springer." },
+        { title: "Published Research", description: "2 publications in agricultural AI and medical imaging, including ICCIT 2025 and Springer ICIDA 2026." },
         { title: "Generative AI & RAG", description: "Built enterprise document Q&A, retrieval-augmented, and multi-agent AI systems." },
         { title: "End-to-End AI", description: "Developed ML systems spanning model development, backend integration, and production deployment." },
         { title: "AI Automation", description: "Built n8n-based workflows integrating AI models, APIs, and external services." },
@@ -285,4 +285,5 @@ export const cvData: CVData = {
         { label: "LinkedIn", url: "https://www.linkedin.com/in/shahabdulmazid", text: "LinkedIn Profile" },
         { label: "Nexus Intelligence", url: "https://ai-rag-project-llm-based.vercel.app/auth/login", text: "Live Demo" },
     ],
+    
 };
