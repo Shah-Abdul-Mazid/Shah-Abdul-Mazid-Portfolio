@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import VisualCV from '../../components/CV/VisualCV/VisualCV';
+import DownloadFileNameModal from '../../components/CV/DownloadFileNameModal';
 import { ArrowLeft, FileDown, Loader, Download } from 'lucide-react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { downloadUpdatedVisualCvTex } from '../../utils/latexSync';
@@ -10,40 +11,36 @@ import { downloadUpdatedVisualCvTex } from '../../utils/latexSync';
 /** Path to the static, pre-compiled Overleaf-generated PDF */
 const PDF_FILE_PATH = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
 
-/** Download the static PDF directly from public/resume/ */
-async function downloadStaticPdf(fileName: string): Promise<boolean> {
-    try {
-        const res = await fetch(PDF_FILE_PATH);
-        const contentType = res.headers.get('content-type') || '';
-        if (res.ok && !contentType.includes('text/html')) {
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(url), 5000);
-            return true;
-        }
-    } catch {
-        // fall through
-    }
-    return false;
-}
-
 export const VisualResumePage: React.FC = () => {
     const { data: portfolioData } = usePortfolio();
-    const [downloading, setDownloading] = useState(false);
+    const [generating, setGenerating] = useState(false);
+    const [showNameModal, setShowNameModal] = useState(false);
+    const cvRef = useRef<HTMLDivElement>(null);
 
-    /* ── Download PDF ── */
-    const handleDownloadPdf = useCallback(async () => {
-        if (downloading) return;
-        setDownloading(true);
-        await downloadStaticPdf('Shah_Abdul_Mazid_Visual_CV.pdf');
-        setDownloading(false);
-    }, [downloading]);
+    /* ── Execute PDF download with user's selected naming convention ── */
+    const handleExecuteDownload = useCallback(async (selectedFileName: string) => {
+        if (generating) return;
+        setGenerating(true);
+        setShowNameModal(false);
+        try {
+            const res = await fetch(PDF_FILE_PATH);
+            const contentType = res.headers.get('content-type') || '';
+            if (res.ok && !contentType.includes('text/html')) {
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = selectedFileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
+            }
+        } catch (err) {
+            console.error('Visual CV PDF download error:', err);
+        }
+        setGenerating(false);
+    }, [generating]);
 
     /* ── Download .tex ── */
     const handleDownloadTex = () => {
@@ -77,21 +74,22 @@ export const VisualResumePage: React.FC = () => {
                         </Link>
 
                         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                            {/* Download PDF */}
+                            {/* Download PDF button opens filename selection modal */}
                             <button
-                                onClick={handleDownloadPdf}
-                                disabled={downloading}
+                                onClick={() => setShowNameModal(true)}
+                                disabled={generating}
+                                className="rv-btn"
                                 style={{
                                     background: '#f59e0b', color: '#fff', border: 'none',
                                     borderRadius: '8px', padding: '8px 16px',
-                                    cursor: downloading ? 'not-allowed' : 'pointer',
+                                    cursor: generating ? 'not-allowed' : 'pointer',
                                     fontWeight: 600, fontSize: '0.82rem',
                                     display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                    opacity: downloading ? 0.7 : 1
+                                    opacity: generating ? 0.7 : 1
                                 }}
                             >
-                                {downloading ? <Loader size={14} /> : <FileDown size={14} />}
-                                {downloading ? 'Downloading…' : 'Download PDF'}
+                                {generating ? <Loader size={14} className="animate-spin" /> : <FileDown size={14} />}
+                                {generating ? 'Downloading…' : 'Download PDF'}
                             </button>
 
                             {/* Download .tex */}
@@ -110,9 +108,19 @@ export const VisualResumePage: React.FC = () => {
                     </div>
 
                     {/* ── Live HTML Preview (web rendering) ── */}
-                    <div>
+                    <div ref={cvRef}>
                         <VisualCV />
                     </div>
+
+                    {/* ── Professional File Naming Convention Suggestion Modal ── */}
+                    <DownloadFileNameModal
+                        isOpen={showNameModal}
+                        onClose={() => setShowNameModal(false)}
+                        onConfirmDownload={handleExecuteDownload}
+                        isGenerating={generating}
+                        cvVersionName="Visual CV"
+                        versionSpecificDefault="Shah_Abdul_Mazid_Visual_CV_Version_2.pdf"
+                    />
 
                 </div>
             </main>

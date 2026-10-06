@@ -5,6 +5,7 @@ import { Download, Loader, CheckCircle2, AlertCircle, Info, X, Zap, Mail, MapPin
 import html2pdf from 'html2pdf.js';
 
 import { downloadUpdatedVisualCvTex } from '../utils/latexSync';
+import DownloadFileNameModal from './CV/DownloadFileNameModal';
 
 const fmtDate = (s: string) => {
     if (!s) return 'Present';
@@ -18,6 +19,7 @@ const Resume = () => {
     const sheetRef = useRef<HTMLDivElement>(null);
     const [busy, setBusy] = useState(false);
     const [showAts, setShowAts] = useState(false);
+    const [showNameModal, setShowNameModal] = useState(false);
     const [showPdfViewer, setShowPdfViewer] = useState(false);
     const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
     const [viewerLoading, setViewerLoading] = useState(false);
