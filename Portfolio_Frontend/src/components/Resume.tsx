@@ -27,6 +27,9 @@ const Resume = () => {
     const TEX_V1 = '/resume/Shah_Abdul_Mazid_ATS_CV_Version_1.tex';
     const TEX_V2 = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.tex';
 
+    // Static compiled PDF path (Overleaf-generated)
+    const VISUAL_PDF_PATH = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
+
     const activeTex = cvType === 'v1_ats' ? TEX_V1 : TEX_V2;
 
     const downloadTex = () => {
@@ -67,14 +70,14 @@ const Resume = () => {
     const downloadPDF = async () => {
         if (cvType === 'v2_visual') {
             try {
-                const res = await fetch('/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf');
+                const res = await fetch(VISUAL_PDF_PATH);
                 const contentType = res.headers.get('content-type') || '';
                 if (res.ok && !contentType.includes('text/html')) {
                     const blob = await res.blob();
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = 'Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
+                    a.download = 'Shah_Abdul_Mazid_Visual_CV.pdf';
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -141,7 +144,7 @@ const Resume = () => {
     const handleViewPdf = async () => {
         if (cvType === 'v2_visual') {
             setShowPdfViewer(true);
-            setPdfBlobUrl('/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf');
+            setPdfBlobUrl(VISUAL_PDF_PATH);
             setViewerLoading(false);
             return;
         }
