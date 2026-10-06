@@ -197,6 +197,11 @@
   line-height: 1.35;
 }
 
+/* Skills continued in right column — no extra top spacing */
+.v2-skill-entry-top {
+  margin-top: 0;
+}
+
 /* ── Education item ── */
 .v2-edu-item {
   margin-bottom: 2.8mm;

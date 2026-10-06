@@ -15,12 +15,13 @@ export interface VisualCvData {
     skills: { category: string; items: string[] }[];
     education: { degree: string; institution: string; period: string; details: string }[];
     languages: { name: string; proficiency: string }[];
+    researchInterests: string[];
+    careerFocus: string[];
     toolsAndPlatforms: { category: string; items: string[] }[];
     achievements: string[];
     highlights: { title: string; description: string }[];
-    researchInterests: string[];
-    careerFocus: string[];
     experience: { role: string; company: string; location: string; period: string; points: string[] }[];
+    projects: { title: string; subtitle: string; description: string; points: string[]; tech: string[] }[];
     publications: {
         title: string;
         authors?: string;
@@ -31,7 +32,6 @@ export interface VisualCvData {
     }[];
     certifications: string[];
     competitions: { title: string; organizer: string; year: string }[];
-    projects: { title: string; subtitle: string; description: string; points: string[]; tech: string[] }[];
     profiles: { label: string; url: string; text: string }[];
 }
 
@@ -41,7 +41,7 @@ export const visualCvData: VisualCvData = {
         title: "AI/ML ENGINEER",
         tags: ["Generative AI", "LLMs", "RAG", "Computer Vision", "NLP"],
         location: "Dhaka, Bangladesh",
-        email: "shahabdulmazid.ezan@yahoo.com",
+        email: "shahabdulmazid.esan@yahoo.com",
         phone: "+880 1531329222",
         linkedin: "https://www.linkedin.com/in/shahabdulmazid",
         github: "https://github.com/Shah-Abdul-Mazid",
@@ -87,6 +87,24 @@ export const visualCvData: VisualCvData = {
         { name: "Bengali", proficiency: "Native" },
         { name: "English", proficiency: "Professional Working Proficiency" },
     ],
+    researchInterests: [
+        "Generative AI and Large Language Models",
+        "Retrieval-Augmented Generation",
+        "Multi-Agent AI Systems",
+        "Healthcare AI",
+        "Computer Vision and Medical Imaging",
+        "Natural Language Processing",
+        "Intelligent Recommendation Systems",
+        "Model Interpretability",
+    ],
+    careerFocus: [
+        "AI/ML Engineering",
+        "Generative AI",
+        "LLM and RAG Systems",
+        "AI Research",
+        "Computer Vision",
+        "Data Science",
+    ],
     toolsAndPlatforms: [
         { category: "Models & APIs", items: ["OpenAI API", "Llama 2", "Mistral", "Claude API", "HuggingFace Models"] },
         { category: "Vector DBs & Search", items: ["Pinecone", "Weaviate", "Milvus", "Chroma", "FAISS"] },
@@ -106,24 +124,6 @@ export const visualCvData: VisualCvData = {
         { title: "Generative AI & RAG", description: "Built enterprise document Q&A, retrieval-augmented, and multi-agent AI systems." },
         { title: "End-to-End AI", description: "Developed ML systems spanning model development, backend integration, and production deployment." },
         { title: "AI Automation", description: "Built n8n-based workflows integrating AI models, APIs, and external services." },
-    ],
-    researchInterests: [
-        "Generative AI and Large Language Models",
-        "Retrieval-Augmented Generation",
-        "Multi-Agent AI Systems",
-        "Healthcare AI",
-        "Computer Vision and Medical Imaging",
-        "Natural Language Processing",
-        "Intelligent Recommendation Systems",
-        "Model Interpretability",
-    ],
-    careerFocus: [
-        "AI/ML Engineering",
-        "Generative AI",
-        "LLM and RAG Systems",
-        "AI Research",
-        "Computer Vision",
-        "Data Science",
     ],
     experience: [
         {
@@ -150,40 +150,6 @@ export const visualCvData: VisualCvData = {
                 "Automated business workflows using n8n and implemented Generative AI and RAG solutions.",
             ],
         },
-    ],
-    publications: [
-        {
-            title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
-            authors: "Raiyan Gani, Yusuf Salehin, Md. Shakil Bhuiyan, Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Shamim Ripon",
-            year: "2025",
-            conference: "2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240.",
-            doi: "10.1109/ICCIT68739.2025.11490181",
-            url: "https://doi.org/10.1109/ICCIT68739.2025.11490181",
-        },
-        {
-            title: "Uncertainty-Aware Chest Pathology Detection with Vision and Language Transformers",
-            authors: "Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Mahia Mehrun Safa, Md. Ashikur Rahman Anik, Md. Omor Faruk Sejan, Khandhakar Shatu Moni, Md. Sazzad Hossain, Md. Adnan Morshed, Ahmed Wasif Reza",
-            year: "2026",
-            conference: "Innovations in Data Analytics, Springer Nature, 2026, pp. 397–417.",
-            doi: "10.1007/978-3-032-27845-6_34",
-            url: "https://doi.org/10.1007/978-3-032-27845-6_34",
-        },
-    ],
-    certifications: [
-        "IBM Deep Learning with PyTorch, Keras and TensorFlow",
-        "DeepLearning.AI TensorFlow Developer",
-        "IBM Machine Learning",
-        "IBM RAG and Agentic AI",
-        "Building AI Agents and Agentic Workflows",
-        "IBM AI Developer",
-        "AWS Generative AI and AI Agents with Amazon Bedrock",
-        "IBM AI Engineering",
-        "IBM Data Science",
-    ],
-    competitions: [
-        { title: "Network War", organizer: "EWU Telecommunication Club", year: "2024" },
-        { title: "IT Olympiad", organizer: "CSE FEST, East West University", year: "2024" },
-        { title: "In House Programming Battle", organizer: "EWUCoPC", year: "2022" },
     ],
     projects: [
         {
@@ -231,6 +197,40 @@ export const visualCvData: VisualCvData = {
             ],
             tech: ["OpenAI", "n8n", "APIs", "Google Maps", "Google Sheets", "Stripe"],
         },
+    ],
+    publications: [
+        {
+            title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
+            authors: "Raiyan Gani, Yusuf Salehin, Md Shakil Bhuiyan, Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Shamim Ripon",
+            year: "2025",
+            conference: "2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE",
+            doi: "10.1109/ICCIT68739.2025.11490181",
+            url: "https://doi.org/10.1109/ICCIT68739.2025.11490181",
+        },
+        {
+            title: "Uncertainty-Aware Chest Pathology Detection with Vision and Language Transformers",
+            authors: "Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Mahia Mehrun Safa, Md Ashikur Rahman Anik, Md Omor Faruk Sejan, Khandhakar Shatu Moni, Md Sazzad Hossain, Md Adnan Morshed, Ahmed Wasif Reza",
+            year: "2026",
+            conference: "Innovations in Data Analytics, Springer Nature",
+            doi: "10.1007/978-3-032-27845-6_34",
+            url: "https://doi.org/10.1007/978-3-032-27845-6_34",
+        },
+    ],
+    certifications: [
+        "IBM Deep Learning with PyTorch, Keras and TensorFlow",
+        "DeepLearning.AI TensorFlow Developer",
+        "IBM Machine Learning",
+        "IBM RAG and Agentic AI",
+        "Building AI Agents and Agentic Workflows",
+        "IBM AI Developer",
+        "AWS Generative AI and AI Agents with Amazon Bedrock",
+        "IBM AI Engineering",
+        "IBM Data Science",
+    ],
+    competitions: [
+        { title: "Network War", organizer: "EWU Telecommunication Club", year: "2024" },
+        { title: "IT Olympiad", organizer: "CSE FEST, East West University", year: "2024" },
+        { title: "In House Programming Battle", organizer: "EWUCoPC", year: "2022" },
     ],
     profiles: [
         { label: "Portfolio", url: "https://shah-abdul-mazid-portfolio.vercel.app/home", text: "Portfolio Profile" },
