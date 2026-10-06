@@ -78,10 +78,10 @@ export const VisualCV: React.FC = () => {
         <div className="v2-cv-container">
 
             {/* ══════════════════════════════════════════
-                PAGE 1 — Matches Overleaf LaTeX Output Exactly
-                Natural two-column flow (multicols{2})
+                PAGE 1 — Exactly 1 A4 Page (210 x 297 mm)
                 Left:  Technical Skills -> Education -> Languages
                 Right: Research Interests -> Career Focus -> Tools & Platforms -> Key Achievements
+                Both columns end on the EXACT same horizontal line
                 ══════════════════════════════════════════ */}
             <div className="v2-page" id="cv-page-1">
 
@@ -146,75 +146,90 @@ export const VisualCV: React.FC = () => {
                     {/* ── LEFT COLUMN ── */}
                     <div className="v2-col-left">
 
-                        {/* Technical Skills — ALL categories (matching PDF left column) */}
-                        <h3 className="v2-sec-heading v2-sec-heading-top">Technical Skills</h3>
-                        {skills.map((s, i) => (
-                            <div key={i} className="v2-skill-entry">
-                                <b>{s.category}:</b> {s.items.join(', ')}
-                            </div>
-                        ))}
+                        {/* Technical Skills — ALL 11 categories */}
+                        <div className="v2-sec-block">
+                            <h3 className="v2-sec-heading v2-sec-heading-top">Technical Skills</h3>
+                            {skills.map((s, i) => (
+                                <div key={i} className="v2-skill-entry">
+                                    <b>{s.category}:</b> {s.items.join(', ')}
+                                </div>
+                            ))}
+                        </div>
 
                         {/* Education */}
-                        <h3 className="v2-sec-heading">Education</h3>
-                        {education.map((edu, i) => (
-                            <div key={i} className="v2-edu-item">
-                                <div className="v2-edu-degree">{edu.degree}</div>
-                                <div className="v2-edu-row">
-                                    <span className="v2-edu-inst">{edu.institution}</span>
-                                    <span className="v2-edu-period">{edu.period}</span>
+                        <div className="v2-sec-block">
+                            <h3 className="v2-sec-heading">Education</h3>
+                            {education.map((edu, i) => (
+                                <div key={i} className="v2-edu-item">
+                                    <div className="v2-edu-degree">{edu.degree}</div>
+                                    <div className="v2-edu-row">
+                                        <span className="v2-edu-inst">{edu.institution}</span>
+                                        <span className="v2-edu-period">{edu.period}</span>
+                                    </div>
+                                    <div className="v2-edu-details">{edu.details}</div>
                                 </div>
-                                <div className="v2-edu-details">{edu.details}</div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
 
-                        {/* Languages */}
-                        <h3 className="v2-sec-heading">Languages</h3>
-                        {languages.map((lang, i) => (
-                            <div key={i} className="v2-lang-entry">
-                                <b>{lang.name}</b> — {lang.proficiency}
-                            </div>
-                        ))}
+                        {/* Languages — Anchored so bottom aligns with right column */}
+                        <div className="v2-sec-block v2-lang-block">
+                            <h3 className="v2-sec-heading">Languages</h3>
+                            {languages.map((lang, i) => (
+                                <div key={i} className="v2-lang-entry">
+                                    <b>{lang.name}</b> — {lang.proficiency}
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     {/* ── RIGHT COLUMN (matching PDF right column) ── */}
                     <div className="v2-col-right">
 
                         {/* Research Interests */}
-                        <h3 className="v2-sec-heading v2-sec-heading-top">Research Interests</h3>
-                        <ul className="v2-ul">
-                            {researchInterests.map((ri, i) => (
-                                <li key={i}>{ri}</li>
-                            ))}
-                        </ul>
+                        <div className="v2-sec-block">
+                            <h3 className="v2-sec-heading v2-sec-heading-top">Research Interests</h3>
+                            <ul className="v2-ul">
+                                {researchInterests.map((ri, i) => (
+                                    <li key={i}>{ri}</li>
+                                ))}
+                            </ul>
+                        </div>
 
                         {/* Career Focus */}
-                        <h3 className="v2-sec-heading">Career Focus</h3>
-                        {careerFocus.map((cf, i) => (
-                            <div key={i} className="v2-focus-item">{cf}</div>
-                        ))}
+                        <div className="v2-sec-block">
+                            <h3 className="v2-sec-heading">Career Focus</h3>
+                            {careerFocus.map((cf, i) => (
+                                <div key={i} className="v2-focus-item">{cf}</div>
+                            ))}
+                        </div>
 
                         {/* Tools & Platforms */}
-                        <h3 className="v2-sec-heading">Tools &amp; Platforms</h3>
-                        {toolsAndPlatforms.map((tp, i) => (
-                            <div key={i} className="v2-skill-entry">
-                                <b>{tp.category}:</b> {tp.items.join(', ')}
-                            </div>
-                        ))}
-
-                        {/* Key Achievements */}
-                        <h3 className="v2-sec-heading">Key Achievements</h3>
-                        <ul className="v2-ul">
-                            {dynamicAchievements.map((ach, i) => (
-                                <li key={i}>{ach}</li>
+                        <div className="v2-sec-block">
+                            <h3 className="v2-sec-heading">Tools &amp; Platforms</h3>
+                            {toolsAndPlatforms.map((tp, i) => (
+                                <div key={i} className="v2-skill-entry">
+                                    <b>{tp.category}:</b> {tp.items.join(', ')}
+                                </div>
                             ))}
-                        </ul>
+                        </div>
+
+                        {/* Key Achievements — Anchored so bottom aligns with left column */}
+                        <div className="v2-sec-block v2-achieve-block">
+                            <h3 className="v2-sec-heading">Key Achievements</h3>
+                            <ul className="v2-ul">
+                                {dynamicAchievements.map((ach, i) => (
+                                    <li key={i}>{ach}</li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* ══════════════════════════════════════════
-                PAGE 2 — Exactly 1 A4 Page
+                PAGE 2 — Exactly 1 A4 Page (210 x 297 mm)
                 Matches Overleaf LaTeX Page 2
+                Both columns end on the EXACT same horizontal line
                 ══════════════════════════════════════════ */}
             <div className="v2-page" id="cv-page-2">
                 <div className="v2-two-col">
@@ -223,133 +238,149 @@ export const VisualCV: React.FC = () => {
                     <div className="v2-col-left">
 
                         {/* Professional Highlights */}
-                        <h3 className="v2-sec-heading v2-sec-heading-first">Professional Highlights</h3>
-                        {dynamicHighlights.map((hl, i) => (
-                            <div key={i} className="v2-highlight-item">
-                                <b>{hl.title}:</b> {hl.description}
-                            </div>
-                        ))}
+                        <div className="v2-sec-block">
+                            <h3 className="v2-sec-heading v2-sec-heading-first">Professional Highlights</h3>
+                            {dynamicHighlights.map((hl, i) => (
+                                <div key={i} className="v2-highlight-item">
+                                    <b>{hl.title}:</b> {hl.description}
+                                </div>
+                            ))}
+                        </div>
 
                         {/* Professional Experience */}
-                        <h3 className="v2-sec-heading">Professional Experience</h3>
-                        {experience.map((exp, i) => (
-                            <div key={i} className="v2-exp-item">
-                                <div className="v2-exp-header">
-                                    <span className="v2-exp-role">{exp.role}</span>
-                                    <span className="v2-exp-period">{exp.period}</span>
+                        <div className="v2-sec-block">
+                            <h3 className="v2-sec-heading">Professional Experience</h3>
+                            {experience.map((exp, i) => (
+                                <div key={i} className="v2-exp-item">
+                                    <div className="v2-exp-header">
+                                        <span className="v2-exp-role">{exp.role}</span>
+                                        <span className="v2-exp-period">{exp.period}</span>
+                                    </div>
+                                    <div className="v2-exp-company">
+                                        {exp.company} — {exp.location}
+                                    </div>
+                                    <ul className="v2-ul">
+                                        {exp.points.map((pt, j) => (
+                                            <li key={j}>{pt}</li>
+                                        ))}
+                                    </ul>
                                 </div>
-                                <div className="v2-exp-company">
-                                    {exp.company} — {exp.location}
-                                </div>
-                                <ul className="v2-ul">
-                                    {exp.points.map((pt, j) => (
-                                        <li key={j}>{pt}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
 
-                        {/* Selected Projects (First 3) */}
-                        <h3 className="v2-sec-heading">Selected Projects</h3>
-                        {leftProjects.map((proj, i) => (
-                            <div key={i} className="v2-project-item">
-                                <div className="v2-project-title">{proj.title}</div>
-                                <div className="v2-project-subtitle">{proj.subtitle}</div>
-                                <div className="v2-project-desc">{proj.description}</div>
-                                <ul className="v2-ul">
-                                    {proj.points.map((pt, j) => (
-                                        <li key={j}>{pt}</li>
-                                    ))}
-                                    {proj.tech.length > 0 && (
-                                        <li><b>Tech:</b> {proj.tech.join(', ')}</li>
-                                    )}
-                                </ul>
-                            </div>
-                        ))}
+                        {/* Selected Projects (First 3) — Anchored at bottom */}
+                        <div className="v2-sec-block v2-left-projects-block">
+                            <h3 className="v2-sec-heading">Selected Projects</h3>
+                            {leftProjects.map((proj, i) => (
+                                <div key={i} className="v2-project-item">
+                                    <div className="v2-project-title">{proj.title}</div>
+                                    <div className="v2-project-subtitle">{proj.subtitle}</div>
+                                    <div className="v2-project-desc">{proj.description}</div>
+                                    <ul className="v2-ul">
+                                        {proj.points.map((pt, j) => (
+                                            <li key={j}>{pt}</li>
+                                        ))}
+                                        {proj.tech.length > 0 && (
+                                            <li><b>Tech:</b> {proj.tech.join(', ')}</li>
+                                        )}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     {/* Right Column */}
                     <div className="v2-col-right">
 
                         {/* Selected Projects Continuation (Last 2) */}
-                        {rightProjects.map((proj, i) => (
-                            <div key={i} className="v2-project-item" style={{ marginTop: i === 0 ? '1mm' : undefined }}>
-                                <div className="v2-project-title">{proj.title}</div>
-                                <div className="v2-project-subtitle">{proj.subtitle}</div>
-                                <div className="v2-project-desc">{proj.description}</div>
-                                <ul className="v2-ul">
-                                    {proj.points.map((pt, j) => (
-                                        <li key={j}>{pt}</li>
-                                    ))}
-                                    {proj.tech.length > 0 && (
-                                        <li><b>Tech:</b> {proj.tech.join(', ')}</li>
-                                    )}
-                                </ul>
-                            </div>
-                        ))}
+                        <div className="v2-sec-block">
+                            {rightProjects.map((proj, i) => (
+                                <div key={i} className="v2-project-item" style={{ marginTop: i === 0 ? '1mm' : undefined }}>
+                                    <div className="v2-project-title">{proj.title}</div>
+                                    <div className="v2-project-subtitle">{proj.subtitle}</div>
+                                    <div className="v2-project-desc">{proj.description}</div>
+                                    <ul className="v2-ul">
+                                        {proj.points.map((pt, j) => (
+                                            <li key={j}>{pt}</li>
+                                        ))}
+                                        {proj.tech.length > 0 && (
+                                            <li><b>Tech:</b> {proj.tech.join(', ')}</li>
+                                        )}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
 
                         {/* Publication */}
-                        <h3 className="v2-sec-heading">Publication</h3>
-                        {displayedPublications.map((pub, i) => (
-                            <div key={i} className="v2-pub-item">
-                                <div className="v2-pub-title">{pub.title}</div>
-                                {pub.authors && (
-                                    <div className="v2-pub-authors">
-                                        <b>Authors:</b> {renderAuthors(pub.authors)}
-                                    </div>
-                                )}
-                                <div className="v2-pub-venue">{pub.conference}</div>
-                                {pub.doi && (
-                                    <div className="v2-pub-doi">
-                                        DOI:{' '}
-                                        <a
-                                            href={pub.url || `https://doi.org/${pub.doi}`}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="v2-link"
-                                        >
-                                            {pub.doi}
+                        <div className="v2-sec-block">
+                            <h3 className="v2-sec-heading">Publication</h3>
+                            {displayedPublications.map((pub, i) => (
+                                <div key={i} className="v2-pub-item">
+                                    <div className="v2-pub-title">{pub.title}</div>
+                                    {pub.authors && (
+                                        <div className="v2-pub-authors">
+                                            <b>Authors:</b> {renderAuthors(pub.authors)}
+                                        </div>
+                                    )}
+                                    <div className="v2-pub-venue">{pub.conference}</div>
+                                    {pub.doi && (
+                                        <div className="v2-pub-doi">
+                                            DOI:{' '}
+                                            <a
+                                                href={pub.url || `https://doi.org/${pub.doi}`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="v2-link"
+                                            >
+                                                {pub.doi}
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                            {remainingPubCount > 0 && (
+                                <div style={{ fontSize: '7.5pt', color: 'var(--v2-muted)', margin: '3px 0 8px 0', fontStyle: 'italic' }}>
+                                    + {remainingPubCount} more publication{remainingPubCount > 1 ? 's' : ''} ({personal.scholar ? (
+                                        <a href={personal.scholar} target="_blank" rel="noreferrer" className="v2-link" style={{ textDecoration: 'underline' }}>
+                                            view on Google Scholar
                                         </a>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                        {remainingPubCount > 0 && (
-                            <div style={{ fontSize: '7.5pt', color: 'var(--v2-muted)', margin: '3px 0 8px 0', fontStyle: 'italic' }}>
-                                + {remainingPubCount} more publication{remainingPubCount > 1 ? 's' : ''} ({personal.scholar ? (
-                                    <a href={personal.scholar} target="_blank" rel="noreferrer" className="v2-link" style={{ textDecoration: 'underline' }}>
-                                        view on Google Scholar
-                                    </a>
-                                ) : 'view on portfolio'})
-                            </div>
-                        )}
+                                    ) : 'view on portfolio'})
+                                </div>
+                            )}
+                        </div>
 
                         {/* Certifications */}
-                        <h3 className="v2-sec-heading">Certifications</h3>
-                        <ul className="v2-ul">
-                            {certifications.map((cert, i) => (
-                                <li key={i}>{cert}</li>
-                            ))}
-                        </ul>
+                        <div className="v2-sec-block">
+                            <h3 className="v2-sec-heading">Certifications</h3>
+                            <ul className="v2-ul">
+                                {certifications.map((cert, i) => (
+                                    <li key={i}>{cert}</li>
+                                ))}
+                            </ul>
+                        </div>
 
                         {/* Competitions & Awards */}
-                        <h3 className="v2-sec-heading">Competitions &amp; Awards</h3>
-                        {competitions.map((comp, i) => (
-                            <div key={i} className="v2-comp-item">
-                                <b>{comp.title}</b> — {comp.organizer}, {comp.year}
-                            </div>
-                        ))}
+                        <div className="v2-sec-block">
+                            <h3 className="v2-sec-heading">Competitions &amp; Awards</h3>
+                            {competitions.map((comp, i) => (
+                                <div key={i} className="v2-comp-item">
+                                    <b>{comp.title}</b> — {comp.organizer}, {comp.year}
+                                </div>
+                            ))}
+                        </div>
 
-                        {/* Online Profiles */}
-                        <h3 className="v2-sec-heading">Online Profiles</h3>
-                        {profiles.map((prof, i) => (
-                            <div key={i} className="v2-profile-item">
-                                <b>{prof.label}:</b>{' '}
-                                <a href={prof.url} target="_blank" rel="noreferrer" className="v2-link">
-                                    {prof.text}
-                                </a>
-                            </div>
-                        ))}
+                        {/* Online Profiles — Anchored at bottom */}
+                        <div className="v2-sec-block v2-profiles-block">
+                            <h3 className="v2-sec-heading">Online Profiles</h3>
+                            {profiles.map((prof, i) => (
+                                <div key={i} className="v2-profile-item">
+                                    <b>{prof.label}:</b>{' '}
+                                    <a href={prof.url} target="_blank" rel="noreferrer" className="v2-link">
+                                        {prof.text}
+                                    </a>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>

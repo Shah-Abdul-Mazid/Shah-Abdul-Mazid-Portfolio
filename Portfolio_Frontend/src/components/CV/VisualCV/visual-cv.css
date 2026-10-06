@@ -43,42 +43,51 @@
   background: var(--v2-bg);
   color: var(--v2-text);
   font-family: var(--v2-font);
-  font-size: 8.8pt;
-  line-height: 1.32;
+  font-size: 8.6pt;
+  line-height: 1.3;
   position: relative;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.16);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ── Two-column natural flow (multicols{2}, columnsep=7mm) ── */
+/* ── Two-column grid — stretches to equal height across columns ── */
 .v2-two-col {
   display: flex;
   gap: 7mm;
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
+  flex: 1;
 }
 
 .v2-col-left {
   flex: 1;
   width: calc(50% - 3.5mm);
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .v2-col-right {
   flex: 1;
   width: calc(50% - 3.5mm);
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 /* ── Section Headings — matching LaTeX \titleformat{\section} with titlerule ── */
 .v2-sec-heading {
-  font-size: 9.3pt;
+  font-size: 9.2pt;
   font-weight: 700;
   color: var(--v2-primary);
   text-transform: uppercase;
   letter-spacing: 0.35px;
-  margin: 2.8mm 0 1.4mm 0;
-  padding-bottom: 0.5mm;
+  margin: 2.2mm 0 1.2mm 0;
+  padding-bottom: 0.4mm;
   border-bottom: 1.2px solid var(--v2-primary);
   line-height: 1.2;
 }
@@ -89,19 +98,22 @@
 }
 
 /* ════════════════════════════════════════════════════════════
-   PAGE 1 SPECIFIC STYLES — Perfectly calibrated to fill A4
+   PAGE 1 SPECIFIC STYLES
+   Left: Skills -> Education -> Languages
+   Right: Research -> Focus -> Tools -> Achievements
+   BOTH COLUMNS END ON THE EXACT SAME HORIZONTAL LINE
    ════════════════════════════════════════════════════════════ */
 
 /* Header Navy Band */
 #cv-page-1 .v2-header-band {
   background: var(--v2-primary);
   color: #ffffff;
-  padding: 4.5mm 5.5mm;
+  padding: 4mm 5mm;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
-  margin-bottom: 3mm;
+  margin-bottom: 2.5mm;
   border-radius: 1px;
 }
 
@@ -112,47 +124,47 @@
 }
 
 #cv-page-1 .v2-name {
-  font-size: 23pt;
+  font-size: 22pt;
   font-weight: 700;
-  margin: 0 0 1.2mm 0;
+  margin: 0 0 1mm 0;
   color: #ffffff;
   letter-spacing: 0.4px;
   line-height: 1.05;
 }
 
 #cv-page-1 .v2-subtitle {
-  font-size: 12pt;
+  font-size: 11.5pt;
   font-weight: 700;
-  margin: 0 0 1.8mm 0;
+  margin: 0 0 1.5mm 0;
   color: #ffffff;
   letter-spacing: 0.4px;
   line-height: 1.1;
 }
 
 #cv-page-1 .v2-tags {
-  font-size: 8.8pt;
+  font-size: 8.5pt;
   color: #d6e2f0;
-  margin-bottom: 2.5mm;
+  margin-bottom: 2mm;
   line-height: 1.25;
 }
 
 #cv-page-1 .v2-contact-grid {
   display: flex;
   flex-direction: column;
-  gap: 1mm;
+  gap: 0.8mm;
 }
 
 #cv-page-1 .v2-contact-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 4mm;
+  gap: 3.5mm;
 }
 
 #cv-page-1 .v2-contact-item {
   display: inline-flex;
   align-items: center;
-  gap: 3.5px;
-  font-size: 8pt;
+  gap: 3px;
+  font-size: 7.8pt;
   color: #ffffff;
   line-height: 1.2;
 }
@@ -171,8 +183,8 @@
 }
 
 #cv-page-1 .v2-avatar {
-  width: 29mm;
-  height: 35mm;
+  width: 27mm;
+  height: 33mm;
   border-radius: 1px;
   object-fit: cover;
   object-position: center top;
@@ -182,28 +194,23 @@
 
 /* Professional Summary */
 #cv-page-1 .v2-sec-summary {
-  margin-top: 2.8mm;
-  margin-bottom: 1.4mm;
+  margin-top: 2.2mm;
+  margin-bottom: 1.2mm;
 }
 
 #cv-page-1 .v2-summary-text {
-  font-size: 8.9pt;
+  font-size: 8.6pt;
   color: var(--v2-text);
-  line-height: 1.36;
-  margin: 0 0 2.5mm 0;
+  line-height: 1.34;
+  margin: 0 0 2mm 0;
   text-align: justify;
-}
-
-/* Page 1 Columns */
-#cv-page-1 .v2-two-col {
-  margin-top: 2mm;
 }
 
 /* Page 1 Left Column */
 #cv-page-1 .v2-skill-entry {
-  font-size: 8.7pt;
-  margin-bottom: 1.6mm;
-  line-height: 1.32;
+  font-size: 8.4pt;
+  margin-bottom: 1.5mm;
+  line-height: 1.3;
   color: var(--v2-text);
 }
 
@@ -213,12 +220,12 @@
 }
 
 #cv-page-1 .v2-edu-item {
-  margin-bottom: 2.2mm;
+  margin-bottom: 2mm;
 }
 
 #cv-page-1 .v2-edu-degree {
   font-weight: 700;
-  font-size: 8.9pt;
+  font-size: 8.6pt;
   line-height: 1.22;
   color: var(--v2-dark);
 }
@@ -227,8 +234,8 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 8.5pt;
-  margin-top: 0.3mm;
+  font-size: 8.2pt;
+  margin-top: 0.2mm;
 }
 
 #cv-page-1 .v2-edu-inst {
@@ -243,16 +250,16 @@
 }
 
 #cv-page-1 .v2-edu-details {
-  font-size: 8.4pt;
+  font-size: 8.1pt;
   color: var(--v2-text);
   line-height: 1.22;
-  margin-top: 0.3mm;
+  margin-top: 0.2mm;
 }
 
 #cv-page-1 .v2-lang-entry {
-  font-size: 8.7pt;
-  margin-bottom: 1.4mm;
-  line-height: 1.3;
+  font-size: 8.5pt;
+  margin-bottom: 1.2mm;
+  line-height: 1.28;
 }
 
 #cv-page-1 .v2-lang-entry b {
@@ -262,33 +269,36 @@
 
 /* Page 1 Right Column */
 #cv-page-1 .v2-ul {
-  margin: 0.8mm 0 1.5mm 4.5mm;
+  margin: 0.6mm 0 1mm 4.2mm;
   padding: 0;
   list-style: disc;
 }
 
 #cv-page-1 .v2-ul li {
-  font-size: 8.7pt;
-  margin-bottom: 1.1mm;
-  line-height: 1.32;
+  font-size: 8.4pt;
+  margin-bottom: 0.85mm;
+  line-height: 1.28;
   color: var(--v2-text);
 }
 
 #cv-page-1 .v2-focus-item {
-  font-size: 8.7pt;
-  margin-bottom: 1.2mm;
-  line-height: 1.3;
+  font-size: 8.4pt;
+  margin-bottom: 0.9mm;
+  line-height: 1.28;
   color: var(--v2-text);
 }
 
 /* ════════════════════════════════════════════════════════════
-   PAGE 2 SPECIFIC STYLES — Perfectly calibrated to fit A4
+   PAGE 2 SPECIFIC STYLES
+   Left: Highlights -> Experience -> Projects (3)
+   Right: Projects (2) -> Pubs -> Certs -> Comps -> Profiles
+   BOTH COLUMNS END ON THE EXACT SAME HORIZONTAL LINE
    ════════════════════════════════════════════════════════════ */
 
 #cv-page-2 .v2-sec-heading {
-  font-size: 8.8pt;
-  margin: 2.2mm 0 1.1mm 0;
-  padding-bottom: 0.4mm;
+  font-size: 8.7pt;
+  margin: 1.8mm 0 1mm 0;
+  padding-bottom: 0.35mm;
 }
 
 #cv-page-2 .v2-sec-heading-first {
@@ -297,9 +307,9 @@
 
 /* Highlights */
 #cv-page-2 .v2-highlight-item {
-  font-size: 8.1pt;
-  margin-bottom: 1.2mm;
-  line-height: 1.28;
+  font-size: 8pt;
+  margin-bottom: 1mm;
+  line-height: 1.26;
   color: var(--v2-text);
 }
 
@@ -310,7 +320,7 @@
 
 /* Experience */
 #cv-page-2 .v2-exp-item {
-  margin-bottom: 2mm;
+  margin-bottom: 1.8mm;
 }
 
 #cv-page-2 .v2-exp-header {
@@ -321,96 +331,96 @@
 
 #cv-page-2 .v2-exp-role {
   font-weight: 700;
-  font-size: 8.5pt;
+  font-size: 8.4pt;
   color: var(--v2-dark);
 }
 
 #cv-page-2 .v2-exp-period {
   font-weight: 700;
-  font-size: 8pt;
+  font-size: 7.9pt;
   color: var(--v2-dark);
   white-space: nowrap;
 }
 
 #cv-page-2 .v2-exp-company {
-  font-size: 8pt;
+  font-size: 7.9pt;
   color: #444444;
   font-style: italic;
-  margin-bottom: 0.6mm;
-  line-height: 1.2;
+  margin-bottom: 0.5mm;
+  line-height: 1.18;
 }
 
 #cv-page-2 .v2-ul {
-  margin: 0.5mm 0 1mm 4mm;
+  margin: 0.4mm 0 0.8mm 3.8mm;
   padding: 0;
   list-style: disc;
 }
 
 #cv-page-2 .v2-ul li {
-  font-size: 8.1pt;
-  margin-bottom: 0.65mm;
-  line-height: 1.26;
+  font-size: 8pt;
+  margin-bottom: 0.55mm;
+  line-height: 1.24;
   color: var(--v2-text);
 }
 
 /* Projects */
 #cv-page-2 .v2-project-item {
-  margin-bottom: 1.9mm;
+  margin-bottom: 1.6mm;
 }
 
 #cv-page-2 .v2-project-title {
   font-weight: 700;
-  font-size: 8.4pt;
+  font-size: 8.3pt;
   color: var(--v2-dark);
-  line-height: 1.2;
+  line-height: 1.18;
 }
 
 #cv-page-2 .v2-project-subtitle {
-  font-size: 7.9pt;
+  font-size: 7.8pt;
   color: var(--v2-muted);
   font-style: italic;
-  line-height: 1.2;
+  line-height: 1.18;
 }
 
 #cv-page-2 .v2-project-desc {
-  font-size: 8pt;
+  font-size: 7.9pt;
   color: var(--v2-text);
-  margin-top: 0.4mm;
-  margin-bottom: 0.4mm;
-  line-height: 1.26;
+  margin-top: 0.3mm;
+  margin-bottom: 0.3mm;
+  line-height: 1.24;
 }
 
 /* Publications */
 #cv-page-2 .v2-pub-item {
-  margin-bottom: 1.8mm;
+  margin-bottom: 1.5mm;
 }
 
 #cv-page-2 .v2-pub-title {
   font-weight: 700;
-  font-size: 8.2pt;
-  line-height: 1.24;
+  font-size: 8.1pt;
+  line-height: 1.22;
   color: var(--v2-dark);
-  margin-bottom: 0.3mm;
+  margin-bottom: 0.25mm;
 }
 
 #cv-page-2 .v2-pub-authors {
-  font-size: 7.8pt;
+  font-size: 7.7pt;
   color: #444444;
-  line-height: 1.24;
-  margin-bottom: 0.2mm;
+  line-height: 1.22;
+  margin-bottom: 0.15mm;
 }
 
 #cv-page-2 .v2-pub-venue {
-  font-size: 7.8pt;
+  font-size: 7.7pt;
   color: var(--v2-text);
   font-style: italic;
-  line-height: 1.22;
+  line-height: 1.2;
 }
 
 #cv-page-2 .v2-pub-doi {
-  font-size: 7.8pt;
+  font-size: 7.7pt;
   color: var(--v2-text);
-  line-height: 1.22;
+  line-height: 1.2;
 }
 
 #cv-page-2 .v2-link {
@@ -424,9 +434,9 @@
 
 /* Competitions */
 #cv-page-2 .v2-comp-item {
-  font-size: 8.1pt;
-  margin-bottom: 0.8mm;
-  line-height: 1.25;
+  font-size: 8pt;
+  margin-bottom: 0.7mm;
+  line-height: 1.22;
 }
 
 #cv-page-2 .v2-comp-item b {
@@ -436,9 +446,9 @@
 
 /* Online Profiles */
 #cv-page-2 .v2-profile-item {
-  font-size: 8.1pt;
-  margin-bottom: 0.8mm;
-  line-height: 1.25;
+  font-size: 8pt;
+  margin-bottom: 0.7mm;
+  line-height: 1.22;
 }
 
 #cv-page-2 .v2-profile-item b {
