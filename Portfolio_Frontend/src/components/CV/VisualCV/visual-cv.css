@@ -3,6 +3,7 @@
    Font: Fira Sans (matching LaTeX FiraSans package)
    Colors: navy #243B5A, blue #2F527F, lightblue #EEF3F8
    A4 Dimensions: 210mm x 297mm
+   Margins: top=10mm, bottom=10mm, left=11mm, right=11mm
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&display=swap');
@@ -12,10 +13,11 @@
   --v2-secondary: #2F527F;
   --v2-light-bg: #EEF3F8;
   --v2-text: #333333;
+  --v2-dark: #222222;
   --v2-muted: #555555;
   --v2-bg: #ffffff;
   --v2-link: #000000;
-  --v2-font: 'Fira Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --v2-font: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* ── Container wrapping both pages ── */
@@ -27,35 +29,34 @@
   width: 100%;
 }
 
-/* ── Individual A4 Page (strictly 210mm x 297mm) ── */
+/* ── Individual A4 Page — strictly matching LaTeX A4 page ── */
 .v2-page {
   width: 210mm;
   min-width: 210mm;
   max-width: 210mm;
-  height: 297mm;
   min-height: 297mm;
-  max-height: 297mm;
+  box-sizing: border-box;
+  padding: 10mm 11mm;
   background: var(--v2-bg);
   color: var(--v2-text);
   font-family: var(--v2-font);
-  font-size: 9.6pt;
-  line-height: 1.35;
-  box-sizing: border-box;
-  padding: 10mm 11mm;
-  overflow: hidden;
+  font-size: 8.4pt;
+  line-height: 1.28;
   position: relative;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  overflow: visible;
 }
 
-/* ── Header navy block ── */
+/* ── Header: Navy band with photo ── */
 .v2-header-band {
   background: var(--v2-primary);
-  color: #fff;
-  padding: 4.5mm 5.5mm;
+  color: #ffffff;
+  padding: 3.5mm 4.5mm;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
+  margin-bottom: 2mm;
   border-radius: 1px;
 }
 
@@ -66,50 +67,49 @@
 }
 
 .v2-name {
-  font-size: 22pt;
+  font-size: 21pt;
   font-weight: 700;
-  margin: 0 0 1.2mm 0;
+  margin: 0 0 1mm 0;
   color: #ffffff;
-  letter-spacing: 0.3px;
-  line-height: 1.1;
+  letter-spacing: 0.4px;
+  line-height: 1.05;
 }
 
 .v2-subtitle {
-  font-size: 12.5pt;
+  font-size: 11pt;
   font-weight: 700;
-  margin: 0 0 2mm 0;
-  color: var(--v2-light-bg);
-  line-height: 1.15;
+  margin: 0 0 1.5mm 0;
+  color: #ffffff;
+  letter-spacing: 0.4px;
+  line-height: 1.1;
 }
 
 .v2-tags {
-  font-size: 8.5pt;
-  margin-bottom: 2.8mm;
-  color: var(--v2-light-bg);
-  letter-spacing: 0.2px;
-  font-weight: 500;
+  font-size: 8.2pt;
+  color: #d6e2f0;
+  margin-bottom: 2mm;
+  line-height: 1.25;
 }
 
 .v2-contact-grid {
   display: flex;
   flex-direction: column;
-  gap: 1.4mm;
-  font-size: 8pt;
-  color: #ffffff;
+  gap: 0.8mm;
 }
 
 .v2-contact-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 5mm;
-  align-items: center;
+  gap: 3.5mm;
 }
 
 .v2-contact-item {
   display: inline-flex;
   align-items: center;
   gap: 3px;
+  font-size: 7.6pt;
   color: #ffffff;
+  line-height: 1.2;
 }
 
 .v2-contact-item a {
@@ -117,65 +117,62 @@
   text-decoration: none;
 }
 
-/* Avatar photo */
+.v2-contact-item a:hover {
+  text-decoration: underline;
+}
+
 .v2-header-photo {
-  width: 29mm;
-  min-width: 29mm;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .v2-avatar {
-  width: 29mm;
-  height: 35mm;
+  width: 25mm;
+  height: 31mm;
+  border-radius: 1px;
   object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  object-position: center top;
+  border: 1px solid rgba(255, 255, 255, 0.4);
   display: block;
 }
 
-/* ── Professional Summary ── */
-.v2-sec-summary {
-  margin-top: 3.5mm;
-  margin-bottom: 1.8mm;
-}
-
-.v2-summary-text {
-  font-size: 9pt;
-  line-height: 1.38;
-  color: var(--v2-text);
-  margin: 0 0 2.5mm 0;
-  text-align: justify;
-}
-
-/* ── Section headings (matching LaTeX \section) ── */
+/* ── Section Headings — matching LaTeX \titleformat{\section} with titlerule ── */
 .v2-sec-heading {
-  font-size: 10.4pt;
+  font-size: 8.8pt;
   font-weight: 700;
   color: var(--v2-primary);
-  border-bottom: 1px solid var(--v2-primary);
-  padding-bottom: 0.5mm;
-  margin: 2.8mm 0 1.8mm 0;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  margin: 2.2mm 0 1.1mm 0;
+  padding-bottom: 0.4mm;
+  border-bottom: 1.2px solid var(--v2-primary);
   line-height: 1.2;
 }
 
-/* Heading at the top of a column has zero top margin */
-.v2-sec-heading-top {
-  margin-top: 0;
-}
-
+.v2-sec-heading-top,
 .v2-sec-heading-first {
   margin-top: 0;
 }
 
-/* ── Two-column natural flow (matching LaTeX multicols{2}, columnsep=7mm) ── */
+.v2-sec-summary {
+  margin-top: 2.2mm;
+}
+
+/* ── Professional Summary ── */
+.v2-summary-text {
+  font-size: 8.3pt;
+  color: var(--v2-text);
+  line-height: 1.32;
+  margin: 0;
+  text-align: justify;
+}
+
+/* ── Two-column natural flow — matching LaTeX \begin{multicols}{2} with 7mm columnsep ── */
 .v2-two-col {
   display: flex;
   gap: 7mm;
   align-items: flex-start;
   width: 100%;
+  margin-top: 2mm;
 }
 
 .v2-col-left {
@@ -192,224 +189,257 @@
 
 /* ── Technical Skills ── */
 .v2-skill-entry {
-  font-size: 9pt;
-  margin-bottom: 2mm;
-  line-height: 1.35;
+  font-size: 8.1pt;
+  margin-bottom: 1.1mm;
+  line-height: 1.26;
+  color: var(--v2-text);
 }
 
-/* Skills continued in right column — no extra top spacing */
-.v2-skill-entry-top {
-  margin-top: 0;
+.v2-skill-entry b {
+  font-weight: 700;
+  color: var(--v2-dark);
 }
 
 /* ── Education item ── */
 .v2-edu-item {
-  margin-bottom: 2.8mm;
+  margin-bottom: 1.8mm;
 }
 
 .v2-edu-degree {
   font-weight: 700;
-  font-size: 9.3pt;
-  line-height: 1.24;
+  font-size: 8.3pt;
+  line-height: 1.2;
+  color: var(--v2-dark);
 }
 
 .v2-edu-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 9pt;
+  font-size: 8pt;
 }
 
 .v2-edu-inst {
   font-style: italic;
-  color: var(--v2-muted);
+  color: #444444;
 }
 
 .v2-edu-period {
   font-weight: 700;
+  color: var(--v2-dark);
   white-space: nowrap;
 }
 
 .v2-edu-details {
-  font-size: 9pt;
+  font-size: 7.9pt;
   color: var(--v2-text);
-  line-height: 1.24;
+  line-height: 1.2;
 }
 
-/* ── Languages (NO artificial blank space, normal section flow) ── */
+/* ── Languages ── */
 .v2-lang-entry {
-  font-size: 9pt;
-  margin-bottom: 1.6mm;
-  line-height: 1.32;
+  font-size: 8.1pt;
+  margin-bottom: 1mm;
+  line-height: 1.25;
 }
 
-/* ── Lists (matching LaTeX itemize) ── */
+.v2-lang-entry b {
+  font-weight: 700;
+  color: var(--v2-dark);
+}
+
+/* ── Bullet lists (\itemize) ── */
 .v2-ul {
-  margin: 0.8mm 0 0 3.8mm;
+  margin: 0.6mm 0 1.2mm 4mm;
   padding: 0;
-  font-size: 9pt;
-  line-height: 1.34;
-  list-style-type: disc;
+  list-style: disc;
 }
 
 .v2-ul li {
-  margin-bottom: 1.3mm;
-  padding-left: 0.5mm;
-}
-
-/* ── Career focus ── */
-.v2-focus-item {
-  font-size: 9pt;
-  margin-bottom: 1.3mm;
-  line-height: 1.32;
+  font-size: 8.1pt;
+  margin-bottom: 0.65mm;
+  line-height: 1.26;
   color: var(--v2-text);
 }
 
-/* ── Professional highlights ── */
-.v2-highlight-item {
-  font-size: 9pt;
-  margin-bottom: 2mm;
-  line-height: 1.35;
+/* ── Career Focus items ── */
+.v2-focus-item {
+  font-size: 8.1pt;
+  margin-bottom: 0.7mm;
+  line-height: 1.25;
+  color: var(--v2-text);
 }
 
-/* ── Experience ── */
+/* ── Professional Highlights (Page 2) ── */
+.v2-highlight-item {
+  font-size: 8.1pt;
+  margin-bottom: 1.2mm;
+  line-height: 1.28;
+  color: var(--v2-text);
+}
+
+.v2-highlight-item b {
+  font-weight: 700;
+  color: var(--v2-dark);
+}
+
+/* ── Professional Experience (Page 2) ── */
 .v2-exp-item {
-  margin-bottom: 2.8mm;
+  margin-bottom: 2mm;
 }
 
 .v2-exp-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 2mm;
 }
 
 .v2-exp-role {
-  font-size: 10pt;
   font-weight: 700;
+  font-size: 8.5pt;
+  color: var(--v2-dark);
 }
 
 .v2-exp-period {
-  font-size: 9pt;
   font-weight: 700;
+  font-size: 8pt;
+  color: var(--v2-dark);
   white-space: nowrap;
 }
 
 .v2-exp-company {
-  font-size: 9pt;
+  font-size: 8pt;
+  color: #444444;
   font-style: italic;
-  color: var(--v2-muted);
   margin-bottom: 0.6mm;
+  line-height: 1.2;
 }
 
-/* ── Projects ── */
+/* ── Projects (Page 2) ── */
 .v2-project-item {
-  margin-bottom: 2.8mm;
+  margin-bottom: 2mm;
 }
 
 .v2-project-title {
   font-weight: 700;
-  font-size: 9.3pt;
-  line-height: 1.22;
+  font-size: 8.4pt;
+  color: var(--v2-dark);
+  line-height: 1.2;
 }
 
 .v2-project-subtitle {
-  font-style: italic;
-  font-size: 8.6pt;
+  font-size: 7.9pt;
   color: var(--v2-muted);
-  margin-bottom: 0.5mm;
+  font-style: italic;
   line-height: 1.2;
 }
 
 .v2-project-desc {
-  font-size: 8.6pt;
-  margin-bottom: 0.6mm;
-  line-height: 1.30;
+  font-size: 8pt;
+  color: var(--v2-text);
+  margin-top: 0.4mm;
+  margin-bottom: 0.4mm;
+  line-height: 1.26;
 }
 
-/* ── Publications ── */
+/* ── Publications (Page 2) ── */
 .v2-pub-item {
-  margin-bottom: 2.5mm;
-  font-size: 8.6pt;
-  line-height: 1.30;
+  margin-bottom: 1.8mm;
 }
 
 .v2-pub-title {
   font-weight: 700;
-  font-size: 8.8pt;
-  line-height: 1.22;
+  font-size: 8.2pt;
+  line-height: 1.24;
+  color: var(--v2-dark);
+  margin-bottom: 0.3mm;
 }
 
 .v2-pub-authors {
-  font-size: 8.4pt;
-  color: var(--v2-text);
-  line-height: 1.22;
+  font-size: 7.8pt;
+  color: #444444;
+  line-height: 1.24;
+  margin-bottom: 0.2mm;
 }
 
 .v2-pub-venue {
+  font-size: 7.8pt;
+  color: var(--v2-text);
   font-style: italic;
-  font-size: 8.4pt;
-  color: var(--v2-muted);
   line-height: 1.22;
 }
 
 .v2-pub-doi {
-  font-size: 8.4pt;
+  font-size: 7.8pt;
+  color: var(--v2-text);
+  line-height: 1.22;
 }
 
+/* ── Hyperlinks ── */
 .v2-link {
-  color: var(--v2-link);
-  text-decoration: none;
-}
-
-.v2-link:hover {
+  color: #000000;
   text-decoration: underline;
 }
 
-/* ── Competitions ── */
+.v2-link:hover {
+  color: var(--v2-secondary);
+}
+
+/* ── Competitions & Awards ── */
 .v2-comp-item {
-  font-size: 9pt;
-  margin-bottom: 1.4mm;
-  line-height: 1.32;
+  font-size: 8.1pt;
+  margin-bottom: 0.8mm;
+  line-height: 1.25;
 }
 
-/* ── Profiles ── */
+.v2-comp-item b {
+  font-weight: 700;
+  color: var(--v2-dark);
+}
+
+/* ── Online Profiles ── */
 .v2-profile-item {
-  font-size: 9pt;
-  margin-bottom: 1.2mm;
-  line-height: 1.32;
+  font-size: 8.1pt;
+  margin-bottom: 0.8mm;
+  line-height: 1.25;
 }
 
-/* ── Responsive Screen adjustments ── */
-@media screen and (max-width: 820px) {
-  .v2-cv-container {
-    overflow-x: auto;
-    padding-bottom: 16px;
-  }
+.v2-profile-item b {
+  font-weight: 700;
+  color: var(--v2-dark);
 }
 
-/* ── Print Styles ── */
-@media print {
-  @page {
-    size: A4 portrait;
-    margin: 0;
-  }
-  body {
-    background: #ffffff !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  .v2-cv-container {
-    gap: 0 !important;
-  }
+/* ── Mobile responsiveness ── */
+@media (max-width: 800px) {
   .v2-page {
-    box-shadow: none !important;
-    margin: 0 !important;
-    page-break-after: always;
-    break-after: page;
+    width: 100%;
+    min-width: unset;
+    max-width: unset;
+    min-height: unset;
+    padding: 6mm 5mm;
+    font-size: 8pt;
   }
-  .v2-page:last-child {
-    page-break-after: auto;
-    break-after: auto;
+
+  .v2-name { font-size: 16pt; }
+  .v2-subtitle { font-size: 10pt; }
+
+  .v2-two-col {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .v2-col-left {
+    width: 100%;
+    padding-bottom: 4mm;
+    margin-bottom: 4mm;
+  }
+
+  .v2-col-right {
+    width: 100%;
+  }
+
+  .v2-avatar {
+    width: 20mm;
+    height: 25mm;
   }
 }

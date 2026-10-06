@@ -63,7 +63,7 @@ export const atsCvData: ATSCvData = {
         name: "SHAH ABDUL MAZID",
         title: "AI/ML Engineer | Generative AI | LLMs | RAG | Computer Vision",
         location: "Dhaka, Bangladesh",
-        email: "shahabdulmazid.ezan@yahoo.com",
+        email: "shahabdulmazid.esan@yahoo.com",
         phone: "+880 1531329222",
         linkedin: "https://www.linkedin.com/in/shahabdulmazid",
         github: "https://github.com/Shah-Abdul-Mazid",

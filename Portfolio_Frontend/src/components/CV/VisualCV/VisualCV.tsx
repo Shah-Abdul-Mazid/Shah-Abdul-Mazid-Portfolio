@@ -146,9 +146,9 @@ export const VisualCV: React.FC = () => {
                     {/* ── LEFT COLUMN ── */}
                     <div className="v2-col-left">
 
-                        {/* Technical Skills — first 6 categories */}
+                        {/* Technical Skills — ALL categories (matching PDF left column) */}
                         <h3 className="v2-sec-heading v2-sec-heading-top">Technical Skills</h3>
-                        {skills.slice(0, 6).map((s, i) => (
+                        {skills.map((s, i) => (
                             <div key={i} className="v2-skill-entry">
                                 <b>{s.category}:</b> {s.items.join(', ')}
                             </div>
@@ -176,18 +176,11 @@ export const VisualCV: React.FC = () => {
                         ))}
                     </div>
 
-                    {/* ── RIGHT COLUMN ── */}
+                    {/* ── RIGHT COLUMN (matching PDF right column) ── */}
                     <div className="v2-col-right">
 
-                        {/* Technical Skills — continued (last 5 categories) */}
-                        {skills.slice(6).map((s, i) => (
-                            <div key={i} className="v2-skill-entry v2-skill-entry-top">
-                                <b>{s.category}:</b> {s.items.join(', ')}
-                            </div>
-                        ))}
-
                         {/* Research Interests */}
-                        <h3 className="v2-sec-heading">Research Interests</h3>
+                        <h3 className="v2-sec-heading v2-sec-heading-top">Research Interests</h3>
                         <ul className="v2-ul">
                             {researchInterests.map((ri, i) => (
                                 <li key={i}>{ri}</li>
@@ -198,6 +191,14 @@ export const VisualCV: React.FC = () => {
                         <h3 className="v2-sec-heading">Career Focus</h3>
                         {careerFocus.map((cf, i) => (
                             <div key={i} className="v2-focus-item">{cf}</div>
+                        ))}
+
+                        {/* Tools & Platforms */}
+                        <h3 className="v2-sec-heading">Tools &amp; Platforms</h3>
+                        {toolsAndPlatforms.map((tp, i) => (
+                            <div key={i} className="v2-skill-entry">
+                                <b>{tp.category}:</b> {tp.items.join(', ')}
+                            </div>
                         ))}
 
                         {/* Key Achievements */}
@@ -284,14 +285,6 @@ export const VisualCV: React.FC = () => {
                                         <li><b>Tech:</b> {proj.tech.join(', ')}</li>
                                     )}
                                 </ul>
-                            </div>
-                        ))}
-
-                        {/* Tools & Platforms */}
-                        <h3 className="v2-sec-heading" style={{ marginTop: rightProjects.length > 0 ? undefined : 0 }}>Tools &amp; Platforms</h3>
-                        {toolsAndPlatforms.map((tp, i) => (
-                            <div key={i} className="v2-skill-entry">
-                                <b>{tp.category}:</b> {tp.items.join(', ')}
                             </div>
                         ))}
 
