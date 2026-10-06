@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, FileDown, Edit3 } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { X, FileDown, Edit3, Check, FileText } from 'lucide-react';
 
 interface DownloadFileNameModalProps {
     isOpen: boolean;
@@ -23,29 +24,36 @@ export const DownloadFileNameModal: React.FC<DownloadFileNameModalProps> = ({
             id: 'role_resume',
             name: 'Shah_Abdul_Mazid_AI_Engineer_Resume.pdf',
             label: 'Role-Specific Corporate (Recommended)',
-            desc: 'Professional standard for AI / Machine Learning applications',
+            desc: 'Targeted format preferred by AI / ML hiring teams & technical leads',
             tag: 'Recommended',
         },
         {
             id: 'general_resume',
             name: 'Shah_Abdul_Mazid_Resume.pdf',
             label: 'Concise Corporate Resume',
-            desc: 'Clean & universally preferred by tech recruiters',
+            desc: 'Clean underscore format universally standard across tech recruiters',
             tag: 'Popular',
+        },
+        {
+            id: 'hyphen_resume',
+            name: 'Shah-Abdul-Mazid-Resume.pdf',
+            label: 'ATS-Friendly Hyphenated Resume',
+            desc: 'Hyphenated kebab-case format optimized for automated ATS parsers',
+            tag: 'ATS Standard',
         },
         {
             id: 'general_cv',
             name: 'Shah_Abdul_Mazid_CV.pdf',
             label: 'International / Academic CV',
-            desc: 'Standard format for research, international roles & academia',
+            desc: 'Standard format for research positions, academia & international roles',
             tag: 'Academic',
         },
         {
             id: 'version_specific',
             name: versionSpecificDefault,
-            label: `${cvVersionName} Default Format`,
-            desc: 'Includes version numbering for your personal tracking',
-            tag: 'Archive',
+            label: `${cvVersionName} Archive Version`,
+            desc: 'Includes version numbering for your records and documentation',
+            tag: 'Versioned',
         },
     ];
 
@@ -71,14 +79,17 @@ export const DownloadFileNameModal: React.FC<DownloadFileNameModalProps> = ({
     if (!isOpen) return null;
 
     const sanitizeFileName = (name: string): string => {
-        let clean = name.trim().replace(/[\\/:*?"<>|]/g, '_');
+        const trimmed = name.trim();
+        if (!trimmed) return versionSpecificDefault || 'Shah_Abdul_Mazid_Resume.pdf';
+        let clean = trimmed.replace(/[\\/:*?"<>|]/g, '_');
         if (!clean.toLowerCase().endsWith('.pdf')) {
             clean += '.pdf';
         }
-        return clean || 'Shah_Abdul_Mazid_Resume.pdf';
+        return clean;
     };
 
     const handleDownload = () => {
+        if (isGenerating) return;
         if (selectedOption === 'custom') {
             const finalName = sanitizeFileName(customName);
             onConfirmDownload(finalName);
@@ -97,10 +108,23 @@ export const DownloadFileNameModal: React.FC<DownloadFileNameModalProps> = ({
         }
     };
 
-    return (
+    const modalContent = (
         <div 
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
-            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)', padding: '16px' }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in"
+            style={{ 
+                position: 'fixed', 
+                top: 0, 
+                left: 0, 
+                right: 0, 
+                bottom: 0, 
+                zIndex: 999999, 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                background: 'rgba(0,0,0,0.72)', 
+                backdropFilter: 'blur(8px)', 
+                padding: '16px' 
+            }}
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
             onKeyDown={handleKeyDown}
         >
@@ -110,63 +134,72 @@ export const DownloadFileNameModal: React.FC<DownloadFileNameModalProps> = ({
                     border: '1px solid rgba(255, 255, 255, 0.12)',
                     borderRadius: '16px',
                     width: '100%',
-                    maxWidth: '540px',
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+                    maxWidth: '560px',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06)',
                     color: '#f8fafc',
                     overflow: 'hidden',
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    maxHeight: '90vh',
                 }}
             >
                 {/* Modal Header */}
-                <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                        <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(245, 158, 11, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
-                            <FileDown size={20} />
+                <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+                        <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b', flexShrink: 0 }}>
+                            <FileDown size={22} />
                         </div>
                         <div>
-                            <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: '#ffffff' }}>
-                                Download CV
+                            <h3 style={{ margin: 0, fontSize: '1.18rem', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.01em' }}>
+                                Download CV / Resume
                             </h3>
-                            <p style={{ margin: '3px 0 0', fontSize: '0.82rem', color: '#94a3b8' }}>
-                                Select a corporate file naming format before downloading
+                            <p style={{ margin: '4px 0 0', fontSize: '0.82rem', color: '#94a3b8' }}>
+                                Select a professional naming format convention for your file
                             </p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
+                        aria-label="Close modal"
                         style={{
-                            background: 'transparent',
-                            border: 'none',
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
                             color: '#94a3b8',
                             cursor: 'pointer',
                             padding: '6px',
-                            borderRadius: '6px',
+                            borderRadius: '8px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            transition: 'color 0.2s',
+                            transition: 'all 0.2s',
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = '#ffffff')}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.color = '#ffffff';
+                            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.color = '#94a3b8';
+                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                        }}
                     >
                         <X size={18} />
                     </button>
                 </div>
 
                 {/* Modal Body / Preset Options */}
-                <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '60vh', overflowY: 'auto' }}>
+                <div style={{ padding: '18px 24px', display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', flex: 1 }}>
                     {corporatePresets.map((preset) => {
                         const isSelected = selectedOption === preset.id;
                         return (
                             <div
                                 key={preset.id}
                                 onClick={() => setSelectedOption(preset.id)}
+                                onDoubleClick={handleDownload}
                                 style={{
                                     padding: '12px 16px',
-                                    borderRadius: '10px',
+                                    borderRadius: '12px',
                                     border: isSelected ? '1.5px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.08)',
-                                    background: isSelected ? 'rgba(245, 158, 11, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+                                    background: isSelected ? 'rgba(245, 158, 11, 0.09)' : 'rgba(255, 255, 255, 0.02)',
                                     cursor: 'pointer',
                                     transition: 'all 0.15s ease',
                                     display: 'flex',
@@ -178,36 +211,43 @@ export const DownloadFileNameModal: React.FC<DownloadFileNameModalProps> = ({
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
                                     <div
                                         style={{
-                                            width: '18px',
-                                            height: '18px',
+                                            width: '20px',
+                                            height: '20px',
                                             borderRadius: '50%',
-                                            border: isSelected ? '5px solid #f59e0b' : '2px solid #64748b',
-                                            background: isSelected ? '#ffffff' : 'transparent',
+                                            border: isSelected ? '2px solid #f59e0b' : '2px solid #64748b',
+                                            background: isSelected ? '#f59e0b' : 'transparent',
                                             flexShrink: 0,
                                             boxSizing: 'border-box',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: '#ffffff',
                                         }}
-                                    />
+                                    >
+                                        {isSelected && <Check size={12} strokeWidth={3} />}
+                                    </div>
                                     <div style={{ minWidth: 0, flex: 1 }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#f1f5f9', wordBreak: 'break-all' }}>
+                                            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: isSelected ? '#ffffff' : '#f1f5f9', wordBreak: 'break-all', fontFamily: 'monospace' }}>
                                                 {preset.name}
                                             </span>
                                             {preset.tag && (
                                                 <span
                                                     style={{
-                                                        fontSize: '0.7rem',
+                                                        fontSize: '0.68rem',
                                                         padding: '1px 7px',
                                                         borderRadius: '999px',
-                                                        fontWeight: 600,
-                                                        background: preset.tag === 'Recommended' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(148, 163, 184, 0.15)',
-                                                        color: preset.tag === 'Recommended' ? '#fbbf24' : '#cbd5e1',
+                                                        fontWeight: 700,
+                                                        background: preset.tag === 'Recommended' ? 'rgba(245, 158, 11, 0.2)' : preset.tag === 'ATS Standard' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(148, 163, 184, 0.15)',
+                                                        color: preset.tag === 'Recommended' ? '#fbbf24' : preset.tag === 'ATS Standard' ? '#34d399' : '#cbd5e1',
+                                                        border: preset.tag === 'Recommended' ? '1px solid rgba(245, 158, 11, 0.3)' : 'none',
                                                     }}
                                                 >
                                                     {preset.tag}
                                                 </span>
                                             )}
                                         </div>
-                                        <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>
+                                        <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>
                                             {preset.desc}
                                         </p>
                                     </div>
@@ -216,14 +256,14 @@ export const DownloadFileNameModal: React.FC<DownloadFileNameModalProps> = ({
                         );
                     })}
 
-                    {/* Option 5: Custom File Name */}
+                    {/* Option: Custom File Name */}
                     <div
                         onClick={() => setSelectedOption('custom')}
                         style={{
                             padding: '12px 16px',
-                            borderRadius: '10px',
+                            borderRadius: '12px',
                             border: selectedOption === 'custom' ? '1.5px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.08)',
-                            background: selectedOption === 'custom' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+                            background: selectedOption === 'custom' ? 'rgba(245, 158, 11, 0.09)' : 'rgba(255, 255, 255, 0.02)',
                             cursor: 'pointer',
                             transition: 'all 0.15s ease',
                             display: 'flex',
@@ -234,15 +274,21 @@ export const DownloadFileNameModal: React.FC<DownloadFileNameModalProps> = ({
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <div
                                 style={{
-                                    width: '18px',
-                                    height: '18px',
+                                    width: '20px',
+                                    height: '20px',
                                     borderRadius: '50%',
-                                    border: selectedOption === 'custom' ? '5px solid #f59e0b' : '2px solid #64748b',
-                                    background: selectedOption === 'custom' ? '#ffffff' : 'transparent',
+                                    border: selectedOption === 'custom' ? '2px solid #f59e0b' : '2px solid #64748b',
+                                    background: selectedOption === 'custom' ? '#f59e0b' : 'transparent',
                                     flexShrink: 0,
                                     boxSizing: 'border-box',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: '#ffffff',
                                 }}
-                            />
+                            >
+                                {selectedOption === 'custom' && <Check size={12} strokeWidth={3} />}
+                            </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <Edit3 size={14} color="#94a3b8" />
                                 <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#f1f5f9' }}>
@@ -253,13 +299,13 @@ export const DownloadFileNameModal: React.FC<DownloadFileNameModalProps> = ({
                         </div>
 
                         {selectedOption === 'custom' && (
-                            <div style={{ paddingLeft: '30px', marginTop: '4px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', background: '#0a0d14', border: '1px solid rgba(245, 158, 11, 0.4)', borderRadius: '8px', overflow: 'hidden' }}>
+                            <div style={{ paddingLeft: '32px', marginTop: '4px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', background: '#0a0d14', border: '1px solid rgba(245, 158, 11, 0.5)', borderRadius: '8px', overflow: 'hidden' }}>
                                     <input
                                         ref={customInputRef}
                                         type="text"
                                         value={customName}
-                                        onChange={(e) => setCustomName(e.target.value)}
+                                        onChange={(e) => setCustomName(e.target.value.replace(/\.pdf$/i, ''))}
                                         placeholder="e.g. Shah_Abdul_Mazid_AI_Engineer"
                                         style={{
                                             background: 'transparent',
@@ -269,15 +315,15 @@ export const DownloadFileNameModal: React.FC<DownloadFileNameModalProps> = ({
                                             fontSize: '0.85rem',
                                             outline: 'none',
                                             width: '100%',
-                                            fontFamily: 'inherit',
+                                            fontFamily: 'monospace',
                                         }}
                                     />
-                                    <span style={{ padding: '0 12px', color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600, userSelect: 'none' }}>
+                                    <span style={{ padding: '0 12px', color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600, userSelect: 'none', fontFamily: 'monospace' }}>
                                         .pdf
                                     </span>
                                 </div>
                                 <p style={{ fontSize: '0.73rem', color: '#64748b', margin: '4px 0 0' }}>
-                                    Characters like \ / : * ? &quot; &lt; &gt; | will automatically be replaced with underscores.
+                                    Illegal characters (\ / : * ? &quot; &lt; &gt; |) will automatically be converted to underscores.
                                 </p>
                             </div>
                         )}
@@ -285,49 +331,66 @@ export const DownloadFileNameModal: React.FC<DownloadFileNameModalProps> = ({
                 </div>
 
                 {/* Modal Footer */}
-                <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', background: 'rgba(0, 0, 0, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
-                    <button
-                        onClick={onClose}
-                        disabled={isGenerating}
-                        style={{
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: '8px',
-                            color: '#cbd5e1',
-                            padding: '8px 16px',
-                            fontSize: '0.84rem',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                        }}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleDownload}
-                        disabled={isGenerating}
-                        style={{
-                            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                            border: 'none',
-                            borderRadius: '8px',
-                            color: '#ffffff',
-                            padding: '8px 20px',
-                            fontSize: '0.84rem',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)',
-                            opacity: isGenerating ? 0.7 : 1,
-                        }}
-                    >
-                        <FileDown size={15} />
-                        {isGenerating ? 'Generating…' : 'Download Now'}
-                    </button>
+                <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', background: 'rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', fontSize: '0.76rem' }}>
+                        <FileText size={14} />
+                        <span>Format: Standard A4 PDF</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <button
+                            onClick={onClose}
+                            disabled={isGenerating}
+                            style={{
+                                background: 'rgba(255, 255, 255, 0.05)',
+                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                borderRadius: '8px',
+                                color: '#cbd5e1',
+                                padding: '8px 16px',
+                                fontSize: '0.84rem',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                transition: 'all 0.15s',
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)')}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)')}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleDownload}
+                            disabled={isGenerating}
+                            style={{
+                                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                border: 'none',
+                                borderRadius: '8px',
+                                color: '#ffffff',
+                                padding: '8px 20px',
+                                fontSize: '0.84rem',
+                                fontWeight: 700,
+                                cursor: isGenerating ? 'not-allowed' : 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                boxShadow: '0 4px 14px rgba(245, 158, 11, 0.35)',
+                                opacity: isGenerating ? 0.7 : 1,
+                                transition: 'transform 0.1s',
+                            }}
+                            onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
+                            onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                        >
+                            <FileDown size={15} />
+                            {isGenerating ? 'Generating…' : 'Download Now'}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     );
+
+    if (typeof document !== 'undefined') {
+        return createPortal(modalContent, document.body);
+    }
+    return modalContent;
 };
 
 export default DownloadFileNameModal;

@@ -69,7 +69,8 @@ const Resume = () => {
         return { total: Math.min(score, 100), tips };
     }, [data]);
 
-    const downloadPDF = async () => {
+    const handleExecuteDownload = async (selectedFileName: string) => {
+        setShowNameModal(false);
         if (cvType === 'v2_visual') {
             try {
                 const res = await fetch(VISUAL_PDF_PATH);
@@ -79,7 +80,7 @@ const Resume = () => {
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = 'Shah_Abdul_Mazid_Visual_CV.pdf';
+                    a.download = selectedFileName;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -98,7 +99,7 @@ const Resume = () => {
             sheetRef.current.classList.add('pdf-export');
             const opt = {
                 margin: [13.2, 0, 13.2, 0],
-                filename: `${data.hero.name.replace(/\s+/g, '_')}_Resume.pdf`,
+                filename: selectedFileName,
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { 
                     scale: 3, 
@@ -225,7 +226,7 @@ const Resume = () => {
                 <button onClick={handleViewPdf} className="rv-btn rv-solid" style={{ background: '#8b5cf6', color: 'white', border: 'none' }}>
                     <Eye size={14} /> View PDF
                 </button>
-                <button onClick={downloadPDF} disabled={busy} className="rv-btn rv-solid" style={{ background: '#f59e0b', color: 'white', border: 'none' }}>
+                <button onClick={() => setShowNameModal(true)} disabled={busy} className="rv-btn rv-solid" style={{ background: '#f59e0b', color: 'white', border: 'none' }}>
                     {busy ? <Loader size={14} className="rv-spin" /> : <FileDown size={14} />}
                     {busy ? 'Generating…' : 'Download PDF'}
                 </button>
@@ -246,7 +247,7 @@ const Resume = () => {
                                 <span>{cvType === 'v1_ats' ? 'Version 1: ATS CV' : cvType === 'v2_visual' ? 'Version 2: Visual CV (2-Column)' : 'Version 3: Europass CV'} (Live Preview)</span>
                             </div>
                             <div className="pdf-viewer-actions">
-                                <button onClick={downloadPDF} disabled={busy} className="pdf-viewer-dl-btn" style={{ cursor: 'pointer', border: 'none' }}>
+                                <button onClick={() => setShowNameModal(true)} disabled={busy} className="pdf-viewer-dl-btn" style={{ cursor: 'pointer', border: 'none' }}>
                                     <FileDown size={15} /> {busy ? 'Generating…' : 'Download'}
                                 </button>
                                 <button onClick={handleCloseViewer} className="pdf-viewer-close">
@@ -932,6 +933,22 @@ const Resume = () => {
                     </div>
                 </div>
             )}
+
+            {/* Modal for Selecting Professional PDF Naming Convention */}
+            <DownloadFileNameModal
+                isOpen={showNameModal}
+                onClose={() => setShowNameModal(false)}
+                onConfirmDownload={handleExecuteDownload}
+                isGenerating={busy}
+                cvVersionName={cvType === 'v1_ats' ? 'ATS CV' : cvType === 'v2_visual' ? 'Visual CV' : 'Europass CV'}
+                versionSpecificDefault={
+                    cvType === 'v1_ats'
+                        ? 'Shah_Abdul_Mazid_ATS_CV_Version_1.pdf'
+                        : cvType === 'v2_visual'
+                        ? 'Shah_Abdul_Mazid_Visual_CV_Version_2.pdf'
+                        : 'Shah_Abdul_Mazid_Europass_CV.pdf'
+                }
+            />
 
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap');
