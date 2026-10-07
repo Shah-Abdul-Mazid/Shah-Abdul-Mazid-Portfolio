@@ -830,10 +830,13 @@ const AdminDashboard = () => {
     };
 
     // ── Badge Drag & Drop Uploader ──────────────────────────────────────────
-    const BadgeUploader = ({ index, value, onUpload }: {
+    const BadgeUploader = ({ index, value, onUpload, publicUrl, onPublicUrl }: {
         index: number;
         value: string;
         onUpload: (url: string) => void;
+        /** Credly badge public page URL — optional, can be filled in later */
+        publicUrl?: string;
+        onPublicUrl?: (url: string) => void;
     }) => {
         const [dragOver, setDragOver] = useState(false);
         const [uploading, setUploading] = useState(false);
@@ -989,6 +992,37 @@ const AdminDashboard = () => {
                         </div>
                     )}
                 </div>
+
+                {/* ── Credly Badge Public URL (optional — add later) ── */}
+                <div style={{ marginTop: '10px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <div style={{ flex: 1, position: 'relative' }}>
+                        <input
+                            type="text"
+                            value={publicUrl || ''}
+                            placeholder="https://www.credly.com/badges/... (optional — add when available)"
+                            onChange={e => onPublicUrl?.(e.target.value)}
+                            style={{ width: '100%', paddingRight: '36px', fontSize: '0.8rem' }}
+                        />
+                        <LinkIcon
+                            size={14}
+                            style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none', opacity: 0.5 }}
+                        />
+                    </div>
+                    {publicUrl && (
+                        <a
+                            href={publicUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Open Credly badge page"
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', borderRadius: '8px', background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.3)', color: 'var(--primary)', flexShrink: 0, textDecoration: 'none' }}
+                        >
+                            <LinkIcon size={14} />
+                        </a>
+                    )}
+                </div>
+                <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', margin: '4px 0 0', opacity: 0.7 }}>
+                    🔗 Credly Badge URL — leave blank for now, add when you have it
+                </p>
             </div>
         );
     };
@@ -2303,6 +2337,8 @@ const AdminDashboard = () => {
                                         index={i}
                                         value={(cert as any).badgeUrl || ''}
                                         onUpload={(url: string) => updateListItem('certifications', i, 'badgeUrl', url)}
+                                        publicUrl={(cert as any).badgePublicUrl || ''}
+                                        onPublicUrl={(url: string) => updateListItem('certifications', i, 'badgePublicUrl', url)}
                                     />
 
                                     <div className="form-group">
@@ -2334,7 +2370,7 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                             ))}
-                            <button type="button" className="add-btn" onClick={() => addListItem('certifications', { name: '', issuer: '', date: '', credentialId: '', credentialUrl: '', badgeUrl: '', links: [], skills: [] })}>
+                            <button type="button" className="add-btn" onClick={() => addListItem('certifications', { name: '', issuer: '', date: '', credentialId: '', credentialUrl: '', badgeUrl: '', badgePublicUrl: '', links: [], skills: [] })}>
                                 <Plus size={16} /> Add Certification
                             </button>
                         </div>
