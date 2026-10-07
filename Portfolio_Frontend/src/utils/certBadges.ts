@@ -13,10 +13,26 @@ export interface CredlyBadge {
  */
 export const CREDLY_VERIFIED_BADGES: CredlyBadge[] = [
   {
+    id: "google-ai-fundamentals",
+    name: "Google AI Fundamentals",
+    issuer: "Google",
+    imageUrl: "/badges/google-ai-fundamentals.png",
+    publicUrl:
+      "https://www.credly.com/badges/d172156c-c193-4172-9c79-829d14b9d93e/public_url",
+  },
+  {
+    id: "google-ai-brainstorming",
+    name: "Google AI for Brainstorming and Planning",
+    issuer: "Google",
+    imageUrl: "/badges/google-ai-brainstorming.png",
+    publicUrl:
+      "https://www.credly.com/badges/a257e2c0-3b13-4d63-aa31-1a2d358c4f99/public_url",
+  },
+  {
     id: "google-ai-professional",
     name: "Google AI Professional Certificate",
     issuer: "Google",
-    imageUrl: "/badges/Google_AI_Professional_Certificate.png",
+    imageUrl: "/badges/Google AI Professional Certificate.png",
   },
   {
     id: "ibm-data-science-prof",
@@ -87,73 +103,110 @@ const getBadgeById = (id: string): CredlyBadge | null =>
 
 /**
  * Returns EXACTLY ONE verified Credly badge for a certification.
- * STRICT: Each certification gets at most ONE badge. Never multiple.
  *
- * Always returns from CREDLY_VERIFIED_BADGES (full-resolution images).
- * Intentionally does NOT use cert.badgeUrl from MongoDB — those stored old
- * linkedin_thumb thumbnail URLs that render blurry.
+ * Priority order:
+ * 1. Explicitly uploaded/custom badge in cert.badgeUrl (e.g., Cloudinary, custom image)
+ *    - If it's a legacy blurry linkedin_thumb, we upgrade it to full resolution or verified badge.
+ *    - Otherwise, the uploaded image URL is used directly.
+ * 2. Predefined high-resolution verified badges matched by certification name / credential ID.
  *
- * Returns null if no badge is mapped for this cert.
+ * Returns null if no badge is available or mapped.
  */
 export function getCredlyBadgeForCert(cert: {
   name: string;
   issuer?: string;
   credentialId?: string;
   badgeUrl?: string;
+  badgePublicUrl?: string;
 }): CredlyBadge | null {
   const name = (cert.name || "").trim().toLowerCase();
   const issuer = (cert.issuer || "").trim().toLowerCase();
   const credId = (cert.credentialId || "").trim();
+  const customBadgeUrl = (cert.badgeUrl || "").trim();
+  const customPublicUrl = (cert.badgePublicUrl || "").trim();
 
-  // 1a. Google AI Professional Certificate → Google AI Professional Certificate badge
-  if (
-    name.includes("google") &&
-    name.includes("ai") &&
-    name.includes("professional")
-  ) {
-    return getBadgeById("google-ai-professional");
-  }
-
-  // 1b. Google AI Fundamentals / generic Google AI → Google AI Fundamentals badge
-  if (
-    name === "google ai" ||
-    credId === "AGNE8JCWOITV" ||
-    (name.includes("google") &&
+  // Find fallback / matching predefined badge for publicUrl or high-res image
+  const getPredefinedBadge = (): CredlyBadge | null => {
+    // 1a. Google AI Professional Certificate → Google AI Professional Certificate badge
+    if (
+      name.includes("google") &&
       name.includes("ai") &&
-      !name.includes("brainstorming"))
-  ) {
-    return getBadgeById("google-ai-fundamentals");
+      name.includes("professional")
+    ) {
+      return getBadgeById("google-ai-professional");
+    }
+
+    // 1b. Google AI Fundamentals / generic Google AI → Google AI Fundamentals badge
+    if (
+      name === "google ai" ||
+      credId === "AGNE8JCWOITV" ||
+      (name.includes("google") &&
+        name.includes("ai") &&
+        !name.includes("brainstorming"))
+    ) {
+      return getBadgeById("google-ai-fundamentals");
+    }
+
+    // 2. RAG for Generative AI Applications → Generative AI Essentials for Data Science
+    if (name.includes("rag") && name.includes("generative")) {
+      return getBadgeById("ibm-genai-essentials");
+    }
+
+    // 3. IBM Generative AI Engineering → Generative AI Essentials for Data Science
+    if (
+      name.includes("generative ai engineering") ||
+      (name.includes("generative") &&
+        name.includes("engineering") &&
+        issuer.includes("ibm"))
+    ) {
+      return getBadgeById("ibm-genai-essentials");
+    }
+
+    // 4. IBM AI Engineering → Artificial Intelligence Essentials V2
+    if (name.includes("ai engineering") && issuer.includes("ibm")) {
+      return getBadgeById("ibm-ai-essentials-v2");
+    }
+
+    // 5. IBM Data Science (not Foundations) → IBM Data Science Professional Certificate (V3)
+    if (
+      name.includes("data science") &&
+      !name.includes("foundations") &&
+      issuer.includes("ibm")
+    ) {
+      return getBadgeById("ibm-data-science-prof");
+    }
+
+    return null;
+  };
+
+  const matchedPredefined = getPredefinedBadge();
+
+  // 1. If an image was uploaded (e.g. Cloudinary, local file, or custom URL)
+  if (customBadgeUrl) {
+    // If it's an old legacy blurry linkedin_thumb, prefer verified high-res or strip the thumb prefix
+    if (customBadgeUrl.includes("linkedin_thumb_")) {
+      if (matchedPredefined) {
+        return matchedPredefined;
+      }
+      return {
+        id: `badge-${name.replace(/[^a-z0-9]/g, "-") || "custom"}`,
+        name: cert.name,
+        issuer: cert.issuer || "Verified",
+        imageUrl: customBadgeUrl.replace(/linkedin_thumb_/, ""),
+        publicUrl: customPublicUrl || undefined,
+      };
+    }
+
+    // Explicit custom badge uploaded via Admin Dashboard (e.g., Cloudinary)
+    return {
+      id: `badge-${name.replace(/[^a-z0-9]/g, "-") || "custom"}`,
+      name: cert.name,
+      issuer: cert.issuer || "Verified",
+      imageUrl: customBadgeUrl,
+      publicUrl: customPublicUrl || matchedPredefined?.publicUrl || undefined,
+    };
   }
 
-  // 2. RAG for Generative AI Applications → Generative AI Essentials for Data Science
-  if (name.includes("rag") && name.includes("generative")) {
-    return getBadgeById("ibm-genai-essentials");
-  }
-
-  // 3. IBM Generative AI Engineering → Generative AI Essentials for Data Science
-  if (
-    name.includes("generative ai engineering") ||
-    (name.includes("generative") &&
-      name.includes("engineering") &&
-      issuer.includes("ibm"))
-  ) {
-    return getBadgeById("ibm-genai-essentials");
-  }
-
-  // 4. IBM AI Engineering → Artificial Intelligence Essentials V2
-  if (name.includes("ai engineering") && issuer.includes("ibm")) {
-    return getBadgeById("ibm-ai-essentials-v2");
-  }
-
-  // 5. IBM Data Science (not Foundations) → IBM Data Science Professional Certificate (V3)
-  if (
-    name.includes("data science") &&
-    !name.includes("foundations") &&
-    issuer.includes("ibm")
-  ) {
-    return getBadgeById("ibm-data-science-prof");
-  }
-
-  // No badge for any other cert
-  return null;
+  // 2. No custom image uploaded; use matched predefined verified Credly badge if any
+  return matchedPredefined;
 }

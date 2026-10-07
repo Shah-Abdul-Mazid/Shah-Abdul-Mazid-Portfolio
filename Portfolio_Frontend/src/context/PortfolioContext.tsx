@@ -132,6 +132,7 @@ export interface CertificationItem {
     credentialId?: string;
     credentialUrl?: string;
     badgeUrl?: string;
+    badgePublicUrl?: string;
     links?: { label: string; url: string }[];
     skills?: string[];
 }
