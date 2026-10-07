@@ -1,21 +1,29 @@
-import { useMemo } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import FloatingContactForm from '../components/FloatingContactForm';
-import IntelligenceMatrix from '../components/IntelligenceMatrix';
-import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
-import { usePortfolio } from '../context/PortfolioContext';
-import { formatDateLabel, sortRecentFirst } from '../utils/dateUtils';
-import { Github, ExternalLink, GraduationCap, BookOpen } from 'lucide-react';
-import { getCredlyBadgeForCert, CREDLY_VERIFIED_BADGES } from '../utils/certBadges';
+import { useMemo } from "react";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import FloatingContactForm from "../components/FloatingContactForm";
+import IntelligenceMatrix from "../components/IntelligenceMatrix";
+import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
+import { usePortfolio } from "../context/PortfolioContext";
+import { formatDateLabel, sortRecentFirst } from "../utils/dateUtils";
+import { Github, ExternalLink, GraduationCap, BookOpen } from "lucide-react";
+import {
+  getCredlyBadgeForCert,
+  CREDLY_VERIFIED_BADGES,
+} from "../utils/certBadges";
 
-import { GITHUB_URL, SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL } from '../constants/researchLinks';
+import {
+  GITHUB_URL,
+  SCHOLAR_URL,
+  ORCID_URL,
+  RESEARCHGATE_URL,
+} from "../constants/researchLinks";
 
 const CORE_RESEARCH_LINKS = [
-  { label: 'GitHub Profile', url: GITHUB_URL, icon: 'github' },
-  { label: 'Google Scholar', url: SCHOLAR_URL, icon: 'scholar' },
-  { label: 'ORCID iD', url: ORCID_URL, icon: 'orcid' },
-  { label: 'ResearchGate', url: RESEARCHGATE_URL, icon: 'researchgate' }
+  { label: "GitHub Profile", url: GITHUB_URL, icon: "github" },
+  { label: "Google Scholar", url: SCHOLAR_URL, icon: "scholar" },
+  { label: "ORCID iD", url: ORCID_URL, icon: "orcid" },
+  { label: "ResearchGate", url: RESEARCHGATE_URL, icon: "researchgate" },
 ];
 
 const ProfilePage = () => {
@@ -29,8 +37,12 @@ const ProfilePage = () => {
   const allBioLinks = useMemo(() => {
     const customLinks = data.about.bioLinks || [];
     if (customLinks.length === 0) return CORE_RESEARCH_LINKS;
-    const existingUrls = new Set(customLinks.map(l => (l.url || '').toLowerCase()));
-    const missing = CORE_RESEARCH_LINKS.filter(c => !existingUrls.has(c.url.toLowerCase()));
+    const existingUrls = new Set(
+      customLinks.map((l) => (l.url || "").toLowerCase()),
+    );
+    const missing = CORE_RESEARCH_LINKS.filter(
+      (c) => !existingUrls.has(c.url.toLowerCase()),
+    );
     return [...customLinks, ...missing];
   }, [data.about.bioLinks]);
 
@@ -43,183 +55,256 @@ const ProfilePage = () => {
           {/* Profile Header */}
           <div className="profile-header">
             <h1 className="profile-title">Profile</h1>
-            <p className="profile-subtitle">Academic background, professional experience, research collaborations, and awards.</p>
+            <p className="profile-subtitle">
+              Academic background, professional experience, research
+              collaborations, and awards.
+            </p>
           </div>
 
           {/* Short Biography Card */}
-            {/* Short Biography Card */}
-            <div className="bio-card">
-              <h2 className="section-heading">Short Biography</h2>
-              
-              {/* Heading / Hero Tagline */}
-              <div className="bio-hero-tagline">
-                <span className="bio-tagline-text">AI ENGINEER &amp; RESEARCHER &nbsp;|&nbsp; INTELLIGENT SYSTEMS &amp; DATA SCIENCE</span>
-              </div>
+          {/* Short Biography Card */}
+          <div className="bio-card">
+            <h2 className="section-heading">Short Biography</h2>
 
-              {(() => {
-                const TECH_PILLS = [
-                  'Multi-Agent RAG',
-                  'Grad-CAM',
-                  'Vision-Language Transformers',
-                  'Vision Transformers',
-                  'LLM pipelines',
-                  'production LLM',
-                  'computer vision',
-                  'AI microservices',
-                  'explainable AI',
-                  'Transformers',
-                  'RAG platforms',
-                ];
+            {/* Heading / Hero Tagline */}
+            <div className="bio-hero-tagline">
+              <span className="bio-tagline-text">
+                AI ENGINEER &amp; RESEARCHER &nbsp;|&nbsp; INTELLIGENT SYSTEMS
+                &amp; DATA SCIENCE
+              </span>
+            </div>
 
-                const renderHighlighted = (text: string) => {
-                  const escaped = TECH_PILLS.map(p => p.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|');
-                  const regex = new RegExp(`(\\b(?:${escaped})\\b|\\*\\*[^*]+\\*\\*)`, 'gi');
-                  const parts = text.split(regex);
+            {(() => {
+              const TECH_PILLS = [
+                "Multi-Agent RAG",
+                "Grad-CAM",
+                "Vision-Language Transformers",
+                "Vision Transformers",
+                "LLM pipelines",
+                "production LLM",
+                "computer vision",
+                "AI microservices",
+                "explainable AI",
+                "Transformers",
+                "RAG platforms",
+              ];
 
-                  return parts.map((part, idx) => {
-                    if (!part) return null;
-                    if (part.startsWith('**') && part.endsWith('**')) {
-                      return <strong key={idx} className="bio-highlight-strong">{part.slice(2, -2)}</strong>;
-                    }
-                    const matched = TECH_PILLS.find(p => p.toLowerCase() === part.toLowerCase());
-                    if (matched) {
-                      return <span key={idx} className="bio-tech-pill">{part}</span>;
-                    }
-                    return <span key={idx}>{part}</span>;
-                  });
-                };
+              const renderHighlighted = (text: string) => {
+                const escaped = TECH_PILLS.map((p) =>
+                  p.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"),
+                ).join("|");
+                const regex = new RegExp(
+                  `(\\b(?:${escaped})\\b|\\*\\*[^*]+\\*\\*)`,
+                  "gi",
+                );
+                const parts = text.split(regex);
 
-                const rawBio = data.about.bio || '';
-                const hasEng = /Engineering\s+Focus/i.test(rawBio);
-                const hasRes = /Research\s+Focus/i.test(rawBio);
-
-                if (hasEng || hasRes) {
-                  const engIdx = rawBio.search(/(?:\*\*|###\s*)?Engineering\s+Focus(?:\*\*)?/i);
-                  const resIdx = rawBio.search(/(?:\*\*|###\s*)?Research\s+Focus(?:\*\*)?/i);
-
-                  let intro = '';
-                  let engBlock = '';
-                  let resBlock = '';
-
-                  if (engIdx !== -1 && resIdx !== -1) {
-                    if (engIdx < resIdx) {
-                      intro = rawBio.slice(0, engIdx).trim();
-                      engBlock = rawBio.slice(engIdx, resIdx).trim();
-                      resBlock = rawBio.slice(resIdx).trim();
-                    } else {
-                      intro = rawBio.slice(0, resIdx).trim();
-                      resBlock = rawBio.slice(resIdx, engIdx).trim();
-                      engBlock = rawBio.slice(engIdx).trim();
-                    }
-                  } else if (engIdx !== -1) {
-                    intro = rawBio.slice(0, engIdx).trim();
-                    engBlock = rawBio.slice(engIdx).trim();
-                  } else if (resIdx !== -1) {
-                    intro = rawBio.slice(0, resIdx).trim();
-                    resBlock = rawBio.slice(resIdx).trim();
+                return parts.map((part, idx) => {
+                  if (!part) return null;
+                  if (part.startsWith("**") && part.endsWith("**")) {
+                    return (
+                      <strong key={idx} className="bio-highlight-strong">
+                        {part.slice(2, -2)}
+                      </strong>
+                    );
                   }
-
-                  engBlock = engBlock.replace(/^(?:\*\*|###\s*)?Engineering\s+Focus(?:\*\*)?[:\s•\-]*/i, '').trim();
-                  resBlock = resBlock.replace(/^(?:\*\*|###\s*)?Research\s+Focus(?:\*\*)?[:\s•\-]*/i, '').trim();
-
-                  const extractItems = (text: string) => {
-                    return text
-                      .split(/(?:\r?\n\s*[-*•]\s*|\r?\n|•\s*)/)
-                      .map(s => s.trim())
-                      .filter(s => s.length > 0 && s !== '-' && s !== '*' && s !== '•')
-                      .map(item => {
-                        const m = item.match(/^(?:\*\*)?([^:*]+?)(?:\*\*)?:\s*(.*)$/);
-                        if (m) {
-                          return { label: m[1].replace(/\*\*/g, '').trim(), desc: m[2].trim() };
-                        }
-                        return { label: '', desc: item.replace(/^[-*•]\s*/, '').trim() };
-                      });
-                  };
-
-                  const defaultIntro = "I am an AI Engineer at Neuroxyte and a Computer Science & Engineering graduate from East West University (majoring in Intelligent Systems & Data Science). Driven by AI innovation, research, and hackathons, my work focuses on building explainable, data-driven systems that bridge the gap between academic research and production engineering.";
-                  const cleanIntro = (intro || defaultIntro)
-                    .replace(/^(?:\*\*|###\s*)?About\s+Me(?:\*\*)?[:\s]*/i, '')
-                    .trim();
-
-                  const engItems = extractItems(engBlock);
-                  const resItems = extractItems(resBlock);
-
-                  return (
-                    <div className="bio-structured-content">
-                      {cleanIntro && (
-                        <p className="bio-para">{renderHighlighted(cleanIntro)}</p>
-                      )}
-
-                      {engItems.length > 0 && (
-                        <div className="bio-section bio-focus-section">
-                          <div className="bio-subhead">
-                            <span className="bio-subhead-icon">⚡</span>
-                            <span className="bio-subhead-title">Engineering Focus</span>
-                          </div>
-                          <ul className="bio-bullet-list">
-                            {engItems.map((item, i) => (
-                              <li key={i} className="bio-bullet-item">
-                                <span className="bio-bullet-marker">○</span>
-                                <div className="bio-bullet-text">
-                                  {item.label && <strong className="bio-label">{item.label}: </strong>}
-                                  <span>{renderHighlighted(item.desc)}</span>
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {resItems.length > 0 && (
-                        <div className="bio-section bio-focus-section">
-                          <div className="bio-subhead">
-                            <span className="bio-subhead-icon">🔬</span>
-                            <span className="bio-subhead-title">Research Focus</span>
-                          </div>
-                          <ul className="bio-bullet-list">
-                            {resItems.map((item, i) => (
-                              <li key={i} className="bio-bullet-item">
-                                <span className="bio-bullet-marker">○</span>
-                                <div className="bio-bullet-text">
-                                  {item.label && <strong className="bio-label">{item.label}: </strong>}
-                                  <span>{renderHighlighted(item.desc)}</span>
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
+                  const matched = TECH_PILLS.find(
+                    (p) => p.toLowerCase() === part.toLowerCase(),
                   );
+                  if (matched) {
+                    return (
+                      <span key={idx} className="bio-tech-pill">
+                        {part}
+                      </span>
+                    );
+                  }
+                  return <span key={idx}>{part}</span>;
+                });
+              };
+
+              const rawBio = data.about.bio || "";
+              const hasEng = /Engineering\s+Focus/i.test(rawBio);
+              const hasRes = /Research\s+Focus/i.test(rawBio);
+
+              if (hasEng || hasRes) {
+                const engIdx = rawBio.search(
+                  /(?:\*\*|###\s*)?Engineering\s+Focus(?:\*\*)?/i,
+                );
+                const resIdx = rawBio.search(
+                  /(?:\*\*|###\s*)?Research\s+Focus(?:\*\*)?/i,
+                );
+
+                let intro = "";
+                let engBlock = "";
+                let resBlock = "";
+
+                if (engIdx !== -1 && resIdx !== -1) {
+                  if (engIdx < resIdx) {
+                    intro = rawBio.slice(0, engIdx).trim();
+                    engBlock = rawBio.slice(engIdx, resIdx).trim();
+                    resBlock = rawBio.slice(resIdx).trim();
+                  } else {
+                    intro = rawBio.slice(0, resIdx).trim();
+                    resBlock = rawBio.slice(resIdx, engIdx).trim();
+                    engBlock = rawBio.slice(engIdx).trim();
+                  }
+                } else if (engIdx !== -1) {
+                  intro = rawBio.slice(0, engIdx).trim();
+                  engBlock = rawBio.slice(engIdx).trim();
+                } else if (resIdx !== -1) {
+                  intro = rawBio.slice(0, resIdx).trim();
+                  resBlock = rawBio.slice(resIdx).trim();
                 }
 
-                // Fallback for plain bio
+                engBlock = engBlock
+                  .replace(
+                    /^(?:\*\*|###\s*)?Engineering\s+Focus(?:\*\*)?[:\s•\-]*/i,
+                    "",
+                  )
+                  .trim();
+                resBlock = resBlock
+                  .replace(
+                    /^(?:\*\*|###\s*)?Research\s+Focus(?:\*\*)?[:\s•\-]*/i,
+                    "",
+                  )
+                  .trim();
+
+                const extractItems = (text: string) => {
+                  return text
+                    .split(/(?:\r?\n\s*[-*•]\s*|\r?\n|•\s*)/)
+                    .map((s) => s.trim())
+                    .filter(
+                      (s) =>
+                        s.length > 0 && s !== "-" && s !== "*" && s !== "•",
+                    )
+                    .map((item) => {
+                      const m = item.match(
+                        /^(?:\*\*)?([^:*]+?)(?:\*\*)?:\s*(.*)$/,
+                      );
+                      if (m) {
+                        return {
+                          label: m[1].replace(/\*\*/g, "").trim(),
+                          desc: m[2].trim(),
+                        };
+                      }
+                      return {
+                        label: "",
+                        desc: item.replace(/^[-*•]\s*/, "").trim(),
+                      };
+                    });
+                };
+
+                const defaultIntro =
+                  "I am an AI Engineer at Neuroxyte and a Computer Science & Engineering graduate from East West University (majoring in Intelligent Systems & Data Science). Driven by AI innovation, research, and hackathons, my work focuses on building explainable, data-driven systems that bridge the gap between academic research and production engineering.";
+                const cleanIntro = (intro || defaultIntro)
+                  .replace(/^(?:\*\*|###\s*)?About\s+Me(?:\*\*)?[:\s]*/i, "")
+                  .trim();
+
+                const engItems = extractItems(engBlock);
+                const resItems = extractItems(resBlock);
+
                 return (
-                  <div className="bio-content">
-                    {rawBio.split(/\n\s*\n/).filter(b => b.trim().length > 0).map((block, idx) => (
-                      <p key={idx} className="bio-para">{renderHighlighted(block)}</p>
-                    ))}
+                  <div className="bio-structured-content">
+                    {cleanIntro && (
+                      <p className="bio-para">
+                        {renderHighlighted(cleanIntro)}
+                      </p>
+                    )}
+
+                    {engItems.length > 0 && (
+                      <div className="bio-section bio-focus-section">
+                        <div className="bio-subhead">
+                          <span className="bio-subhead-icon">⚡</span>
+                          <span className="bio-subhead-title">
+                            Engineering Focus
+                          </span>
+                        </div>
+                        <ul className="bio-bullet-list">
+                          {engItems.map((item, i) => (
+                            <li key={i} className="bio-bullet-item">
+                              <span className="bio-bullet-marker">○</span>
+                              <div className="bio-bullet-text">
+                                {item.label && (
+                                  <strong className="bio-label">
+                                    {item.label}:{" "}
+                                  </strong>
+                                )}
+                                <span>{renderHighlighted(item.desc)}</span>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {resItems.length > 0 && (
+                      <div className="bio-section bio-focus-section">
+                        <div className="bio-subhead">
+                          <span className="bio-subhead-icon">🔬</span>
+                          <span className="bio-subhead-title">
+                            Research Focus
+                          </span>
+                        </div>
+                        <ul className="bio-bullet-list">
+                          {resItems.map((item, i) => (
+                            <li key={i} className="bio-bullet-item">
+                              <span className="bio-bullet-marker">○</span>
+                              <div className="bio-bullet-text">
+                                {item.label && (
+                                  <strong className="bio-label">
+                                    {item.label}:{" "}
+                                  </strong>
+                                )}
+                                <span>{renderHighlighted(item.desc)}</span>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 );
-              })()}
-            
+              }
+
+              // Fallback for plain bio
+              return (
+                <div className="bio-content">
+                  {rawBio
+                    .split(/\n\s*\n/)
+                    .filter((b) => b.trim().length > 0)
+                    .map((block, idx) => (
+                      <p key={idx} className="bio-para">
+                        {renderHighlighted(block)}
+                      </p>
+                    ))}
+                </div>
+              );
+            })()}
+
             {/* Profile Action Links */}
             <div className="bio-links">
               {allBioLinks.map((link, idx) => {
-                const iconType = (link.icon || '').toLowerCase();
+                const iconType = (link.icon || "").toLowerCase();
                 return (
                   <a
                     key={idx}
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`bio-btn ${iconType || 'custom'}`}
+                    className={`bio-btn ${iconType || "custom"}`}
                   >
-                    {iconType === 'github' && <Github size={16} />}
-                    {iconType === 'scholar' && <GraduationCap size={16} />}
-                    {iconType === 'orcid' && <span className="orcid-dot">iD</span>}
-                    {iconType === 'researchgate' && <span className="rg-dot">RG</span>}
-                    {iconType !== 'github' && iconType !== 'scholar' && iconType !== 'orcid' && iconType !== 'researchgate' && <ExternalLink size={16} />}
+                    {iconType === "github" && <Github size={16} />}
+                    {iconType === "scholar" && <GraduationCap size={16} />}
+                    {iconType === "orcid" && (
+                      <span className="orcid-dot">iD</span>
+                    )}
+                    {iconType === "researchgate" && (
+                      <span className="rg-dot">RG</span>
+                    )}
+                    {iconType !== "github" &&
+                      iconType !== "scholar" &&
+                      iconType !== "orcid" &&
+                      iconType !== "researchgate" && <ExternalLink size={16} />}
                     {link.label}
                   </a>
                 );
@@ -235,7 +320,9 @@ const ProfilePage = () => {
               <div className="timeline">
                 <div className="timeline-line"></div>
                 {education.map((item, index) => {
-                  const isBSc = item.degree.toLowerCase().includes('b.sc') || item.degree.toLowerCase().includes('bachelor');
+                  const isBSc =
+                    item.degree.toLowerCase().includes("b.sc") ||
+                    item.degree.toLowerCase().includes("bachelor");
                   return (
                     <div key={index} className="timeline-item">
                       <div className="timeline-dot orange"></div>
@@ -243,33 +330,62 @@ const ProfilePage = () => {
                         <span className="timeline-year">{item.year}</span>
                         <h3 className="timeline-title">{item.degree}</h3>
                         <p className="timeline-institution">{item.school}</p>
-                        {item.major && <p className="timeline-desc">{item.major}</p>}
+                        {item.major && (
+                          <p className="timeline-desc">{item.major}</p>
+                        )}
 
                         {/* Major Academic Highlights for B.Sc. */}
                         {isBSc && (
                           <div className="education-coursework-container">
                             <div className="coursework-group">
                               <span className="coursework-group-title">
-                                <BookOpen size={13} style={{ display: 'inline', marginRight: 5, verticalAlign: 'text-bottom' }} />
-                                Major Compulsory Courses (AI &amp; Data Science):
+                                <BookOpen
+                                  size={13}
+                                  style={{
+                                    display: "inline",
+                                    marginRight: 5,
+                                    verticalAlign: "text-bottom",
+                                  }}
+                                />
+                                Major Compulsory Courses (AI &amp; Data
+                                Science):
                               </span>
                               <div className="coursework-badges">
-                                <span className="course-badge major">CSE303: Statistics for Data Science</span>
-                                <span className="course-badge major">CSE366: Artificial Intelligence</span>
-                                <span className="course-badge capstone">CSE400: Capstone Project (A / A+)</span>
+                                <span className="course-badge major">
+                                  CSE303: Statistics for Data Science
+                                </span>
+                                <span className="course-badge major">
+                                  CSE366: Artificial Intelligence
+                                </span>
+                                <span className="course-badge capstone">
+                                  CSE400: Capstone Project (A / A+)
+                                </span>
                               </div>
                             </div>
 
-                            <div className="coursework-group" style={{ marginTop: '10px' }}>
+                            <div
+                              className="coursework-group"
+                              style={{ marginTop: "10px" }}
+                            >
                               <span className="coursework-group-title">
                                 Major Elective &amp; Core Computing Courses:
                               </span>
                               <div className="coursework-badges">
-                                <span className="course-badge elective">CSE475: Machine Learning</span>
-                                <span className="course-badge elective">CSE477: Data Mining</span>
-                                <span className="course-badge elective">CSE438: Digital Image Processing</span>
-                                <span className="course-badge core">CSE246: Algorithms</span>
-                                <span className="course-badge core">CSE302: Database Systems</span>
+                                <span className="course-badge elective">
+                                  CSE475: Machine Learning
+                                </span>
+                                <span className="course-badge elective">
+                                  CSE477: Data Mining
+                                </span>
+                                <span className="course-badge elective">
+                                  CSE438: Digital Image Processing
+                                </span>
+                                <span className="course-badge core">
+                                  CSE246: Algorithms
+                                </span>
+                                <span className="course-badge core">
+                                  CSE302: Database Systems
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -283,12 +399,16 @@ const ProfilePage = () => {
 
             {/* Experience Column */}
             <div className="timeline-column">
-              <h2 className="section-heading line-below">Professional Experience</h2>
+              <h2 className="section-heading line-below">
+                Professional Experience
+              </h2>
               <div className="timeline">
                 <div className="timeline-line"></div>
                 {workExperience.map((item, index) => {
                   const startLabel = formatDateLabel(item.startDate);
-                  const endLabel = item.endDate ? formatDateLabel(item.endDate) : 'PRESENT';
+                  const endLabel = item.endDate
+                    ? formatDateLabel(item.endDate)
+                    : "PRESENT";
                   const yearRange = `${startLabel} – ${endLabel}`.toUpperCase();
 
                   return (
@@ -301,7 +421,9 @@ const ProfilePage = () => {
                         {item.details && item.details.length > 0 && (
                           <ul className="timeline-details-list">
                             {item.details.map((detail, idx) => (
-                              <li key={idx} className="timeline-desc-bullet">{detail}</li>
+                              <li key={idx} className="timeline-desc-bullet">
+                                {detail}
+                              </li>
                             ))}
                           </ul>
                         )}
@@ -316,14 +438,19 @@ const ProfilePage = () => {
           {/* Certifications Section */}
           {certifications.length > 0 && (
             <div className="certifications-section">
-              <h2 className="section-heading line-below">Certifications & Licenses</h2>
+              <h2 className="section-heading line-below">
+                Certifications & Licenses
+              </h2>
               <div className="certifications-grid">
                 {certifications.map((cert, index) => {
                   const credlyBadge = getCredlyBadgeForCert(cert);
                   const hasBadge = credlyBadge !== null;
 
                   return (
-                    <div key={index} className={`cert-item-card ${hasBadge ? 'has-credly-badge' : ''}`}>
+                    <div
+                      key={index}
+                      className={`cert-item-card ${hasBadge ? "has-credly-badge" : ""}`}
+                    >
                       <div className="cert-item-top">
                         {hasBadge ? (
                           credlyBadge.publicUrl ? (
@@ -344,7 +471,11 @@ const ProfilePage = () => {
                               </div>
                             </a>
                           ) : (
-                            <div className="cert-badge-anchor" style={{ cursor: 'default' }} title={credlyBadge.name}>
+                            <div
+                              className="cert-badge-anchor"
+                              style={{ cursor: "default" }}
+                              title={credlyBadge.name}
+                            >
                               <div className="cert-badge-frame">
                                 <img
                                   src={credlyBadge.imageUrl}
@@ -356,9 +487,7 @@ const ProfilePage = () => {
                             </div>
                           )
                         ) : (
-                          <div className="cert-issuer-badge">
-                            {cert.issuer}
-                          </div>
+                          <div className="cert-issuer-badge">{cert.issuer}</div>
                         )}
 
                         <div className="cert-meta-right">
@@ -375,19 +504,27 @@ const ProfilePage = () => {
                         <h3 className="cert-item-title">{cert.name}</h3>
                         <p className="cert-item-issuer">{cert.issuer}</p>
                         {cert.credentialId && (
-                          <p className="cert-item-id">Credential ID: {cert.credentialId}</p>
+                          <p className="cert-item-id">
+                            Credential ID: {cert.credentialId}
+                          </p>
                         )}
                       </div>
 
                       <div className="cert-item-footer">
                         {cert.credentialUrl && (
-                          <a 
-                            href={cert.credentialUrl.startsWith('http://') || cert.credentialUrl.startsWith('https://') ? cert.credentialUrl : `https://${cert.credentialUrl}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
+                          <a
+                            href={
+                              cert.credentialUrl.startsWith("http://") ||
+                              cert.credentialUrl.startsWith("https://")
+                                ? cert.credentialUrl
+                                : `https://${cert.credentialUrl}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="cert-item-link"
                           >
-                            Verify Credential <ExternalLink size={13} style={{ marginLeft: 4 }} />
+                            Verify Credential{" "}
+                            <ExternalLink size={13} style={{ marginLeft: 4 }} />
                           </a>
                         )}
                         {hasBadge && credlyBadge.publicUrl && (
@@ -398,7 +535,8 @@ const ProfilePage = () => {
                             className="cert-credly-badge-link"
                             title="Verify on Credly"
                           >
-                            Credly Badge <ExternalLink size={11} style={{ marginLeft: 3 }} />
+                            Credly Badge{" "}
+                            <ExternalLink size={11} style={{ marginLeft: 3 }} />
                           </a>
                         )}
                       </div>
@@ -413,9 +551,12 @@ const ProfilePage = () => {
                   <div className="credly-showcase-title-row">
                     <span className="credly-icon-badge">🏅</span>
                     <div>
-                      <h3 className="credly-showcase-title">Credly Verified Digital Badges (9)</h3>
+                      <h3 className="credly-showcase-title">
+                        Credly Verified Digital Badges (9)
+                      </h3>
                       <p className="credly-showcase-desc">
-                        Official, verifiable credentials issued via Credly for Google AI & IBM Data Science specializations.
+                        Official, verifiable credentials issued via Credly for
+                        Google AI & IBM Data Science specializations.
                       </p>
                     </div>
                   </div>
@@ -441,25 +582,43 @@ const ProfilePage = () => {
                         title={`Verify ${b.name} on Credly`}
                       >
                         <div className="credly-single-badge-img-wrap">
-                          <img src={b.imageUrl} alt={b.name} className="credly-single-badge-img" loading="lazy" />
+                          <img
+                            src={b.imageUrl}
+                            alt={b.name}
+                            className="credly-single-badge-img"
+                            loading="lazy"
+                          />
                         </div>
-                        <span className="credly-single-badge-name">{b.name}</span>
-                        <span className="credly-single-badge-issuer">{b.issuer}</span>
+                        <span className="credly-single-badge-name">
+                          {b.name}
+                        </span>
+                        <span className="credly-single-badge-issuer">
+                          {b.issuer}
+                        </span>
                       </a>
                     ) : (
                       <div
                         key={b.id}
                         className="credly-single-badge-card"
-                        style={{ cursor: 'default' }}
+                        style={{ cursor: "default" }}
                         title={b.name}
                       >
                         <div className="credly-single-badge-img-wrap">
-                          <img src={b.imageUrl} alt={b.name} className="credly-single-badge-img" loading="lazy" />
+                          <img
+                            src={b.imageUrl}
+                            alt={b.name}
+                            className="credly-single-badge-img"
+                            loading="lazy"
+                          />
                         </div>
-                        <span className="credly-single-badge-name">{b.name}</span>
-                        <span className="credly-single-badge-issuer">{b.issuer}</span>
+                        <span className="credly-single-badge-name">
+                          {b.name}
+                        </span>
+                        <span className="credly-single-badge-issuer">
+                          {b.issuer}
+                        </span>
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               </div>

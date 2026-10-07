@@ -13,26 +13,10 @@ export interface CredlyBadge {
  */
 export const CREDLY_VERIFIED_BADGES: CredlyBadge[] = [
   {
-    id: "google-ai-fundamentals",
-    name: "Google AI Fundamentals",
-    issuer: "Google",
-    imageUrl: "/badges/google-ai-fundamentals.png",
-    publicUrl:
-      "https://www.credly.com/badges/d172156c-c193-4172-9c79-829d14b9d93e/public_url",
-  },
-  {
-    id: "google-ai-brainstorming",
-    name: "Google AI for Brainstorming and Planning",
-    issuer: "Google",
-    imageUrl: "/badges/google-ai-brainstorming.png",
-    publicUrl:
-      "https://www.credly.com/badges/a257e2c0-3b13-4d63-aa31-1a2d358c4f99/public_url",
-  },
-  {
     id: "google-ai-professional",
     name: "Google AI Professional Certificate",
     issuer: "Google",
-    imageUrl: "/badges/Google AI Professional Certificate.png",
+    imageUrl: "/badges/Google_AI_Professional_Certificate.png",
   },
   {
     id: "ibm-data-science-prof",
