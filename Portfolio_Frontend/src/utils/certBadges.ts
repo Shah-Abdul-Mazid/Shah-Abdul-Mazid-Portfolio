@@ -15,7 +15,7 @@ export const CREDLY_VERIFIED_BADGES: CredlyBadge[] = [
     id: 'google-ai-fundamentals',
     name: 'Google AI Fundamentals',
     issuer: 'Google',
-    imageUrl: 'https://images.credly.com/images/d6521452-e64b-4f96-bc20-4758b720757b/blob',
+    imageUrl: '/badges/google-ai-fundamentals.png',
     publicUrl: 'https://www.credly.com/badges/d172156c-c193-4172-9c79-829d14b9d93e/public_url'
   },
   {

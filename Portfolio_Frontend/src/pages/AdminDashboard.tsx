@@ -829,6 +829,171 @@ const AdminDashboard = () => {
         );
     };
 
+    // ── Badge Drag & Drop Uploader ──────────────────────────────────────────
+    const BadgeUploader = ({ index, value, onUpload }: {
+        index: number;
+        value: string;
+        onUpload: (url: string) => void;
+    }) => {
+        const [dragOver, setDragOver] = useState(false);
+        const [uploading, setUploading] = useState(false);
+        const [urlMode, setUrlMode] = useState(false);
+        const [urlInput, setUrlInput] = useState(value || '');
+        const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+        // Keep urlInput synced when value changes from outside
+        React.useEffect(() => { setUrlInput(value || ''); }, [value]);
+
+        const uploadFile = async (file: File) => {
+            if (!file.type.startsWith('image/')) {
+                showNotification('❌ Please upload an image file (PNG, SVG, JPG)');
+                return;
+            }
+            setUploading(true);
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                if (res.ok) {
+                    const result = await res.json();
+                    if (result.success) {
+                        onUpload(result.url);
+                        showNotification('🏅 Badge uploaded successfully!');
+                    } else {
+                        showNotification(`❌ Upload failed: ${result.message}`);
+                    }
+                } else {
+                    showNotification('❌ Upload connection failed');
+                }
+            } catch {
+                showNotification('❌ Upload connection failed');
+            } finally {
+                setUploading(false);
+            }
+        };
+
+        const handleDrop = (e: React.DragEvent) => {
+            e.preventDefault();
+            setDragOver(false);
+            const file = e.dataTransfer.files?.[0];
+            if (file) uploadFile(file);
+        };
+
+        return (
+            <div className="form-group" style={{ marginTop: '8px' }}>
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        🏅 Credly Badge Image
+                    </span>
+                    <button
+                        type="button"
+                        onClick={() => setUrlMode(!urlMode)}
+                        style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                        {urlMode ? <><Upload size={12} /> Use Drag & Drop</> : <><LinkIcon size={12} /> Paste URL Instead</>}
+                    </button>
+                </label>
+
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    {/* Left: drop zone OR url input */}
+                    <div style={{ flex: 1 }}>
+                        {urlMode ? (
+                            <input
+                                type="text"
+                                value={urlInput}
+                                placeholder="https://images.credly.com/size/340x340/images/..."
+                                onChange={e => { setUrlInput(e.target.value); onUpload(e.target.value); }}
+                                style={{ width: '100%' }}
+                            />
+                        ) : (
+                            <>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*,.svg"
+                                    style={{ display: 'none' }}
+                                    id={`badge-file-${index}`}
+                                    onChange={e => { const f = e.target.files?.[0]; if (f) uploadFile(f); }}
+                                />
+                                <div
+                                    onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                                    onDragLeave={() => setDragOver(false)}
+                                    onDrop={handleDrop}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    style={{
+                                        border: dragOver
+                                            ? '2px dashed var(--primary)'
+                                            : value
+                                                ? '2px dashed rgba(16,185,129,0.5)'
+                                                : '2px dashed rgba(139,92,246,0.3)',
+                                        borderRadius: '12px',
+                                        padding: '18px 12px',
+                                        textAlign: 'center',
+                                        cursor: 'pointer',
+                                        background: dragOver
+                                            ? 'rgba(139,92,246,0.08)'
+                                            : value
+                                                ? 'rgba(16,185,129,0.04)'
+                                                : 'rgba(255,255,255,0.02)',
+                                        transition: 'all 0.2s ease',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                    }}
+                                >
+                                    {uploading ? (
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--primary)' }}>⏳ Uploading...</span>
+                                    ) : dragOver ? (
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}>Drop badge here!</span>
+                                    ) : value ? (
+                                        <span style={{ fontSize: '0.8rem', color: '#10b981' }}>✅ Badge uploaded — drop or click to replace</span>
+                                    ) : (
+                                        <>
+                                            <span style={{ fontSize: '1.5rem' }}>🏅</span>
+                                            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Drag & Drop badge here</span>
+                                            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', opacity: 0.7 }}>or click to browse — PNG, SVG, JPG</span>
+                                        </>
+                                    )}
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Right: circular preview */}
+                    {value && (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                            <img
+                                src={value}
+                                alt="Badge Preview"
+                                style={{
+                                    width: '72px',
+                                    height: '72px',
+                                    borderRadius: '50%',
+                                    border: '2px solid rgba(139,92,246,0.5)',
+                                    objectFit: 'contain',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    padding: '4px',
+                                    boxShadow: '0 0 14px rgba(139,92,246,0.25)',
+                                }}
+                                onError={e => { e.currentTarget.style.opacity = '0.3'; }}
+                            />
+                            <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', textAlign: 'center' }}>Preview</span>
+                            <button
+                                type="button"
+                                onClick={() => { onUpload(''); setUrlInput(''); }}
+                                style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                            >
+                                <Trash2 size={11} /> Clear
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+
     const navItems = [
         { id: 'overview', icon: '⚡', label: 'Dashboard' },
         { id: 'profile', icon: '👤', label: editData.sections?.about?.adminLabel || 'About' },
@@ -2133,31 +2298,12 @@ const AdminDashboard = () => {
                                         <input type="text" value={cert.credentialUrl || ''} placeholder="https://..." onChange={e => updateListItem('certifications', i, 'credentialUrl', e.target.value)} />
                                     </div>
 
-                                    <div className="form-group" style={{ marginTop: '8px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            🏅 Credly Badge Image URL
-                                            <span style={{ fontSize: '0.65rem', color: '#9ca3af', fontWeight: 400 }}>
-                                                Paste the badge PNG/SVG URL from credly.com
-                                            </span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={(cert as any).badgeUrl || ''}
-                                            placeholder="https://images.credly.com/size/340x340/images/..."
-                                            onChange={e => updateListItem('certifications', i, 'badgeUrl', e.target.value)}
-                                        />
-                                        {(cert as any).badgeUrl && (
-                                            <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                <img
-                                                    src={(cert as any).badgeUrl}
-                                                    alt="Badge Preview"
-                                                    style={{ width: '52px', height: '52px', borderRadius: '50%', border: '2px solid rgba(139,92,246,0.4)', objectFit: 'contain' }}
-                                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                                />
-                                                <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Badge preview</span>
-                                            </div>
-                                        )}
-                                    </div>
+                                    {/* ── Badge Drag & Drop Uploader ── */}
+                                    <BadgeUploader
+                                        index={i}
+                                        value={(cert as any).badgeUrl || ''}
+                                        onUpload={(url: string) => updateListItem('certifications', i, 'badgeUrl', url)}
+                                    />
 
                                     <div className="form-group">
                                         <label>Skills Earned (Comma separated)</label>
