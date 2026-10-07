@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
 import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles } from 'lucide-react';
@@ -839,10 +839,10 @@ const AdminDashboard = () => {
         const [uploading, setUploading] = useState(false);
         const [urlMode, setUrlMode] = useState(false);
         const [urlInput, setUrlInput] = useState(value || '');
-        const fileInputRef = React.useRef<HTMLInputElement>(null);
+        const fileInputRef = useRef<HTMLInputElement>(null);
 
         // Keep urlInput synced when value changes from outside
-        React.useEffect(() => { setUrlInput(value || ''); }, [value]);
+        useEffect(() => { setUrlInput(value || ''); }, [value]);
 
         const uploadFile = async (file: File) => {
             if (!file.type.startsWith('image/')) {
