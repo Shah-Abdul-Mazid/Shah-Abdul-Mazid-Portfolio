@@ -24,7 +24,7 @@ export const CREDLY_VERIFIED_BADGES: CredlyBadge[] = [
     id: "google-ai-brainstorming",
     name: "Google AI for Brainstorming and Planning",
     issuer: "Google",
-    imageUrl: "/badges/google-ai-brainstorming.png",
+    imageUrl: "/badges/google-ai-for-brainstorming-and-planning.png",
     publicUrl:
       "https://www.credly.com/badges/a257e2c0-3b13-4d63-aa31-1a2d358c4f99/public_url",
   },
