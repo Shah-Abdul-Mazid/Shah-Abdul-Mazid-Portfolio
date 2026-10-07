@@ -31,22 +31,35 @@ const Certifications = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                             {/* Badge / Icon Box */}
                             <div className="cert-icon-box">
                                 {hasBadge ? (
-                                    <a
-                                        href={credlyBadge.publicUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="cert-badge-wrapper"
-                                        title={`Credly Verified Badge: ${credlyBadge.name}`}
-                                    >
-                                        <img
-                                            src={credlyBadge.imageUrl}
-                                            alt={`${cert.name} badge`}
-                                            className="cert-badge-img"
-                                        />
-                                        <span className="cert-badge-label">
-                                            <BadgeCheck size={9} /> Credly
-                                        </span>
-                                    </a>
+                                    credlyBadge.publicUrl ? (
+                                        <a
+                                            href={credlyBadge.publicUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="cert-badge-wrapper"
+                                            title={`Credly Verified Badge: ${credlyBadge.name}`}
+                                        >
+                                            <img
+                                                src={credlyBadge.imageUrl}
+                                                alt={`${cert.name} badge`}
+                                                className="cert-badge-img"
+                                            />
+                                            <span className="cert-badge-label">
+                                                <BadgeCheck size={9} /> Credly
+                                            </span>
+                                        </a>
+                                    ) : (
+                                        <div
+                                            className="cert-badge-wrapper"
+                                            title={`${credlyBadge.name}`}
+                                        >
+                                            <img
+                                                src={credlyBadge.imageUrl}
+                                                alt={`${cert.name} badge`}
+                                                className="cert-badge-img"
+                                            />
+                                        </div>
+                                    )
                                 ) : (
                                     <Award size={24} className="cert-main-icon" />
                                 )}
@@ -94,9 +107,9 @@ const Certifications = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                                                 Verify <ExternalLink size={14} />
                                             </a>
                                         )}
-                                        {hasBadge && (
+                                        {hasBadge && credlyBadge.publicUrl && (
                                             <a
-                                                href={credlyBadge!.publicUrl}
+                                                href={credlyBadge.publicUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="cert-link-btn cert-credly-btn"
@@ -141,24 +154,41 @@ const Certifications = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                     </div>
 
                     <div className="credly-badges-row">
-                        {CREDLY_VERIFIED_BADGES.map((badge, i) => (
-                            <a
-                                key={i}
-                                href={badge.publicUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="credly-badge-item"
-                                title={`Verified on Credly: ${badge.name}`}
-                            >
-                                <img
-                                    src={badge.imageUrl}
-                                    alt={badge.name}
-                                    className="credly-badge-img"
-                                    loading="lazy"
-                                />
-                                <span className="credly-badge-name">{badge.name}</span>
-                            </a>
-                        ))}
+                        {CREDLY_VERIFIED_BADGES.map((badge, i) =>
+                            badge.publicUrl ? (
+                                <a
+                                    key={i}
+                                    href={badge.publicUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="credly-badge-item"
+                                    title={`Verified on Credly: ${badge.name}`}
+                                >
+                                    <img
+                                        src={badge.imageUrl}
+                                        alt={badge.name}
+                                        className="credly-badge-img"
+                                        loading="lazy"
+                                    />
+                                    <span className="credly-badge-name">{badge.name}</span>
+                                </a>
+                            ) : (
+                                <div
+                                    key={i}
+                                    className="credly-badge-item"
+                                    title={badge.name}
+                                    style={{ cursor: 'default' }}
+                                >
+                                    <img
+                                        src={badge.imageUrl}
+                                        alt={badge.name}
+                                        className="credly-badge-img"
+                                        loading="lazy"
+                                    />
+                                    <span className="credly-badge-name">{badge.name}</span>
+                                </div>
+                            )
+                        )}
                     </div>
                 </div>
 

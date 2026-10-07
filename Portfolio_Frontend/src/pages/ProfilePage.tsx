@@ -326,22 +326,35 @@ const ProfilePage = () => {
                     <div key={index} className={`cert-item-card ${hasBadge ? 'has-credly-badge' : ''}`}>
                       <div className="cert-item-top">
                         {hasBadge ? (
-                          <a
-                            href={credlyBadge.publicUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="cert-badge-anchor"
-                            title={`Verify on Credly: ${credlyBadge.name}`}
-                          >
-                            <div className="cert-badge-frame">
-                              <img
-                                src={credlyBadge.imageUrl}
-                                alt={`${credlyBadge.name} badge`}
-                                className="cert-badge-image"
-                                loading="lazy"
-                              />
+                          credlyBadge.publicUrl ? (
+                            <a
+                              href={credlyBadge.publicUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="cert-badge-anchor"
+                              title={`Verify on Credly: ${credlyBadge.name}`}
+                            >
+                              <div className="cert-badge-frame">
+                                <img
+                                  src={credlyBadge.imageUrl}
+                                  alt={`${credlyBadge.name} badge`}
+                                  className="cert-badge-image"
+                                  loading="lazy"
+                                />
+                              </div>
+                            </a>
+                          ) : (
+                            <div className="cert-badge-anchor" style={{ cursor: 'default' }} title={credlyBadge.name}>
+                              <div className="cert-badge-frame">
+                                <img
+                                  src={credlyBadge.imageUrl}
+                                  alt={`${credlyBadge.name} badge`}
+                                  className="cert-badge-image"
+                                  loading="lazy"
+                                />
+                              </div>
                             </div>
-                          </a>
+                          )
                         ) : (
                           <div className="cert-issuer-badge">
                             {cert.issuer}
@@ -369,7 +382,7 @@ const ProfilePage = () => {
                       <div className="cert-item-footer">
                         {cert.credentialUrl && (
                           <a 
-                            href={cert.credentialUrl} 
+                            href={cert.credentialUrl.startsWith('http://') || cert.credentialUrl.startsWith('https://') ? cert.credentialUrl : `https://${cert.credentialUrl}`} 
                             target="_blank" 
                             rel="noopener noreferrer" 
                             className="cert-item-link"
@@ -377,7 +390,7 @@ const ProfilePage = () => {
                             Verify Credential <ExternalLink size={13} style={{ marginLeft: 4 }} />
                           </a>
                         )}
-                        {hasBadge && (
+                        {hasBadge && credlyBadge.publicUrl && (
                           <a
                             href={credlyBadge.publicUrl}
                             target="_blank"
@@ -417,22 +430,37 @@ const ProfilePage = () => {
                 </div>
 
                 <div className="credly-badges-grid">
-                  {CREDLY_VERIFIED_BADGES.map((b) => (
-                    <a
-                      key={b.id}
-                      href={b.publicUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="credly-single-badge-card"
-                      title={`Verify ${b.name} on Credly`}
-                    >
-                      <div className="credly-single-badge-img-wrap">
-                        <img src={b.imageUrl} alt={b.name} className="credly-single-badge-img" loading="lazy" />
+                  {CREDLY_VERIFIED_BADGES.map((b) =>
+                    b.publicUrl ? (
+                      <a
+                        key={b.id}
+                        href={b.publicUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="credly-single-badge-card"
+                        title={`Verify ${b.name} on Credly`}
+                      >
+                        <div className="credly-single-badge-img-wrap">
+                          <img src={b.imageUrl} alt={b.name} className="credly-single-badge-img" loading="lazy" />
+                        </div>
+                        <span className="credly-single-badge-name">{b.name}</span>
+                        <span className="credly-single-badge-issuer">{b.issuer}</span>
+                      </a>
+                    ) : (
+                      <div
+                        key={b.id}
+                        className="credly-single-badge-card"
+                        style={{ cursor: 'default' }}
+                        title={b.name}
+                      >
+                        <div className="credly-single-badge-img-wrap">
+                          <img src={b.imageUrl} alt={b.name} className="credly-single-badge-img" loading="lazy" />
+                        </div>
+                        <span className="credly-single-badge-name">{b.name}</span>
+                        <span className="credly-single-badge-issuer">{b.issuer}</span>
                       </div>
-                      <span className="credly-single-badge-name">{b.name}</span>
-                      <span className="credly-single-badge-issuer">{b.issuer}</span>
-                    </a>
-                  ))}
+                    )
+                  )}
                 </div>
               </div>
             </div>

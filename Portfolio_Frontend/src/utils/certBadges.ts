@@ -33,8 +33,6 @@ export const CREDLY_VERIFIED_BADGES: CredlyBadge[] = [
     name: "Google AI Professional Certificate",
     issuer: "Google",
     imageUrl: "/badges/Google AI Professional Certificate.png",
-    publicUrl:
-      "https://www.credly.com/badges/6a8e7540-1d98-455d-af07-2559ed272e3b/public_url",
   },
   {
     id: "ibm-data-science-prof",
@@ -100,6 +98,9 @@ export const CREDLY_VERIFIED_BADGES: CredlyBadge[] = [
   },
 ];
 
+const getBadgeById = (id: string): CredlyBadge | null =>
+  CREDLY_VERIFIED_BADGES.find((b) => b.id === id) || null;
+
 /**
  * Returns EXACTLY ONE verified Credly badge for a certification.
  * STRICT: Each certification gets at most ONE badge. Never multiple.
@@ -126,7 +127,7 @@ export function getCredlyBadgeForCert(cert: {
     name.includes("ai") &&
     name.includes("professional")
   ) {
-    return CREDLY_VERIFIED_BADGES[2];
+    return getBadgeById("google-ai-professional");
   }
 
   // 1b. Google AI Fundamentals / generic Google AI → Google AI Fundamentals badge
@@ -137,12 +138,12 @@ export function getCredlyBadgeForCert(cert: {
       name.includes("ai") &&
       !name.includes("brainstorming"))
   ) {
-    return CREDLY_VERIFIED_BADGES[0];
+    return getBadgeById("google-ai-fundamentals");
   }
 
   // 2. RAG for Generative AI Applications → Generative AI Essentials for Data Science
   if (name.includes("rag") && name.includes("generative")) {
-    return CREDLY_VERIFIED_BADGES[5];
+    return getBadgeById("ibm-genai-essentials");
   }
 
   // 3. IBM Generative AI Engineering → Generative AI Essentials for Data Science
@@ -152,12 +153,12 @@ export function getCredlyBadgeForCert(cert: {
       name.includes("engineering") &&
       issuer.includes("ibm"))
   ) {
-    return CREDLY_VERIFIED_BADGES[5];
+    return getBadgeById("ibm-genai-essentials");
   }
 
   // 4. IBM AI Engineering → Artificial Intelligence Essentials V2
   if (name.includes("ai engineering") && issuer.includes("ibm")) {
-    return CREDLY_VERIFIED_BADGES[8];
+    return getBadgeById("ibm-ai-essentials-v2");
   }
 
   // 5. IBM Data Science (not Foundations) → IBM Data Science Professional Certificate (V3)
@@ -166,7 +167,7 @@ export function getCredlyBadgeForCert(cert: {
     !name.includes("foundations") &&
     issuer.includes("ibm")
   ) {
-    return CREDLY_VERIFIED_BADGES[2];
+    return getBadgeById("ibm-data-science-prof");
   }
 
   // No badge for any other cert
