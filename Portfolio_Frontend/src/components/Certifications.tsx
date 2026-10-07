@@ -86,7 +86,7 @@ const Certifications = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                                     <div className="cert-link-group" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                                         {cert.credentialUrl && (
                                             <a 
-                                                href={cert.credentialUrl} 
+                                                href={cert.credentialUrl.startsWith('http://') || cert.credentialUrl.startsWith('https://') ? cert.credentialUrl : `https://${cert.credentialUrl}`} 
                                                 target="_blank" 
                                                 rel="noopener noreferrer" 
                                                 className="cert-link-btn"

@@ -32,13 +32,15 @@ export const CREDLY_VERIFIED_BADGES: CredlyBadge[] = [
     id: "google-ai-professional",
     name: "Google AI Professional Certificate",
     issuer: "Google",
-    imageUrl: "/badges/google-ai-professional.png",
+    imageUrl: "/badges/Google AI Professional Certificate.png",
+    publicUrl:
+      "https://www.credly.com/badges/6a8e7540-1d98-455d-af07-2559ed272e3b/public_url",
   },
   {
     id: "ibm-data-science-prof",
     name: "IBM Data Science Professional Certificate (V3)",
     issuer: "IBM",
-    imageUrl: "/badges/ibm-data-science-prof.png",
+    imageUrl: "/badges/ibm-data-science-professional-certificate-v3.png",
     publicUrl:
       "https://www.credly.com/badges/6a8e7540-1d98-455d-af07-2559ed272e3b/public_url",
   },
@@ -118,7 +120,16 @@ export function getCredlyBadgeForCert(cert: {
   const issuer = (cert.issuer || "").trim().toLowerCase();
   const credId = (cert.credentialId || "").trim();
 
-  // 1. Google AI → Google AI Fundamentals
+  // 1a. Google AI Professional Certificate → Google AI Professional Certificate badge
+  if (
+    name.includes("google") &&
+    name.includes("ai") &&
+    name.includes("professional")
+  ) {
+    return CREDLY_VERIFIED_BADGES[2];
+  }
+
+  // 1b. Google AI Fundamentals / generic Google AI → Google AI Fundamentals badge
   if (
     name === "google ai" ||
     credId === "AGNE8JCWOITV" ||
