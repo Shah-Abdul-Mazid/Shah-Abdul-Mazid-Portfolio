@@ -182,37 +182,43 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
         id: "google-ai-c3",
         order: 3,
         title: "AI for Research and Insights",
-        status: "in-progress"
+        status: "completed",
+        completionDate: "2026"
       },
       {
         id: "google-ai-c4",
         order: 4,
         title: "AI for Writing and Communicating",
-        status: "in-progress"
+        status: "completed",
+        completionDate: "2026"
       },
       {
         id: "google-ai-c5",
         order: 5,
         title: "AI for Content Creation",
-        status: "in-progress"
+        status: "completed",
+        completionDate: "2026"
       },
       {
         id: "google-ai-c6",
         order: 6,
         title: "AI for Data Analysis",
-        status: "in-progress"
+        status: "completed",
+        completionDate: "2026"
       },
       {
         id: "google-ai-c7",
         order: 7,
         title: "AI for App Building",
-        status: "in-progress"
+        status: "completed",
+        completionDate: "2026"
       },
       {
         id: "google-ai-c8",
         order: 8,
         title: "AI for App Deployment",
-        status: "in-progress"
+        status: "completed",
+        completionDate: "2026"
       }
     ]
   },
