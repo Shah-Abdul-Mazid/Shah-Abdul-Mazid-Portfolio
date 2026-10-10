@@ -497,6 +497,10 @@ export function getNormalizedCertifications(apiCerts?: Array<{
   badgePublicUrl?: string;
   date?: string;
   skills?: string[];
+  category?: CredentialCategory;
+  credentialType?: CredentialType;
+  programNote?: string;
+  subCourses?: SubCourseItem[];
 }>): CredentialRecord[] {
   if (!apiCerts || apiCerts.length === 0) {
     return CANONICAL_CREDENTIALS;
@@ -527,6 +531,11 @@ export function getNormalizedCertifications(apiCerts?: Array<{
         ? matchingApi.badgeUrl 
         : canon.badgeUrl;
 
+      // Merge subCourses if matchingApi provides them, otherwise use canonical
+      const mergedSubCourses = (matchingApi.subCourses && matchingApi.subCourses.length > 0)
+        ? matchingApi.subCourses
+        : canon.subCourses;
+
       results.push({
         ...canon,
         title: matchingApi.name || canon.title,
@@ -536,7 +545,11 @@ export function getNormalizedCertifications(apiCerts?: Array<{
         verificationUrl: matchingApi.credentialUrl || canon.verificationUrl,
         badgeUrl: cleanApiBadgeUrl,
         credlyUrl: matchingApi.badgePublicUrl || canon.credlyUrl,
-        skills: matchingApi.skills && matchingApi.skills.length > 0 ? matchingApi.skills : canon.skills
+        skills: matchingApi.skills && matchingApi.skills.length > 0 ? matchingApi.skills : canon.skills,
+        programNote: matchingApi.programNote !== undefined && matchingApi.programNote !== '' ? matchingApi.programNote : canon.programNote,
+        category: (matchingApi.category || canon.category) as CredentialCategory,
+        credentialType: (matchingApi.credentialType || canon.credentialType) as CredentialType,
+        subCourses: mergedSubCourses
       });
     } else {
       results.push(canon);
@@ -556,8 +569,8 @@ export function getNormalizedCertifications(apiCerts?: Array<{
         id: `custom-${(ac.credentialId || ac.name).toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
         title: ac.name,
         issuer: ac.issuer || 'Professional',
-        category: nameLower.includes('professional') || nameLower.includes('engineer') ? 'professional' : 'course',
-        credentialType: nameLower.includes('specialization') ? 'Specialization' : 'Course',
+        category: (ac.category || (nameLower.includes('professional') || nameLower.includes('engineer') ? 'professional' : 'course')) as CredentialCategory,
+        credentialType: (ac.credentialType || (nameLower.includes('specialization') ? 'Specialization' : 'Course')) as CredentialType,
         date: ac.date || '',
         credentialId: ac.credentialId,
         verificationUrl: ac.credentialUrl,
@@ -565,7 +578,9 @@ export function getNormalizedCertifications(apiCerts?: Array<{
         credlyUrl: ac.badgePublicUrl,
         sourcePlatform: (ac.issuer?.includes('IBM') ? 'IBM' : ac.issuer?.includes('Google') ? 'Google' : 'Coursera') as any,
         status: 'verified',
-        skills: ac.skills
+        skills: ac.skills,
+        programNote: ac.programNote,
+        subCourses: ac.subCourses
       });
     }
   });

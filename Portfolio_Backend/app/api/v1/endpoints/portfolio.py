@@ -83,14 +83,23 @@ async def save_portfolio(
         "cleaned": len(deleted_paths)
     }
 
-@router.post("/sync-cv")
-async def sync_cv_latex(
-    data: dict = Body(...),
-    admin=Depends(get_admin_user)
-):
-    """Manually trigger synchronization of Visual CV LaTeX file with portfolio publications."""
-    from app.utils.latex_sync import update_visual_cv_latex
-    papers = data.get("papers", [])
-    success = update_visual_cv_latex(papers)
-    return {"success": success, "message": "Visual CV LaTeX synchronized with publications."}
+@router.get("/credly-image")
+async def get_credly_badge_image(url: str):
+    """Fetches the official Credly badge image URL directly from any public Credly badge link."""
+    import urllib.request, re
+    try:
+        clean_url = url.strip()
+        if not clean_url.startswith("http"):
+            clean_url = f"https://www.credly.com/badges/{clean_url}/public_url"
+        req = urllib.request.Request(clean_url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+        html = urllib.request.urlopen(req, timeout=8).read().decode("utf-8")
+        matches = re.findall(r'meta property="og:image" content="([^"]+)"', html)
+        if matches:
+            img = matches[0]
+            clean_img = img.replace("linkedin_thumb_", "")
+            return {"success": True, "imageUrl": clean_img}
+        return {"success": False, "error": "No image found on Credly page"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 

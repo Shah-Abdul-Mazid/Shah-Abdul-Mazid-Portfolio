@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { GITHUB_URL, SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL } from '../constants/researchLinks';
+import { CANONICAL_CREDENTIALS } from '../data/certificationData';
 
 export interface SkillCategory {
     name: string;
@@ -601,6 +602,50 @@ const defaultPapers: PaperItem[] = [
     }
 ];
 
+export const defaultCertifications: CertificationItem[] = CANONICAL_CREDENTIALS.map(c => ({
+    name: c.title,
+    issuer: c.issuer,
+    date: c.date || '',
+    credentialId: c.credentialId,
+    credentialUrl: c.verificationUrl,
+    badgeUrl: c.badgeUrl,
+    badgePublicUrl: c.credlyUrl,
+    skills: c.skills || [],
+    category: c.category,
+    credentialType: c.credentialType,
+    programNote: c.programNote,
+    subCourses: c.subCourses,
+    links: []
+}));
+
+export const mergeCertificationsWithCanonical = (apiCerts?: any[]): CertificationItem[] => {
+    if (!apiCerts || apiCerts.length === 0) return defaultCertifications;
+    return apiCerts.map(cert => {
+        const canon = CANONICAL_CREDENTIALS.find(c => 
+            (c.credentialId && cert.credentialId && c.credentialId.toLowerCase() === cert.credentialId.toLowerCase()) ||
+            (c.title.toLowerCase() === (cert.name || '').toLowerCase()) ||
+            (c.id === 'google-ai-prof' && (cert.name || '').toLowerCase().includes('google ai')) ||
+            (c.id === 'ibm-data-science-prof' && (cert.name || '').toLowerCase().includes('ibm data science'))
+        );
+        return {
+            ...cert,
+            name: cert.name || canon?.title || '',
+            issuer: cert.issuer || canon?.issuer || '',
+            date: cert.date || canon?.date || '',
+            credentialId: cert.credentialId || canon?.credentialId || '',
+            credentialUrl: cert.credentialUrl || canon?.verificationUrl || '',
+            badgeUrl: cert.badgeUrl || canon?.badgeUrl || '',
+            badgePublicUrl: cert.badgePublicUrl || canon?.credlyUrl || '',
+            category: cert.category || canon?.category || 'professional',
+            credentialType: cert.credentialType || canon?.credentialType || 'Professional Certificate',
+            programNote: cert.programNote !== undefined && cert.programNote !== '' ? cert.programNote : (canon?.programNote || ''),
+            skills: (cert.skills && cert.skills.length > 0) ? cert.skills : (canon?.skills || []),
+            subCourses: (cert.subCourses && cert.subCourses.length > 0) ? cert.subCourses : (canon?.subCourses || []),
+            links: cert.links || []
+        };
+    });
+};
+
 const defaultData: PortfolioData = {
     sections: {
         about: { navLabel: 'About', adminLabel: 'Intro & Profile', subtitle: 'About Me', title: 'A Digital Craftsman with a Passion' },
@@ -779,9 +824,7 @@ const defaultData: PortfolioData = {
     blogs: [
         { title: 'The Future of AI in Web Development', date: 'October 2024', excerpt: 'Exploring how large language models are fundamentally changing how we approach UI engineering.', url: '#' }
     ],
-    certifications: [
-        { name: 'Machine Learning Specialization', issuer: 'Coursera (Stanford)', date: '2023', credentialId: 'ABC-123', credentialUrl: 'https://coursera.org/verify/123' }
-    ],
+    certifications: defaultCertifications,
     contact: {
         email: "shahabdulmazid.ezan@yahoo.com",
         phone: "(+88015) 3132-9222",
@@ -858,7 +901,8 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
                             sections: { ...defaultData.sections, ...(apiData.sections || {}) },
                             contact: { ...defaultData.contact, ...(apiData.contact || {}) },
                             skills: (apiData.skills && apiData.skills.length > 0) ? apiData.skills : defaultData.skills,
-                            papers: (apiData.papers && apiData.papers.length > 0) ? apiData.papers : defaultData.papers
+                            papers: (apiData.papers && apiData.papers.length > 0) ? apiData.papers : defaultData.papers,
+                            certifications: mergeCertificationsWithCanonical(apiData.certifications)
                         };
                         const sanitized = sanitizeData(merged);
                         setData(sanitized);
@@ -880,7 +924,8 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
                         sections: { ...defaultData.sections, ...(parsed.sections || {}) },
                         contact: { ...defaultData.contact, ...(parsed.contact || {}) },
                         skills: (parsed.skills && parsed.skills.length > 0) ? parsed.skills : defaultData.skills,
-                        papers: (parsed.papers && parsed.papers.length > 0) ? parsed.papers : defaultData.papers
+                        papers: (parsed.papers && parsed.papers.length > 0) ? parsed.papers : defaultData.papers,
+                        certifications: mergeCertificationsWithCanonical(parsed.certifications)
                     };
                     setData(sanitizeData(merged));
                     return;

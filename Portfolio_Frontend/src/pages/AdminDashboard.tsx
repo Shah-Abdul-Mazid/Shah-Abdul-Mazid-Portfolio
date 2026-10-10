@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles } from 'lucide-react';
+import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles, CheckCircle2, ChevronDown, ChevronUp, Layers } from 'lucide-react';
 import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, PaperItem, SkillCategory } from '../context/PortfolioContext';
 import './AdminDashboard.css';
 
@@ -24,6 +24,11 @@ const AdminDashboard = () => {
     const [bibtexParseStatus, setBibtexParseStatus] = useState<Record<number, { msg: string; type: 'success' | 'error' }>>({});
     const [generatingIndex, setGeneratingIndex] = useState<number | null>(null);
     const [customInstructions, setCustomInstructions] = useState<Record<number, string>>({});
+    const [expandedCurriculums, setExpandedCurriculums] = useState<Record<number, boolean>>({ 0: true, 1: true });
+
+    const toggleCurriculum = (idx: number) => {
+        setExpandedCurriculums(prev => ({ ...prev, [idx]: !prev[idx] }));
+    };
 
     const handleGenerateProjectAI = async (index: number, customPrompt?: string) => {
         const project = editData.projects[index];
@@ -549,6 +554,69 @@ const AdminDashboard = () => {
         });
     };
 
+    const updateSubCourse = (certIndex: number, subIndex: number, field: string, value: any) => {
+        setEditData(prev => {
+            const list = [...prev.certifications];
+            const cert = { ...list[certIndex] };
+            const subCourses = [...(cert.subCourses || [])];
+            subCourses[subIndex] = { ...subCourses[subIndex], [field]: value };
+            cert.subCourses = subCourses;
+            list[certIndex] = cert;
+            return { ...prev, certifications: list };
+        });
+    };
+
+    const toggleSubCourseStatus = (certIndex: number, subIndex: number) => {
+        setEditData(prev => {
+            const list = [...prev.certifications];
+            const cert = { ...list[certIndex] };
+            const subCourses = [...(cert.subCourses || [])];
+            const current = subCourses[subIndex]?.status;
+            const newStatus = (current === 'verified' || current === 'completed') ? 'in-progress' : 'verified';
+            subCourses[subIndex] = { ...subCourses[subIndex], status: newStatus };
+            cert.subCourses = subCourses;
+            list[certIndex] = cert;
+            return { ...prev, certifications: list };
+        });
+        showNotification('⚡ Course status updated');
+    };
+
+    const addSubCourse = (certIndex: number) => {
+        setEditData(prev => {
+            const list = [...prev.certifications];
+            const cert = { ...list[certIndex] };
+            const subCourses = [...(cert.subCourses || [])];
+            const nextOrder = subCourses.length + 1;
+            subCourses.push({
+                id: `sub-${Date.now()}-${nextOrder}`,
+                order: nextOrder,
+                title: '',
+                status: 'in-progress',
+                credlyUrl: '',
+                badgeImageUrl: '',
+                completionDate: ''
+            });
+            cert.subCourses = subCourses;
+            list[certIndex] = cert;
+            return { ...prev, certifications: list };
+        });
+        setExpandedCurriculums(prev => ({ ...prev, [certIndex]: true }));
+        showNotification('➕ Added sub-course to curriculum');
+    };
+
+    const removeSubCourse = (certIndex: number, subIndex: number) => {
+        setEditData(prev => {
+            const list = [...prev.certifications];
+            const cert = { ...list[certIndex] };
+            const subCourses = [...(cert.subCourses || [])];
+            subCourses.splice(subIndex, 1);
+            cert.subCourses = subCourses.map((s: any, idx: number) => ({ ...s, order: idx + 1 }));
+            list[certIndex] = cert;
+            return { ...prev, certifications: list };
+        });
+        showNotification('🗑️ Removed course from curriculum');
+    };
+
 
     const addWorkDetail = (workIndex: number) => {
         setEditData(prev => {
@@ -885,6 +953,32 @@ const AdminDashboard = () => {
             if (file) uploadFile(file);
         };
 
+        const [fetchingCredly, setFetchingCredly] = useState(false);
+
+        const fetchImageFromCredly = async (targetUrl?: string) => {
+            const link = targetUrl || publicUrl;
+            if (!link || !link.includes('credly.com')) {
+                showNotification('⚠️ Please enter a valid Credly badge public URL first');
+                return;
+            }
+            setFetchingCredly(true);
+            try {
+                const res = await fetch(`/api/portfolio/credly-image?url=${encodeURIComponent(link.trim())}`);
+                const data = await res.json();
+                if (data.success && data.imageUrl) {
+                    onUpload(data.imageUrl);
+                    setUrlInput(data.imageUrl);
+                    showNotification('✨ Badge image auto-fetched from Credly!');
+                } else {
+                    showNotification(`⚠️ Could not auto-detect image: ${data.error || 'Check URL'}`);
+                }
+            } catch {
+                showNotification('❌ Failed to connect to Credly fetch service');
+            } finally {
+                setFetchingCredly(false);
+            }
+        };
+
         return (
             <div className="form-group" style={{ marginTop: '8px' }}>
                 <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -996,14 +1090,20 @@ const AdminDashboard = () => {
                     )}
                 </div>
 
-                {/* ── Credly Badge Public URL (optional — add later) ── */}
+                {/* ── Credly Badge Public URL with Auto-Fetch ── */}
                 <div style={{ marginTop: '10px', display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <div style={{ flex: 1, position: 'relative' }}>
                         <input
                             type="text"
                             value={publicUrl || ''}
-                            placeholder="https://www.credly.com/badges/... (optional — add when available)"
-                            onChange={e => onPublicUrl?.(e.target.value)}
+                            placeholder="https://www.credly.com/badges/... (paste link to auto-fetch image)"
+                            onChange={e => {
+                                const val = e.target.value;
+                                onPublicUrl?.(val);
+                                if (val.includes('credly.com/badges/') && !value) {
+                                    fetchImageFromCredly(val);
+                                }
+                            }}
                             style={{ width: '100%', paddingRight: '36px', fontSize: '0.8rem' }}
                         />
                         <LinkIcon
@@ -1011,6 +1111,30 @@ const AdminDashboard = () => {
                             style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none', opacity: 0.5 }}
                         />
                     </div>
+                    {publicUrl && (
+                        <button
+                            type="button"
+                            onClick={() => fetchImageFromCredly()}
+                            disabled={fetchingCredly}
+                            title="Auto-fetch official badge image from this Credly page"
+                            style={{ 
+                                display: 'inline-flex', 
+                                alignItems: 'center', 
+                                gap: '4px',
+                                padding: '6px 10px', 
+                                borderRadius: '8px', 
+                                background: 'rgba(56, 189, 248, 0.15)', 
+                                border: '1px solid rgba(56, 189, 248, 0.3)', 
+                                color: '#38bdf8', 
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                flexShrink: 0 
+                            }}
+                        >
+                            {fetchingCredly ? '⏳ Fetching...' : <><Sparkles size={12} /> Auto-Fetch Image</>}
+                        </button>
+                    )}
                     {publicUrl && (
                         <a
                             href={publicUrl}
@@ -1024,7 +1148,7 @@ const AdminDashboard = () => {
                     )}
                 </div>
                 <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', margin: '4px 0 0', opacity: 0.7 }}>
-                    🔗 Credly Badge URL — leave blank for now, add when you have it
+                    🔗 Paste any Credly badge link — click Auto-Fetch or let our system detect the official badge image CDN URL!
                 </p>
             </div>
         );
@@ -2298,10 +2422,47 @@ const AdminDashboard = () => {
                             <SaveBar />
                             {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="certifications" />
-                            {editData.certifications?.map((cert: any, i: number) => (
+                            {editData.certifications?.map((cert: any, i: number) => {
+                                const hasSubCourses = !!cert.subCourses && cert.subCourses.length > 0;
+                                const completedCount = cert.subCourses?.filter((s: any) => s.status === 'verified' || s.status === 'completed').length || 0;
+                                const totalCount = cert.subCourses?.length || 0;
+                                const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+                                return (
                                 <div key={i} className="form-section item-card">
-                                    <div className="item-card-header">
-                                        <h4 className="section-label">Certification #{i + 1}</h4>
+                                    <div className="item-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                                            <h4 className="section-label" style={{ margin: 0 }}>
+                                                #{i + 1} {cert.name || 'Untitled Certification'}
+                                            </h4>
+                                            <span style={{ 
+                                                fontSize: '0.72rem', 
+                                                padding: '2px 8px', 
+                                                borderRadius: '999px', 
+                                                background: cert.category === 'course' ? 'rgba(168, 85, 247, 0.15)' : 'rgba(56, 189, 248, 0.15)', 
+                                                color: cert.category === 'course' ? '#c084fc' : '#38bdf8', 
+                                                border: `1px solid ${cert.category === 'course' ? 'rgba(168, 85, 247, 0.3)' : 'rgba(56, 189, 248, 0.3)'}`,
+                                                fontWeight: 600
+                                            }}>
+                                                {cert.category === 'course' ? 'Tier 2: Course / Spec' : 'Tier 1: Professional'}
+                                            </span>
+                                            {hasSubCourses && (
+                                                <span style={{ 
+                                                    fontSize: '0.72rem', 
+                                                    padding: '2px 8px', 
+                                                    borderRadius: '999px', 
+                                                    background: completedCount === totalCount ? 'rgba(16, 185, 129, 0.15)' : 'rgba(234, 179, 8, 0.15)', 
+                                                    color: completedCount === totalCount ? '#34d399' : '#facc15', 
+                                                    border: `1px solid ${completedCount === totalCount ? 'rgba(16, 185, 129, 0.3)' : 'rgba(234, 179, 8, 0.3)'}`,
+                                                    fontWeight: 600,
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px'
+                                                }}>
+                                                    <CheckCircle2 size={11} /> {completedCount} / {totalCount} Completed ({progressPct}%)
+                                                </span>
+                                            )}
+                                        </div>
                                         <button type="button" className="remove-btn" onClick={() => removeListItem('certifications', i)}><Minus size={14} /> Remove</button>
                                     </div>
                                     <div className="flex-group">
@@ -2388,8 +2549,6 @@ const AdminDashboard = () => {
                                         />
                                     </div>
 
-
-
                                     <div className="form-section-nested" style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '12px', marginTop: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                         <h5 className="section-label" style={{ fontSize: '0.7rem', marginBottom: '12px' }}>Additional Credential Links</h5>
                                         {cert.links?.map((link: any, lIndex: number) => (
@@ -2407,8 +2566,268 @@ const AdminDashboard = () => {
                                             <Plus size={14} /> Add Another Link
                                         </button>
                                     </div>
+
+                                    {/* ── Progressive Curriculum / Sub-Courses Tray ── */}
+                                    <div className="form-section-nested" style={{ 
+                                        background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.4))', 
+                                        padding: '18px', 
+                                        borderRadius: '14px', 
+                                        marginTop: '16px', 
+                                        border: hasSubCourses ? '1px solid rgba(56, 189, 248, 0.25)' : '1px dashed rgba(255, 255, 255, 0.1)' 
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: hasSubCourses ? '12px' : 0 }}>
+                                            <div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <Layers size={16} color="#38bdf8" />
+                                                    <h5 className="section-label" style={{ fontSize: '0.85rem', margin: 0, color: '#f8fafc', fontWeight: 600 }}>
+                                                        Parent-Child Progressive Curriculum {hasSubCourses ? `(${totalCount} Courses)` : ''}
+                                                    </h5>
+                                                </div>
+                                                {hasSubCourses && (
+                                                    <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                                                        Track multi-course program progress course-by-course with Credly badges.
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            {hasSubCourses && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                    <span style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: 600 }}>
+                                                        {completedCount} / {totalCount} Completed ({progressPct}%)
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => toggleCurriculum(i)}
+                                                        style={{
+                                                            background: 'rgba(255, 255, 255, 0.05)',
+                                                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                            color: '#94a3b8',
+                                                            padding: '4px 10px',
+                                                            borderRadius: '6px',
+                                                            fontSize: '0.72rem',
+                                                            cursor: 'pointer',
+                                                            display: 'inline-flex',
+                                                            alignItems: 'center',
+                                                            gap: '4px'
+                                                        }}
+                                                    >
+                                                        {expandedCurriculums[i] ? <>Collapse <ChevronUp size={12} /></> : <>Expand <ChevronDown size={12} /></>}
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {hasSubCourses && (
+                                            <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '999px', overflow: 'hidden', marginBottom: '16px' }}>
+                                                <div style={{ 
+                                                    width: `${progressPct}%`, 
+                                                    height: '100%', 
+                                                    background: completedCount === totalCount ? 'linear-gradient(90deg, #10b981, #059669)' : 'linear-gradient(90deg, #38bdf8, #818cf8)',
+                                                    transition: 'width 0.3s ease'
+                                                }} />
+                                            </div>
+                                        )}
+
+                                        {hasSubCourses && expandedCurriculums[i] && (
+                                            <div className="subcourses-editor-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '14px' }}>
+                                                {cert.subCourses.map((sub: any, sIdx: number) => {
+                                                    const isVerified = sub.status === 'verified';
+                                                    const isCompleted = isVerified || sub.status === 'completed';
+                                                    return (
+                                                        <div 
+                                                            key={sub.id || sIdx} 
+                                                            style={{ 
+                                                                background: isVerified 
+                                                                    ? 'rgba(16, 185, 129, 0.04)' 
+                                                                    : 'rgba(255, 255, 255, 0.02)', 
+                                                                border: isVerified 
+                                                                    ? '1px solid rgba(16, 185, 129, 0.25)' 
+                                                                    : '1px solid rgba(255, 255, 255, 0.06)', 
+                                                                padding: '14px', 
+                                                                borderRadius: '10px' 
+                                                            }}
+                                                        >
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                    <span style={{ 
+                                                                        fontSize: '0.72rem', 
+                                                                        fontWeight: 700, 
+                                                                        padding: '2px 8px', 
+                                                                        borderRadius: '6px', 
+                                                                        background: isCompleted ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                                                                        color: isCompleted ? '#34d399' : '#94a3b8' 
+                                                                    }}>
+                                                                        #{sub.order || sIdx + 1}
+                                                                    </span>
+                                                                    <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#f1f5f9' }}>
+                                                                        {sub.title || `Sub-Course #${sIdx + 1}`}
+                                                                    </span>
+                                                                </div>
+
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => toggleSubCourseStatus(i, sIdx)}
+                                                                        title="Quick 1-click status toggle"
+                                                                        style={{
+                                                                            background: isVerified ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+                                                                            border: `1px solid ${isVerified ? 'rgba(16, 185, 129, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
+                                                                            color: isVerified ? '#34d399' : '#cbd5e1',
+                                                                            padding: '4px 8px',
+                                                                            borderRadius: '6px',
+                                                                            fontSize: '0.7rem',
+                                                                            cursor: 'pointer',
+                                                                            display: 'inline-flex',
+                                                                            alignItems: 'center',
+                                                                            gap: '4px',
+                                                                            fontWeight: 600
+                                                                        }}
+                                                                    >
+                                                                        {isVerified ? (
+                                                                            <>✓ Verified on Credly</>
+                                                                        ) : (
+                                                                            <>○ Mark as Verified</>
+                                                                        )}
+                                                                    </button>
+                                                                    <button 
+                                                                        type="button" 
+                                                                        className="icon-btn danger" 
+                                                                        title="Remove this sub-course"
+                                                                        onClick={() => removeSubCourse(i, sIdx)}
+                                                                    >
+                                                                        <Minus size={14} />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex-group" style={{ marginBottom: '8px' }}>
+                                                                <div className="form-group w-50" style={{ marginBottom: 0 }}>
+                                                                    <label style={{ fontSize: '0.7rem' }}>Course Title</label>
+                                                                    <input 
+                                                                        type="text" 
+                                                                        value={sub.title || ''} 
+                                                                        placeholder="e.g. AI for Research and Insights" 
+                                                                        onChange={e => updateSubCourse(i, sIdx, 'title', e.target.value)} 
+                                                                    />
+                                                                </div>
+                                                                <div className="form-group w-50" style={{ marginBottom: 0 }}>
+                                                                    <label style={{ fontSize: '0.7rem' }}>Status</label>
+                                                                    <select 
+                                                                        value={sub.status || 'in-progress'} 
+                                                                        onChange={e => updateSubCourse(i, sIdx, 'status', e.target.value)}
+                                                                    >
+                                                                        <option value="verified">Verified (Completed + Credly Badge)</option>
+                                                                        <option value="completed">Completed (No Badge)</option>
+                                                                        <option value="in-progress">In Progress (Curriculum)</option>
+                                                                        <option value="curriculum">Planned Curriculum</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex-group" style={{ marginBottom: '8px' }}>
+                                                                <div className="form-group w-50" style={{ marginBottom: 0 }}>
+                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                                                        <label style={{ fontSize: '0.7rem', margin: 0 }}>Credly Badge Public URL (Optional)</label>
+                                                                        {sub.credlyUrl && (
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={async () => {
+                                                                                    showNotification('⏳ Fetching image from Credly...');
+                                                                                    try {
+                                                                                        const res = await fetch(`/api/portfolio/credly-image?url=${encodeURIComponent(sub.credlyUrl.trim())}`);
+                                                                                        const data = await res.json();
+                                                                                        if (data.success && data.imageUrl) {
+                                                                                            updateSubCourse(i, sIdx, 'badgeImageUrl', data.imageUrl);
+                                                                                            showNotification('✨ Badge image URL fetched successfully!');
+                                                                                        } else {
+                                                                                            showNotification('⚠️ Could not auto-detect image URL.');
+                                                                                        }
+                                                                                    } catch {
+                                                                                        showNotification('❌ Failed to fetch from Credly.');
+                                                                                    }
+                                                                                }}
+                                                                                style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', fontSize: '0.68rem', fontWeight: 600, padding: 0 }}
+                                                                            >
+                                                                                ⚡ Auto-Fetch Image
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                    <input 
+                                                                        type="text" 
+                                                                        value={sub.credlyUrl || ''} 
+                                                                        placeholder="https://www.credly.com/badges/.../public_url" 
+                                                                        onChange={e => {
+                                                                            const val = e.target.value;
+                                                                            updateSubCourse(i, sIdx, 'credlyUrl', val);
+                                                                            if (val.includes('credly.com/badges/') && !sub.badgeImageUrl) {
+                                                                                fetch(`/api/portfolio/credly-image?url=${encodeURIComponent(val.trim())}`)
+                                                                                    .then(r => r.json())
+                                                                                    .then(data => {
+                                                                                        if (data.success && data.imageUrl) {
+                                                                                            updateSubCourse(i, sIdx, 'badgeImageUrl', data.imageUrl);
+                                                                                            showNotification('✨ Badge image auto-detected from Credly!');
+                                                                                        }
+                                                                                    })
+                                                                                    .catch(() => {});
+                                                                            }
+                                                                        }} 
+                                                                    />
+                                                                </div>
+                                                                <div className="form-group w-50" style={{ marginBottom: 0 }}>
+                                                                    <label style={{ fontSize: '0.7rem' }}>Completion Date / Year (Optional)</label>
+                                                                    <input 
+                                                                        type="text" 
+                                                                        value={sub.completionDate || ''} 
+                                                                        placeholder="e.g. Sep 2026" 
+                                                                        onChange={e => updateSubCourse(i, sIdx, 'completionDate', e.target.value)} 
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex-group">
+                                                                <div className="form-group w-50" style={{ marginBottom: 0 }}>
+                                                                    <label style={{ fontSize: '0.7rem' }}>Credly Badge Image URL (CDN)</label>
+                                                                    <input 
+                                                                        type="text" 
+                                                                        value={sub.badgeImageUrl || ''} 
+                                                                        placeholder="https://images.credly.com/images/..." 
+                                                                        onChange={e => updateSubCourse(i, sIdx, 'badgeImageUrl', e.target.value)} 
+                                                                    />
+                                                                </div>
+                                                                <div className="form-group w-50" style={{ marginBottom: 0 }}>
+                                                                    <label style={{ fontSize: '0.7rem' }}>Sub-Course Credential ID (Optional)</label>
+                                                                    <input 
+                                                                        type="text" 
+                                                                        value={sub.credentialId || ''} 
+                                                                        placeholder="e.g. Coursera or Credly ID" 
+                                                                        onChange={e => updateSubCourse(i, sIdx, 'credentialId', e.target.value)} 
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+
+                                                <button type="button" className="add-inline-btn" onClick={() => addSubCourse(i)}>
+                                                    <Plus size={14} /> Add Course to Curriculum
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {!hasSubCourses && (
+                                            <button 
+                                                type="button" 
+                                                className="add-inline-btn" 
+                                                style={{ width: '100%', justifyContent: 'center', padding: '10px' }}
+                                                onClick={() => addSubCourse(i)}
+                                            >
+                                                <Plus size={14} /> Enable Progressive Curriculum (Convert to Multi-Course Program)
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
-                            ))}
+                            );
+                            })}
                             <button type="button" className="add-btn" onClick={() => addListItem('certifications', { name: '', issuer: '', date: '', credentialId: '', credentialUrl: '', badgeUrl: '', badgePublicUrl: '', links: [], skills: [], category: 'professional', credentialType: 'Professional Certificate', programNote: '', subCourses: [] })}>
                                 <Plus size={16} /> Add Certification
                             </button>
