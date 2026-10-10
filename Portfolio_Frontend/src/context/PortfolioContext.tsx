@@ -625,7 +625,8 @@ export const mergeCertificationsWithCanonical = (apiCerts?: any[]): Certificatio
             (c.credentialId && cert.credentialId && c.credentialId.toLowerCase() === cert.credentialId.toLowerCase()) ||
             (c.title.toLowerCase() === (cert.name || '').toLowerCase()) ||
             (c.id === 'google-ai-prof' && (cert.name || '').toLowerCase().includes('google ai')) ||
-            (c.id === 'ibm-data-science-prof' && (cert.name || '').toLowerCase().includes('ibm data science'))
+            (c.id === 'ibm-data-science-prof' && (cert.name || '').toLowerCase().includes('ibm data science')) ||
+            (c.id === 'ibm-ai-developer' && (cert.name || '').toLowerCase().includes('ibm ai developer'))
         );
         return {
             ...cert,

@@ -155,13 +155,13 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     badgeUrl: "https://res.cloudinary.com/dxjv3zwse/image/upload/v1791369593/portfolio_uploads/stream_raryfe.png",
     sourcePlatform: "Google",
     status: "verified",
-    programNote: "Comprehensive 8-course track mastering generative AI workflow, prompting, and application development.",
-    skills: ["Generative AI", "Prompt Engineering", "Large Language Models", "Workflow Automation", "Responsible AI"],
+    programNote: "Designed by Google experts to build career-ready AI fluency across 6 domains with 20+ hands-on projects, from prompt engineering and data analysis to vibe coding and custom AI app deployment.",
+    skills: ["Artificial Intelligence", "Generative AI", "Prompt Engineering", "Planning", "Machine Learning", "Brainstorming", "Data Wrangling", "Business Communication", "Data Visualization", "AI powered creativity", "Research", "Application Development", "Debugging", "Vibe coding"],
     subCourses: [
       {
         id: "google-ai-c1",
         order: 1,
-        title: "AI Fundamentals",
+        title: "AI Fundamentals (3h)",
         status: "verified",
         credlyBadgeId: "d172156c-c193-4172-9c79-829d14b9d93e",
         credlyUrl: "https://www.credly.com/badges/d172156c-c193-4172-9c79-829d14b9d93e/public_url",
@@ -171,7 +171,7 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
       {
         id: "google-ai-c2",
         order: 2,
-        title: "AI for Brainstorming and Planning",
+        title: "AI for Brainstorming and Planning (1h)",
         status: "verified",
         credlyBadgeId: "a257e2c0-3b13-4d63-aa31-1a2d358c4f99",
         credlyUrl: "https://www.credly.com/badges/a257e2c0-3b13-4d63-aa31-1a2d358c4f99/public_url",
@@ -181,49 +181,55 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
       {
         id: "google-ai-c3",
         order: 3,
-        title: "AI for Research and Insights",
+        title: "AI for Research and Insights (1h)",
         status: "completed",
+        credlyUrl: "https://www.coursera.org/learn/google-ai-for-research-and-insights?specialization=google-ai",
         completionDate: "2026"
       },
       {
         id: "google-ai-c4",
         order: 4,
-        title: "AI for Writing and Communicating",
+        title: "AI for Writing and Communicating (1h)",
         status: "completed",
+        credlyUrl: "https://www.coursera.org/learn/google-ai-for-writing-and-communicating?specialization=google-ai",
         completionDate: "2026"
       },
       {
         id: "google-ai-c5",
         order: 5,
-        title: "AI for Content Creation",
+        title: "AI for Content Creation (2h)",
         status: "completed",
+        credlyUrl: "https://www.coursera.org/learn/google-ai-for-content-creation?specialization=google-ai",
         completionDate: "2026"
       },
       {
         id: "google-ai-c6",
         order: 6,
-        title: "AI for Data Analysis",
+        title: "AI for Data Analysis (1h)",
         status: "completed",
+        credlyUrl: "https://www.coursera.org/learn/google-ai-for-data-analysis?specialization=google-ai",
         completionDate: "2026"
       },
       {
         id: "google-ai-c7",
         order: 7,
-        title: "AI for App Building",
+        title: "AI for App Building (2h)",
         status: "completed",
+        credlyUrl: "https://www.coursera.org/learn/google-ai-for-app-building?specialization=google-ai",
         completionDate: "2026"
       },
       {
         id: "google-ai-c8",
         order: 8,
-        title: "AI for App Deployment",
+        title: "AI for App Deployment (2h)",
         status: "completed",
+        credlyUrl: "https://www.coursera.org/learn/google-ai-for-app-deployment?specialization=google-ai",
         completionDate: "2026"
       }
     ]
   },
 
-  // ── 2. IBM DATA SCIENCE PROFESSIONAL CERTIFICATE (V3) (PARENT WITH CONFIRMED CHILD BADGES) ──
+  // ── 2. IBM DATA SCIENCE PROFESSIONAL CERTIFICATE (V3) (PARENT WITH 12-COURSE CURRICULUM) ──
   {
     id: "ibm-data-science-prof",
     title: "IBM Data Science Professional Certificate (V3)",
@@ -238,53 +244,107 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     badgeUrl: "https://images.credly.com/images/42ce4209-8839-431a-9046-f2ce2e72e04b/Coursera_20Data_20Science_20Professional_20Certificate.png",
     sourcePlatform: "IBM",
     status: "verified",
-    programNote: "Rigorous 10-course program covering Python, SQL, data analysis, visualization, ML algorithms, and applied capstone.",
-    skills: ["Python", "SQL", "Data Analysis", "Data Visualization", "Machine Learning", "Jupyter", "Dashboards"],
+    programNote: "Demonstrated career readiness in data science: Python development (SciPy, Pandas, NumPy), SQL & relational databases, machine learning model construction & evaluation, Jupyter notebooks, and Generative AI techniques.",
+    skills: ["Data Science", "Python", "SQL", "Machine Learning", "Generative AI", "Data Analysis", "Data Visualization", "Jupyter Notebooks", "Pandas", "NumPy", "SciPy", "SciKitLearn", "Matplotlib", "Seaborne", "Classification", "Clustering", "Regression", "Model Selection", "Recommender Systems", "Db2", "Watson", "RStudio"],
     subCourses: [
       {
         id: "ibm-ds-c1",
         order: 1,
-        title: "Databases and SQL for Data Science",
-        status: "verified",
-        credlyBadgeId: "dc581941-4adf-4d13-9672-5c7b5902b056",
-        credlyUrl: "https://www.credly.com/badges/dc581941-4adf-4d13-9672-5c7b5902b056/public_url",
-        badgeImageUrl: "https://images.credly.com/images/f2573aac-d21c-483d-acda-afaa366b4f51/image.png"
+        title: "What is Data Science?",
+        status: "completed",
+        completionDate: "May 2026"
       },
       {
         id: "ibm-ds-c2",
         order: 2,
-        title: "Data Visualization with Python",
-        status: "verified",
-        credlyBadgeId: "cd320125-d418-4a23-883e-845afef9c6d9",
-        credlyUrl: "https://www.credly.com/badges/cd320125-d418-4a23-883e-845afef9c6d9/public_url",
-        badgeImageUrl: "https://images.credly.com/images/9da3eedf-fda3-4e81-bb46-d174b4699bf1/image.png"
+        title: "Tools for Data Science",
+        status: "completed",
+        completionDate: "May 2026"
       },
       {
         id: "ibm-ds-c3",
         order: 3,
-        title: "Generative AI Essentials for Data Science",
-        status: "verified",
-        credlyBadgeId: "a6f34c20-aa81-43c2-be32-680ad03dbf9e",
-        credlyUrl: "https://www.credly.com/badges/a6f34c20-aa81-43c2-be32-680ad03dbf9e/public_url",
-        badgeImageUrl: "https://images.credly.com/images/1dc40257-c856-4e6b-9a92-29be936a9e7c/image.png"
+        title: "Data Science Methodology",
+        status: "completed",
+        completionDate: "May 2026"
       },
       {
         id: "ibm-ds-c4",
         order: 4,
-        title: "Applied Data Science Capstone",
-        status: "verified",
-        credlyBadgeId: "56cc091b-a87c-4af4-8d23-8ea151100c3e",
-        credlyUrl: "https://www.credly.com/badges/56cc091b-a87c-4af4-8d23-8ea151100c3e/public_url",
-        badgeImageUrl: "https://images.credly.com/images/169512d3-cef6-43e3-bec8-e6af2723a076/image.png"
+        title: "Python for Data Science, AI & Development",
+        status: "completed",
+        completionDate: "May 2026"
       },
       {
         id: "ibm-ds-c5",
         order: 5,
+        title: "Python Project for Data Science",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-ds-c6",
+        order: 6,
+        title: "Databases and SQL for Data Science with Python",
+        status: "verified",
+        credlyBadgeId: "dc581941-4adf-4d13-9672-5c7b5902b056",
+        credlyUrl: "https://www.credly.com/badges/dc581941-4adf-4d13-9672-5c7b5902b056/public_url",
+        badgeImageUrl: "https://images.credly.com/images/f2573aac-d21c-483d-acda-afaa366b4f51/image.png",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-ds-c7",
+        order: 7,
+        title: "Data Analysis with Python",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-ds-c8",
+        order: 8,
+        title: "Data Visualization with Python",
+        status: "verified",
+        credlyBadgeId: "cd320125-d418-4a23-883e-845afef9c6d9",
+        credlyUrl: "https://www.credly.com/badges/cd320125-d418-4a23-883e-845afef9c6d9/public_url",
+        badgeImageUrl: "https://images.credly.com/images/9da3eedf-fda3-4e81-bb46-d174b4699bf1/image.png",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-ds-c9",
+        order: 9,
+        title: "Machine Learning with Python",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-ds-c10",
+        order: 10,
+        title: "Applied Data Science Capstone",
+        status: "verified",
+        credlyBadgeId: "56cc091b-a87c-4af4-8d23-8ea151100c3e",
+        credlyUrl: "https://www.credly.com/badges/56cc091b-a87c-4af4-8d23-8ea151100c3e/public_url",
+        badgeImageUrl: "https://images.credly.com/images/169512d3-cef6-43e3-bec8-e6af2723a076/image.png",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-ds-c11",
+        order: 11,
+        title: "Generative AI: Elevate Your Data Science Career",
+        status: "verified",
+        credlyBadgeId: "a6f34c20-aa81-43c2-be32-680ad03dbf9e",
+        credlyUrl: "https://www.credly.com/badges/a6f34c20-aa81-43c2-be32-680ad03dbf9e/public_url",
+        badgeImageUrl: "https://images.credly.com/images/1dc40257-c856-4e6b-9a92-29be936a9e7c/image.png",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-ds-c12",
+        order: 12,
         title: "Data Scientist Career Guide and Interview Preparation",
         status: "verified",
         credlyBadgeId: "439040fd-48ae-47f7-87b1-bf7158c73659",
         credlyUrl: "https://www.credly.com/badges/439040fd-48ae-47f7-87b1-bf7158c73659/public_url",
-        badgeImageUrl: "https://images.credly.com/images/6eb08161-0425-4fc0-b66c-a1138dee7953/image.png"
+        badgeImageUrl: "https://images.credly.com/images/6eb08161-0425-4fc0-b66c-a1138dee7953/image.png",
+        completionDate: "May 2026"
       }
     ]
   },
@@ -295,13 +355,86 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     title: "IBM AI Developer",
     issuer: "IBM",
     category: "professional",
-    credentialType: "Professional Certificate",
+    credentialType: "Specialization",
     date: "May 18, 2026",
     credentialId: "EK2UWJK3XJTE",
     verificationUrl: "https://www.coursera.org/verify/professional-cert/EK2UWJK3XJTE",
     sourcePlatform: "IBM",
     status: "verified",
-    skills: ["AI Workflows", "ChatGPT", "Computer Vision", "Data Ethics", "Data Science", "Generative AI", "IBM Cloud", "LangChain", "LLM", "Prompt Engineering"]
+    programNote: "Comprehensive 10-course IBM Specialization covering software engineering, Python, Flask, HTML/CSS/JS, Generative AI application development, and career preparation.",
+    skills: ["Software Engineering", "Artificial Intelligence", "Generative AI", "Prompt Engineering", "HTML, CSS, & JavaScript", "Python", "Flask", "AI Applications", "ChatGPT", "LLM", "IBM Cloud", "LangChain"],
+    subCourses: [
+      {
+        id: "ibm-aid-c1",
+        order: 1,
+        title: "Introduction to Software Engineering",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aid-c2",
+        order: 2,
+        title: "Introduction to Artificial Intelligence (AI)",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aid-c3",
+        order: 3,
+        title: "Generative AI: Introduction and Applications",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aid-c4",
+        order: 4,
+        title: "Generative AI: Prompt Engineering Basics",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aid-c5",
+        order: 5,
+        title: "Introduction to HTML, CSS, & JavaScript",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aid-c6",
+        order: 6,
+        title: "Python for Data Science, AI & Development",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aid-c7",
+        order: 7,
+        title: "Developing AI Applications with Python and Flask",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aid-c8",
+        order: 8,
+        title: "Building Generative AI-Powered Applications with Python",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aid-c9",
+        order: 9,
+        title: "Generative AI: Elevate your Software Development Career",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aid-c10",
+        order: 10,
+        title: "Software Developer Career Guide and Interview Preparation",
+        status: "completed",
+        completionDate: "May 2026"
+      }
+    ]
   },
   {
     id: "ibm-ai-engineering",
@@ -527,6 +660,7 @@ export function getNormalizedCertifications(apiCerts?: Array<{
       if (canonTitle === acName) return true;
       if (canon.id === "google-ai-prof" && (acName === "google ai" || acName.includes("google ai"))) return true;
       if (canon.id === "ibm-data-science-prof" && (acName === "ibm data science" || acName === "data science")) return true;
+      if (canon.id === "ibm-ai-developer" && (acName.includes("ibm ai developer") || acName.includes("ai developer"))) return true;
       return false;
     });
 

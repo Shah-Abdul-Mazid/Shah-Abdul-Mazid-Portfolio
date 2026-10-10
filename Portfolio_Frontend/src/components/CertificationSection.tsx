@@ -1178,6 +1178,8 @@ const CredentialCard: React.FC<CredentialCardProps> = ({
                         >
                           {sub.credlyUrl.includes('credly.com') ? (
                             <><BadgeCheck size={9} /> Credly</>
+                          ) : sub.credlyUrl.includes('coursera.org') ? (
+                            <><ExternalLink size={9} /> Coursera</>
                           ) : (
                             <><ExternalLink size={9} /> Certificate</>
                           )}
