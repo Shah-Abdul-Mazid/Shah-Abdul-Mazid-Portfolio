@@ -1,6 +1,6 @@
 # 🌌 Shah Abdul Mazid — Full-Stack Portfolio & CMS Ecosystem
 
-A modern, high-performance, full-stack portfolio and Content Management System (CMS) engineered with **React 19**, **TypeScript**, **FastAPI**, **MongoDB Atlas**, **Cloudinary**, and **PWA support**. Features a futuristic technical design, verified Credly badge integration, dual ATS & Visual CV builders, and an AI-powered project assistant.
+A modern, high-performance, full-stack portfolio and Content Management System (CMS) engineered with **React 19**, **TypeScript**, **FastAPI**, **MongoDB Atlas**, **Cloudinary**, and **PWA support**. Features a futuristic technical design, verified Credly badge integration, multi-course progressive curricula, dual ATS & Visual CV builders, an AI-powered project assistant, and an **enterprise-grade 20-Point Defensive Security Framework**.
 
 ---
 
@@ -14,34 +14,37 @@ A modern, high-performance, full-stack portfolio and Content Management System (
   - [3. Resume & CV Generation Engine (ATS + Visual)](#3-resume--cv-generation-engine-ats--visual)
   - [4. Admin Dashboard CMS & Automation](#4-admin-dashboard-cms--automation)
   - [5. AI Agent & LLM Project Assistant](#5-ai-agent--llm-project-assistant)
-- [Backend Services & API Endpoints](#-backend-services--api-endpoints)
-- [Security & Authentication](#-security--authentication)
+- [Backend Services & Protected API Endpoints](#-backend-services--protected-api-endpoints)
+- [🔒 20-Point Security Hardening Framework](#-20-point-security-hardening-framework)
+  - [Threat Model & Defense-in-Depth Architecture](#threat-model--defense-in-depth-architecture)
+  - [Audit Matrix & Implementation Details](#audit-matrix--implementation-details)
 - [Deployment & Hosting Infrastructure](#-deployment--hosting-infrastructure)
 - [Local Development Setup](#-local-development-setup)
 - [Environment Variables Guide](#-environment-variables-guide)
+- [License & Acknowledgements](#-license--acknowledgements)
 
 ---
 
 ## 🏛 Architectural Overview
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    CLIENT BROWSER / PWA                     │
-│        React 19 · TypeScript · Vite · Tailwind/CSS          │
-└──────────────┬──────────────────────────────▲───────────────┘
-               │                              │
-        HTTPS Requests                   Fast HMR &
-       (Vercel Proxies)                  State Sync
-               │                              │
-┌──────────────▼──────────────────────────────┴───────────────┐
-│                    FASTAPI BACKEND (Render)                 │
-│         Python · Async Motor · PyJWT · BCrypt               │
-└──────┬──────────────────────┬───────────────────────┬───────┘
-       │                      │                       │
-┌──────▼──────┐        ┌──────▼──────┐         ┌──────▼───────┐
-│   MongoDB   │        │ Cloudinary  │         │ Groq / Ollama│
-│    Atlas    │        │ Media / CDN │         │  LLM Agent   │
-└─────────────┘        └─────────────┘         └──────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│                        CLIENT BROWSER / PWA                            │
+│           React 19 · TypeScript · Vite · Tailwind/CSS                  │
+└──────────────────┬──────────────────────────────────▲──────────────────┘
+                   │                                  │
+            HTTPS Requests                       Fast HMR &
+           (Vercel Proxies)                      State Sync
+                   │                                  │
+┌──────────────────▼──────────────────────────────────┴──────────────────┐
+│                   FASTAPI SECURITY MIDDLEWARE & APP                    │
+│      Rate Limiter · OWASP Headers · CORS Whitelist · JWT Bearer        │
+└─────────┬──────────────────────────┬─────────────────────────┬─────────┘
+          │                          │                         │
+┌─────────▼─────────┐      ┌─────────▼─────────┐      ┌────────▼─────────┐
+│   MongoDB Atlas   │      │    Cloudinary     │      │   Groq / Ollama  │
+│ Resilient Cluster │      │ Strict Upload CDN │      │ LLM Inferences   │
+└───────────────────┘      └───────────────────┘      └──────────────────┘
 ```
 
 ---
@@ -50,8 +53,8 @@ A modern, high-performance, full-stack portfolio and Content Management System (
 
 ```
 Portfolio_Final/
-├── README.md                           # Main project documentation
-├── LICENSE                             # Open-source license
+├── README.md                           # Main project documentation & security specification
+├── LICENSE                             # Open-source MIT license
 ├── TODO.md                             # Backlog & feature roadmap
 │
 ├── Portfolio_Frontend/                 # React 19 + TypeScript + Vite SPA
@@ -67,7 +70,7 @@ Portfolio_Final/
 │   │   │   ├── CV/                     # ATS & Visual CV subcomponents
 │   │   │   │   ├── ATSCV/              # Single-column ATS resume render & print styles
 │   │   │   │   └── VisualCV/           # Creative two-column visual resume
-│   │   │   ├── CertificationSection.tsx # Unified certifications & Credly showcase
+│   │   │   ├── CertificationSection.tsx # Unified certifications, Credly showcase & trays
 │   │   │   ├── Certifications.tsx      # Section wrapper
 │   │   │   ├── IntelligenceMatrix.tsx  # Dynamic skillset & telemetry radar
 │   │   │   ├── Projects.tsx            # Project showcase with dynamic modal
@@ -97,21 +100,24 @@ Portfolio_Final/
 │   │   ├── App.tsx                     # Top-level routing & PWA standalone handler
 │   │   ├── main.tsx                    # React DOM entry point
 │   │   ├── vercel.json                 # Vercel deployment rewrites (/api/ -> Render)
-│   │   └── vite.config.ts              # Vite configuration & PWA manifest
+│   │   └── vite.config.ts              # Vite configuration & production security (sourcemap: false)
 │   │
 └── Portfolio_Backend/                  # FastAPI Modular Microservice
     ├── app/
     │   ├── api/v1/endpoints/
-    │   │   ├── portfolio.py            # Public & Admin GET/POST portfolio content
-    │   │   ├── admin.py                # Admin authentication & token generation
+    │   │   ├── portfolio.py            # Public GET & Admin POST portfolio content (SSRF protected)
+    │   │   ├── admin.py                # Admin authentication & token generation (Brute-force protected)
     │   │   ├── analytics.py            # Real-time visitor tracking & views telemetry
-    │   │   ├── messages.py             # Contact form submissions & mail inbox
-    │   │   ├── upload.py               # Cloudinary direct image/document upload pipeline
-    │   │   └── agent.py                # AI agent (Groq / Ollama) project generator
+    │   │   ├── messages.py             # Contact form submissions (XSS sanitized & rate-limited)
+    │   │   ├── upload.py               # Cloudinary secure upload pipeline (Auth + type + size validated)
+    │   │   └── agent.py                # AI agent (Groq / Ollama) project generator (Admin guarded)
+    │   ├── middleware/
+    │   │   ├── __init__.py             # Middleware package
+    │   │   └── security.py             # Sliding-window IP rate limiter & OWASP security headers
     │   ├── core/                       # Core authentication & password hashing
     │   ├── config.py                   # Pydantic BaseSettings & environment configs
     │   ├── db.py                       # Async Motor MongoDB connection client
-    │   └── main.py                     # FastAPI application factory & middleware
+    │   └── main.py                     # FastAPI application factory & hardened CORS configuration
     ├── Dockerfile                      # Production container recipe
     ├── main.py                         # ASGI entry point (`uvicorn main:app`)
     ├── requirements.txt                # Python package dependencies
@@ -123,7 +129,7 @@ Portfolio_Final/
 ## 🎯 Core Functional Scopes
 
 ### 1. Public Portfolio & Navigation
-* **Futuristic Dark Atmosphere:** Technical cyberpunk theme, animated neon accents, interactive canvas telemetry, and responsive grid layouts.
+* **Futuristic Dark Atmosphere:** Technical cyberpunk aesthetic, animated neon accents, interactive canvas telemetry, and responsive grid layouts.
 * **Telemetry Radar / Intelligence Matrix:** Dynamic visualization of core competencies across Artificial Intelligence, Full-Stack Engineering, and Cloud Infrastructure.
 * **Instant Visitor Inquiries:** In-app floating contact drawer that saves messages directly to the database and notifies the administrator.
 
@@ -131,11 +137,11 @@ Portfolio_Final/
 * **Cloud-First Media Pipeline:** **Zero badge image files stored inside Git or build bundles.** All badges stream dynamically from the official **Credly CDN** (`images.credly.com`) or **Cloudinary** (`res.cloudinary.com`).
 * **Canonical Deduplication:** Certifications and digital badges are mapped to single underlying achievements in [`src/data/certificationData.ts`](file:///c:/Users/LENOVO/Desktop/Portfolio_Final/Portfolio_Frontend/src/data/certificationData.ts).
 * **Parent-Child Progressive Hierarchy:**
-  * **Google AI Professional Certificate:** 8-course modular program featuring dynamic completion tracking (`8 / 8 Courses Completed`), expandable curriculum tray, direct Coursera course links, and Credly verification badges for modular courses (AI Fundamentals, AI for Brainstorming and Planning).
-  * **IBM Data Science Professional Certificate (V3):** 12-course comprehensive curriculum with 5 verified Credly badges (Databases & SQL, Data Visualization, Applied Capstone, GenAI Essentials, Career Guide & Interview Prep) and 7 verified Coursera milestones.
-  * **IBM AI Engineering Specialization:** 13-course advanced track covering Machine Learning, Deep Learning (Keras, PyTorch, TensorFlow), Transformers, LLM Fine-Tuning, RAG, and AI Agent workflows with LangChain.
-  * **IBM AI Developer Specialization:** 10-course software and generative AI track covering Python, Flask, HTML/CSS/JS, Prompt Engineering, and custom Generative AI application development.
-  * **Dynamic Progression & Smart Links:** Automatically displays `🏅 Credly` for Credly badges, `↗ Coursera` for Coursera course links, or `✓ Completed` for finished milestones without dedicated badges.
+  * **Google AI Professional Certificate:** 8-course modular program (`8 / 8 Courses Completed`) featuring dynamic completion tracking, expandable curriculum tray, direct Coursera course links, and verified Credly badges for foundational modules (*AI Fundamentals*, *AI for Brainstorming and Planning*).
+  * **IBM Data Science Professional Certificate (V3):** 12-course comprehensive curriculum (`12 / 12 Courses Completed`) featuring 5 verified Credly child badges (*Databases & SQL, Data Visualization, Applied Capstone, GenAI Essentials, Career Guide & Interview Prep*) and 7 verified Coursera milestones.
+  * **IBM AI Engineering Specialization:** 13-course advanced track (`13 / 13 Courses Completed`) covering Machine Learning, Deep Learning (Keras, PyTorch, TensorFlow), Transformers, LLM Fine-Tuning, RAG, and AI Agent workflows with LangChain.
+  * **IBM AI Developer Specialization:** 10-course software engineering & GenAI track (`10 / 10 Courses Completed`) covering Python, Flask, HTML/CSS/JS, Prompt Engineering, and custom Generative AI application development.
+  * **Smart Provider Link Detection:** Automatically displays `🏅 Credly` for Credly badges, `↗ Coursera` for Coursera course links, or `✓ Completed` for finished milestones without dedicated badges.
 * **Instant Credly Auto-Fetch Integration:**
   * Paste any public Credly badge URL (`https://www.credly.com/badges/...`) into the dashboard.
   * The system automatically queries `/api/portfolio/credly-image` to scrape and extract the official `images.credly.com` CDN image link without requiring manual image searches.
@@ -174,41 +180,81 @@ Portfolio_Final/
 ### 5. AI Agent & LLM Project Assistant
 * **Autonomous Project Drafter (`/api/agent/generate-project`):** An embedded AI assistant that generates structured project descriptions, feature lists, key learnings, and role highlights.
 * **Hybrid LLM Provider Support:**
-  * **Production Mode:** Ultra-fast cloud inference powered by **Groq** (`llama3-8b-8192` or `mixtral-8x7b-32768`).
+  * **Production Mode:** Ultra-fast cloud inference powered by **Groq** (`openai/gpt-oss-120b` or `mixtral-8x7b-32768`).
   * **Local / Zero-Cost Mode:** Local offline inference powered by **Ollama** (`openchat` or custom model files).
 
 ---
 
-## 🔌 Backend Services & API Endpoints
+## 🔌 Backend Services & Protected API Endpoints
 
-| Endpoint | Method | Scope | Description |
-|---|:---:|:---:|---|
-| `/api/portfolio` | `GET` | Public | Retrieves full portfolio document from MongoDB (`portfolio_content`) |
-| `/api/portfolio` | `POST` | Admin | Updates entire portfolio document in MongoDB (Protected via JWT) |
-| `/api/portfolio/credly-image` | `GET` | Public | Scrapes and extracts official CDN badge image from any public Credly badge URL |
-| `/api/admin/login` | `POST` | Public | Authenticates admin credentials and issues signed JWT bearer token |
-| `/api/admin/verify` | `GET` | Admin | Validates existing session token |
-| `/api/analytics` | `GET` | Public | Returns total website views count |
-| `/api/analytics/track`| `POST` | Public | Increments visitor counter and records geolocation telemetry |
-| `/api/messages` | `GET` | Admin | Fetches list of all visitor contact inquiries |
-| `/api/messages` | `POST` | Public | Submits a new contact form message |
-| `/api/messages/{id}` | `DELETE`| Admin | Deletes a processed message |
-| `/api/upload` | `POST` | Admin | Streams images/documents directly to Cloudinary and returns secure URL |
-| `/api/agent/generate-project` | `POST` | Admin | AI-assisted project generator using Groq/Ollama |
-| `/api/health` | `GET` | Public | Verifies MongoDB and Cloudinary system health |
+| Endpoint | Method | Security Level | Rate Limit | Description |
+|---|:---:|:---:|:---:|---|
+| `/api/portfolio` | `GET` | Public | Standard | Retrieves full portfolio document from MongoDB (`portfolio_content`) |
+| `/api/portfolio` | `POST` | **Admin JWT** | 180 req / min | Updates portfolio document in MongoDB (Protected via JWT Bearer) |
+| `/api/portfolio/credly-image` | `GET` | Public + SSRF Filter | **30 req / min** | Scrapes official CDN badge image (Restricted strictly to `credly.com`) |
+| `/api/admin/login` | `POST` | Public + Sanitized | **5 attempts / 5 min** | Authenticates admin credentials, hashes check, issues signed JWT |
+| `/api/admin/register` | `POST` | **Locked Endpoint** | 5 attempts / 5 min | Initial setup only; permanently rejects registration if admin exists |
+| `/api/admin/verify` | `GET` | **Admin JWT** | Standard | Validates existing session token against expiration |
+| `/api/admin/list` | `GET` | **Admin JWT** | Standard | Fetches admin user list (Password hashes redacted) |
+| `/api/messages` | `POST` | Public + Sanitized | **5 submissions / 10 min** | Submits a contact inquiry (XSS sanitized, length capped) |
+| `/api/messages` | `GET` | **Admin JWT** | Standard | Retrieves visitor inquiries sorted by submission date |
+| `/api/messages/{id}` | `DELETE`| **Admin JWT** | Standard | Deletes a processed inquiry |
+| `/api/upload` | `POST` | **Admin JWT** | **20 req / min** | Secure upload to Cloudinary (Extension, MIME & 10MB size limit) |
+| `/api/agent/generate-project` | `POST` | **Admin JWT** | **15 req / min** | AI project case-study drafter using Groq / Ollama |
+| `/api/analytics` | `GET` | Public | Standard | Returns total website views count |
+| `/api/analytics/track`| `POST` | Public | Standard | Increments visitor counter and records geolocation telemetry |
+| `/api/health` | `GET` | Public | Standard | Verifies MongoDB and Cloudinary system health |
 
 ---
 
 ## 🔒 20-Point Security Hardening Framework
 
-This application is engineered with an enterprise-grade defense-in-depth model aligned with OWASP Top 10 and cloud application security standards:
+This application implements an enterprise-grade defense-in-depth model aligned with the OWASP Top 10 and cloud application security standards:
 
-### 🛡️ Group 1: Injection & Input Validation
-1. **NoSQL & Parameter Injection Defense:** All database queries utilize strict typed parameter matching (`$eq`) and input sanitization to eliminate operator injection risks in MongoDB.
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        INCOMING HTTP REQUEST                           │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+    [1. CORS Whitelist] ────────────► Reject unauthorized domains
+                                    │
+    [2. Rate Limiting Middleware] ──► Reject flooders / brute-force (429)
+                                    │
+    [3. OWASP Security Headers] ────► Inject nosniff, SAMEORIGIN, CSP
+                                    │
+    [4. JWT Bearer Guard] ──────────► Verify signature, exp, and role: admin
+                                    │
+    [5. Input Validator & Pydantic] ► Escape XSS, strip script tags, cap sizes
+                                    │
+    [6. NoSQL Operator Guard] ──────► Strict typed string parameter queries ($eq)
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                    SECURE DATABASE / CLOUD STORAGE                     │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+### Threat Model & Defense-in-Depth Architecture
+
+| Category | Security Standard | Defense Mechanism | Implementation File |
+|---|---|---|---|
+| **Rate Limiting** | Sliding Window Algorithm | In-memory timestamp buckets per client IP with dynamic `Retry-After` headers. | [`security.py`](file:///c:/Users/LENOVO/Desktop/Portfolio_Final/Portfolio_Backend/app/middleware/security.py) |
+| **Authentication** | Cryptographic JWT | HS256 algorithm with explicit `exp` claim (`ACCESS_TOKEN_EXPIRE_MINUTES`). | [`admin.py`](file:///c:/Users/LENOVO/Desktop/Portfolio_Final/Portfolio_Backend/app/api/v1/endpoints/admin.py) |
+| **Password Storage** | BCrypt Work Factor 12 | Salted cryptographic hashes; plaintext passwords never touch database or logs. | [`admin.py`](file:///c:/Users/LENOVO/Desktop/Portfolio_Final/Portfolio_Backend/app/api/v1/endpoints/admin.py) |
+| **SSRF Defense** | Domain Whitelisting | Target URL parsing restricting external fetches strictly to `credly.com`. Blocks loopbacks and cloud metadata (`169.254.169.254`). | [`portfolio.py`](file:///c:/Users/LENOVO/Desktop/Portfolio_Final/Portfolio_Backend/app/api/v1/endpoints/portfolio.py) |
+| **Upload Security** | Tri-Layer File Filter | Admin authentication requirement + extension whitelist (`png, jpg, webp, svg, pdf`) + MIME verification + 10MB size ceiling. | [`upload.py`](file:///c:/Users/LENOVO/Desktop/Portfolio_Final/Portfolio_Backend/app/api/v1/endpoints/upload.py) |
+| **XSS Defense** | Dual-Layer Sanitization | Server-side regex script stripping and HTML escaping + Frontend DOMPurify sanitizer. | [`messages.py`](file:///c:/Users/LENOVO/Desktop/Portfolio_Final/Portfolio_Backend/app/api/v1/endpoints/messages.py) |
+| **Source Protection**| Bundler Hardening | Production source maps disabled (`sourcemap: false`) in Vite build configuration. | [`vite.config.ts`](file:///c:/Users/LENOVO/Desktop/Portfolio_Final/Portfolio_Frontend/vite.config.ts) |
+
+---
+
+### Audit Matrix & Implementation Details
+
+#### 🛡️ Group 1: Injection & Input Validation
+1. **NoSQL & Parameter Injection Defense:** All MongoDB operations strictly use typed string queries (`{"$eq": value}`). Passing dictionary objects with MongoDB operators (`$ne`, `$gt`, `$regex`) as user inputs is completely neutralized.
 2. **Cross-Site Scripting (XSS) Sanitization:**
-   * **Backend:** Server-side HTML escaping and regex stripping for `<script>`, `<iframe>`, `<object>`, and `javascript:` URIs on all incoming user submissions.
-   * **Frontend:** Dynamic markup rendered strictly via `DOMPurify` (`dist/assets/purify.es-*.js`).
-3. **Cross-Site Request Forgery (CSRF) Immunity:** All state-changing mutations require an explicit cryptographic `Authorization: Bearer <token>` header rather than implicit ambient cookies.
+   * **Backend:** Server-side HTML escaping via `html.escape()` and regex stripping for `<script>`, `<iframe>`, `<object>`, `<embed>`, and `javascript:` URIs in contact submissions.
+   * **Frontend:** Dynamic markdown and badge descriptions rendered strictly via `DOMPurify` (`dist/assets/purify.es-*.js`).
+3. **Cross-Site Request Forgery (CSRF) Immunity:** All state-changing endpoints (`/api/portfolio`, `/api/upload`, `/api/admin/*`) require an explicit `Authorization: Bearer <token>` header rather than ambient browser cookies. Browsers do not attach custom Authorization headers on cross-origin requests.
 4. **Strict File Upload Validation (`/api/upload`):**
    * Mandatory Administrator JWT authorization.
    * Whitelist-enforced file extension verification (`.png`, `.jpg`, `.jpeg`, `.webp`, `.svg`, `.pdf`).
@@ -218,8 +264,8 @@ This application is engineered with an enterprise-grade defense-in-depth model a
    * Strict domain whitelist: Only requests directly targeting `credly.com` or `*.credly.com` are permitted.
    * Internal loopback (`127.0.0.1`), private subnets (`10.*`, `172.16.*`, `192.168.*`), and cloud metadata IP (`169.254.169.254`) requests are unconditionally blocked.
 
-### 🔐 Group 2: Authentication & Access Control
-6. **Broken Object Level Authorization (BOLA) Prevention:** Every administrative endpoint (`/api/portfolio`, `/api/upload`, `/api/messages`, `/api/agent/generate-project`) verifies server-side JWT claims and enforces the `admin` role.
+#### 🔐 Group 2: Authentication & Access Control
+6. **Broken Object Level Authorization (BOLA) Prevention:** Every administrative endpoint verifies server-side JWT claims and enforces the `admin` role independently on every request.
 7. **Sliding-Window Rate Limiting:** High-performance in-memory IP rate limiter protecting against brute-force attacks and abuse:
    * `/api/admin/login`: Max 5 attempts per 5 minutes per IP (`429 Too Many Requests` with `Retry-After`).
    * `/api/messages`: Max 5 contact submissions per 10 minutes per IP.
@@ -231,12 +277,12 @@ This application is engineered with an enterprise-grade defense-in-depth model a
 11. **Tenant & Data Isolation:** Singleton portfolio records strictly scoped to partition keys (`key: "main"`).
 12. **Public Admin Registration Locked:** The `/api/admin/register` endpoint automatically closes once an initial admin exists, preventing unauthorized administrative account creation.
 
-### 🔑 Group 3: Secrets & Token Safety
+#### 🔑 Group 3: Secrets & Token Safety
 13. **Server-Side Secret Isolation:** Cloudinary secrets, Groq LLM API keys, and MongoDB connection strings reside strictly on the server in `.env` and are never bundled into client-side code.
 14. **Frontend Environment Sanitization:** Frontend contains only public vanity URLs and non-sensitive identifiers (`VITE_API_BASE_URL`, `VITE_GITHUB_URL`).
-15. **Git Secret Shield:** Dual `.gitignore` configuration in both root and backend preventing accidental commits of `.env`, logs, and caches.
+15. **Git Secret Shield:** Dual `.gitignore` configuration in both root and backend preventing accidental commits of `.env`, logs, and compiled bytecode (`__pycache__`).
 
-### ⚙️ Group 4: Config & Web Hygiene
+#### ⚙️ Group 4: Config & Web Hygiene
 16. **Hardened CORS Configuration:** Dynamic origin whitelisting restricting API communication exclusively to authorized production domains (`shahabdulmazid.com`, `shah-abdul-mazid.vercel.app`) and local development ports.
 17. **OWASP Defensive HTTP Security Headers:** Injected by backend middleware and frontend meta tags:
    * `X-Content-Type-Options: nosniff` (prevents MIME confusion)
@@ -314,26 +360,33 @@ Admin Portal: `http://localhost:5173/login/admin`
 ### Frontend (`Portfolio_Frontend/.env`)
 ```env
 # Optional: Set backend target (defaults to Render proxy in vite.config.ts)
-VITE_API_URL=http://localhost:8000
+VITE_API_BASE_URL=https://shah-abdul-mazid-portfolio.onrender.com
+
+# Academic profiles (Public metadata)
+VITE_SCHOLAR_URL=https://scholar.google.com/citations?user=TYkiwUgAAAAJ
+VITE_ORCID_URL=https://orcid.org/0009-0009-6864-5343
+VITE_RESEARCHGATE_URL=https://www.researchgate.net/profile/Shah-Abdul-Mazid
+VITE_GITHUB_URL=https://github.com/Shah-Abdul-Mazid
 ```
 
 ### Backend (`Portfolio_Backend/.env`)
 ```env
-# Database
-ATLAS_URL=mongodb+srv://<username>:<password>@cluster.mongodb.net/?retryWrites=true&w=majority
-DB_NAME=portfolio_data
+# MongoDB Atlas Database
+atlas_URL="mongodb+srv://<username>:<password>@cluster.mongodb.net/?retryWrites=true&w=majority"
+atlas_DB_NAME=portfolio_data
 
-# Admin Security
+# Admin Security & Auth
 JWT_SECRET=your_super_secret_jwt_key_here
 ACCESS_TOKEN_EXPIRE_MINUTES=1440
 
-# Cloudinary (Badge & Media Uploads)
+# Cloudinary (Media Uploads)
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 
-# AI Agent (Optional)
+# AI Agent (Groq LLM)
 GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=openai/gpt-oss-120b
 ENVIRONMENT=production
 ```
 
