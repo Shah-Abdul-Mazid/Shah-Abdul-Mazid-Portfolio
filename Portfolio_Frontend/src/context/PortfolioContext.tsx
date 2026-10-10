@@ -135,6 +135,20 @@ export interface CertificationItem {
     badgePublicUrl?: string;
     links?: { label: string; url: string }[];
     skills?: string[];
+    category?: 'professional' | 'course' | 'badge';
+    credentialType?: string;
+    programNote?: string;
+    subCourses?: Array<{
+        id: string;
+        order: number;
+        title: string;
+        status: 'verified' | 'completed' | 'in-progress' | 'curriculum';
+        credlyUrl?: string;
+        credlyBadgeId?: string;
+        badgeImageUrl?: string;
+        completionDate?: string;
+        credentialId?: string;
+    }>;
 }
 
 export interface SectionConfig {

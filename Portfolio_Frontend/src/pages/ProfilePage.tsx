@@ -7,10 +7,7 @@ import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 import { usePortfolio } from "../context/PortfolioContext";
 import { formatDateLabel, sortRecentFirst } from "../utils/dateUtils";
 import { Github, ExternalLink, GraduationCap, BookOpen } from "lucide-react";
-import {
-  getCredlyBadgeForCert,
-  CREDLY_VERIFIED_BADGES,
-} from "../utils/certBadges";
+import { CertificationSection } from "../components/CertificationSection";
 
 import {
   GITHUB_URL,
@@ -436,194 +433,13 @@ const ProfilePage = () => {
           </div>
 
           {/* Certifications Section */}
-          {certifications.length > 0 && (
-            <div className="certifications-section">
-              <h2 className="section-heading line-below">
-                Certifications & Licenses
-              </h2>
-              <div className="certifications-grid">
-                {certifications.map((cert, index) => {
-                  const credlyBadge = getCredlyBadgeForCert(cert);
-                  const hasBadge = credlyBadge !== null;
+          <div className="certifications-section">
+            <h2 className="section-heading line-below">
+              Certifications & Licenses
+            </h2>
+            <CertificationSection apiCertifications={certifications} />
+          </div>
 
-                  return (
-                    <div
-                      key={index}
-                      className={`cert-item-card ${hasBadge ? "has-credly-badge" : ""}`}
-                    >
-                      <div className="cert-item-top">
-                        {hasBadge ? (
-                          credlyBadge.publicUrl ? (
-                            <a
-                              href={credlyBadge.publicUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="cert-badge-anchor"
-                              title={`Verify on Credly: ${credlyBadge.name}`}
-                            >
-                              <div className="cert-badge-frame">
-                                <img
-                                  src={credlyBadge.imageUrl}
-                                  alt={`${credlyBadge.name} badge`}
-                                  className="cert-badge-image"
-                                  loading="lazy"
-                                />
-                              </div>
-                            </a>
-                          ) : (
-                            <div
-                              className="cert-badge-anchor"
-                              style={{ cursor: "default" }}
-                              title={credlyBadge.name}
-                            >
-                              <div className="cert-badge-frame">
-                                <img
-                                  src={credlyBadge.imageUrl}
-                                  alt={`${credlyBadge.name} badge`}
-                                  className="cert-badge-image"
-                                  loading="lazy"
-                                />
-                              </div>
-                            </div>
-                          )
-                        ) : (
-                          <div className="cert-issuer-badge">{cert.issuer}</div>
-                        )}
-
-                        <div className="cert-meta-right">
-                          <span className="cert-item-date">{cert.date}</span>
-                          {hasBadge && (
-                            <span className="cert-credly-tag">
-                              <span className="credly-dot"></span> Credly
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="cert-item-body">
-                        <h3 className="cert-item-title">{cert.name}</h3>
-                        <p className="cert-item-issuer">{cert.issuer}</p>
-                        {cert.credentialId && (
-                          <p className="cert-item-id">
-                            Credential ID: {cert.credentialId}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="cert-item-footer">
-                        {cert.credentialUrl && (
-                          <a
-                            href={
-                              cert.credentialUrl.startsWith("http://") ||
-                              cert.credentialUrl.startsWith("https://")
-                                ? cert.credentialUrl
-                                : `https://${cert.credentialUrl}`
-                            }
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="cert-item-link"
-                          >
-                            Verify Credential{" "}
-                            <ExternalLink size={13} style={{ marginLeft: 4 }} />
-                          </a>
-                        )}
-                        {hasBadge && credlyBadge.publicUrl && (
-                          <a
-                            href={credlyBadge.publicUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="cert-credly-badge-link"
-                            title="Verify on Credly"
-                          >
-                            Credly Badge{" "}
-                            <ExternalLink size={11} style={{ marginLeft: 3 }} />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* ── Official Credly Badges Showcase ── */}
-              <div className="credly-profile-showcase">
-                <div className="credly-showcase-header">
-                  <div className="credly-showcase-title-row">
-                    <span className="credly-icon-badge">🏅</span>
-                    <div>
-                      <h3 className="credly-showcase-title">
-                        Credly Verified Digital Badges (9)
-                      </h3>
-                      <p className="credly-showcase-desc">
-                        Official, verifiable credentials issued via Credly for
-                        Google AI & IBM Data Science specializations.
-                      </p>
-                    </div>
-                  </div>
-                  <a
-                    href="https://www.credly.com/users/shah-abdul-mazid"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="credly-profile-btn"
-                  >
-                    View Credly Profile <ExternalLink size={13} />
-                  </a>
-                </div>
-
-                <div className="credly-badges-grid">
-                  {CREDLY_VERIFIED_BADGES.map((b) =>
-                    b.publicUrl ? (
-                      <a
-                        key={b.id}
-                        href={b.publicUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="credly-single-badge-card"
-                        title={`Verify ${b.name} on Credly`}
-                      >
-                        <div className="credly-single-badge-img-wrap">
-                          <img
-                            src={b.imageUrl}
-                            alt={b.name}
-                            className="credly-single-badge-img"
-                            loading="lazy"
-                          />
-                        </div>
-                        <span className="credly-single-badge-name">
-                          {b.name}
-                        </span>
-                        <span className="credly-single-badge-issuer">
-                          {b.issuer}
-                        </span>
-                      </a>
-                    ) : (
-                      <div
-                        key={b.id}
-                        className="credly-single-badge-card"
-                        style={{ cursor: "default" }}
-                        title={b.name}
-                      >
-                        <div className="credly-single-badge-img-wrap">
-                          <img
-                            src={b.imageUrl}
-                            alt={b.name}
-                            className="credly-single-badge-img"
-                            loading="lazy"
-                          />
-                        </div>
-                        <span className="credly-single-badge-name">
-                          {b.name}
-                        </span>
-                        <span className="credly-single-badge-issuer">
-                          {b.issuer}
-                        </span>
-                      </div>
-                    ),
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </main>
       <Footer />

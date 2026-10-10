@@ -5,6 +5,7 @@ import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as
 import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, PaperItem, SkillCategory } from '../context/PortfolioContext';
 import './AdminDashboard.css';
 
+
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const { data, updateData } = usePortfolio();
@@ -547,6 +548,8 @@ const AdminDashboard = () => {
             return { ...prev, certifications: list };
         });
     };
+
+
     const addWorkDetail = (workIndex: number) => {
         setEditData(prev => {
             const work = [...prev.work];
@@ -2306,6 +2309,16 @@ const AdminDashboard = () => {
                                             <label>Name / Title</label>
                                             <input type="text" value={cert.name} onChange={e => updateListItem('certifications', i, 'name', e.target.value)} />
                                         </div>
+                                        <div className="form-group w-50">
+                                            <label>Category (Section Tier)</label>
+                                            <select 
+                                                value={cert.category || (cert.name?.toLowerCase().includes('professional') ? 'professional' : 'course')} 
+                                                onChange={e => updateListItem('certifications', i, 'category', e.target.value)}
+                                            >
+                                                <option value="professional">Professional Certificate (Tier 1)</option>
+                                                <option value="course">Courses & Specializations (Tier 2)</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     <div className="flex-group">
                                         <div className="form-group w-50">
@@ -2313,8 +2326,16 @@ const AdminDashboard = () => {
                                             <input type="text" value={cert.issuer} onChange={e => updateListItem('certifications', i, 'issuer', e.target.value)} />
                                         </div>
                                         <div className="form-group w-50">
-                                            <label>Instructor / Trainer (Optional)</label>
-                                            <input type="text" value={cert.instructor || ''} onChange={e => updateListItem('certifications', i, 'instructor', e.target.value)} />
+                                            <label>Credential Type</label>
+                                            <select 
+                                                value={cert.credentialType || (cert.name?.toLowerCase().includes('specialization') ? 'Specialization' : 'Professional Certificate')} 
+                                                onChange={e => updateListItem('certifications', i, 'credentialType', e.target.value)}
+                                            >
+                                                <option value="Professional Certificate">Professional Certificate</option>
+                                                <option value="Specialization">Specialization</option>
+                                                <option value="Course">Individual Course</option>
+                                                <option value="Exam Prep">Exam Preparation</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div className="flex-group">
@@ -2327,9 +2348,25 @@ const AdminDashboard = () => {
                                             <input type="text" value={cert.credentialId || ''} onChange={e => updateListItem('certifications', i, 'credentialId', e.target.value)} />
                                         </div>
                                     </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Primary Credential URL</label>
+                                            <input type="text" value={cert.credentialUrl || ''} placeholder="https://..." onChange={e => updateListItem('certifications', i, 'credentialUrl', e.target.value)} />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <label>Instructor / Trainer (Optional)</label>
+                                            <input type="text" value={cert.instructor || ''} onChange={e => updateListItem('certifications', i, 'instructor', e.target.value)} />
+                                        </div>
+                                    </div>
+
                                     <div className="form-group">
-                                        <label>Primary Credential URL (Legacy)</label>
-                                        <input type="text" value={cert.credentialUrl || ''} placeholder="https://..." onChange={e => updateListItem('certifications', i, 'credentialUrl', e.target.value)} />
+                                        <label>Program Overview / Description (Optional)</label>
+                                        <input 
+                                            type="text" 
+                                            value={cert.programNote || ''} 
+                                            placeholder="e.g. Comprehensive 8-course track mastering generative AI..." 
+                                            onChange={e => updateListItem('certifications', i, 'programNote', e.target.value)} 
+                                        />
                                     </div>
 
                                     {/* ── Badge Drag & Drop Uploader ── */}
@@ -2351,6 +2388,8 @@ const AdminDashboard = () => {
                                         />
                                     </div>
 
+
+
                                     <div className="form-section-nested" style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '12px', marginTop: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                         <h5 className="section-label" style={{ fontSize: '0.7rem', marginBottom: '12px' }}>Additional Credential Links</h5>
                                         {cert.links?.map((link: any, lIndex: number) => (
@@ -2370,9 +2409,10 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                             ))}
-                            <button type="button" className="add-btn" onClick={() => addListItem('certifications', { name: '', issuer: '', date: '', credentialId: '', credentialUrl: '', badgeUrl: '', badgePublicUrl: '', links: [], skills: [] })}>
+                            <button type="button" className="add-btn" onClick={() => addListItem('certifications', { name: '', issuer: '', date: '', credentialId: '', credentialUrl: '', badgeUrl: '', badgePublicUrl: '', links: [], skills: [], category: 'professional', credentialType: 'Professional Certificate', programNote: '', subCourses: [] })}>
                                 <Plus size={16} /> Add Certification
                             </button>
+
                         </div>
                     )}
 
