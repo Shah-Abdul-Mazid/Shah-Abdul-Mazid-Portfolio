@@ -662,6 +662,8 @@ def clean_json_string(s: str) -> str:
     s = re.sub(r"```$", "", s, flags=re.IGNORECASE)
     return s.strip()
 
+from app.api.v1.endpoints.portfolio import get_admin_user
+
 class ProjectGenerateRequest(BaseModel):
     title: str
     desc: Optional[str] = ""
@@ -669,7 +671,10 @@ class ProjectGenerateRequest(BaseModel):
     instructions: Optional[str] = ""
 
 @router.post("/generate-project")
-async def generate_project_case_study(payload: ProjectGenerateRequest):
+async def generate_project_case_study(
+    payload: ProjectGenerateRequest,
+    admin=Depends(get_admin_user)
+):
     title = payload.title.strip()
     raw_desc = payload.desc.strip()
     role = payload.role.strip() or "Software Engineer"

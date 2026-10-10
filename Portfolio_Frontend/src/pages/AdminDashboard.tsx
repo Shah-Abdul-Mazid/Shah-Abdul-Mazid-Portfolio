@@ -789,8 +789,10 @@ const AdminDashboard = () => {
                 const formData = new FormData();
                 formData.append('file', file);
 
+                const token = localStorage.getItem('admin_token') || '';
                 const res = await fetch('/api/upload', {
                     method: 'POST',
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {},
                     body: formData
                 });
 
@@ -927,7 +929,12 @@ const AdminDashboard = () => {
             try {
                 const formData = new FormData();
                 formData.append('file', file);
-                const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                const token = localStorage.getItem('admin_token') || '';
+                const res = await fetch('/api/upload', { 
+                    method: 'POST', 
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+                    body: formData 
+                });
                 if (res.ok) {
                     const result = await res.json();
                     if (result.success) {

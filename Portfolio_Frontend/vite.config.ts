@@ -45,5 +45,8 @@ export default defineConfig({
         secure: true
       }
     }
+  },
+  build: {
+    sourcemap: false, // Security: Never expose unminified source code or directory structure in production
   }
 })

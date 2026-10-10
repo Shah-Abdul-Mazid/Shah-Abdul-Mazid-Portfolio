@@ -11,3 +11,7 @@ pnpm-debug.log*
 lerna-debug.log*
 .idea/
 .vscode/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/

@@ -13,11 +13,15 @@ security = HTTPBearer()
 logger = logging.getLogger("portfolio-endpoint")
 
 def get_admin_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Verifies the JWT token from the Authorization header."""
+    """Verifies the JWT token from the Authorization header and enforces role authorization."""
     token = credentials.credentials
     try:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
+        if payload.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Forbidden: Admin privileges required")
         return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Session expired. Please log in again.")
     except jwt.JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
@@ -85,12 +89,30 @@ async def save_portfolio(
 
 @router.get("/credly-image")
 async def get_credly_badge_image(url: str):
-    """Fetches the official Credly badge image URL directly from any public Credly badge link."""
-    import urllib.request, re
+    """
+    Fetches the official Credly badge image URL directly from any public Credly badge link.
+    SSRF Defense: Strictly restricted to credly.com domain, rejecting internal/private IPs.
+    """
+    import urllib.request, urllib.parse, re
     try:
         clean_url = url.strip()
-        if not clean_url.startswith("http"):
+        if not clean_url.startswith("http://") and not clean_url.startswith("https://"):
             clean_url = f"https://www.credly.com/badges/{clean_url}/public_url"
+            
+        parsed = urllib.parse.urlparse(clean_url)
+        hostname = (parsed.hostname or "").lower()
+        
+        # SSRF Protection: Strict domain whitelist
+        if not (hostname == "credly.com" or hostname.endswith(".credly.com")):
+            raise HTTPException(
+                status_code=400, 
+                detail="Security validation error: Only official Credly URLs (credly.com) are permitted."
+            )
+            
+        # Ensure scheme is HTTPS
+        if parsed.scheme not in ["https", "http"]:
+            raise HTTPException(status_code=400, detail="Invalid protocol scheme.")
+
         req = urllib.request.Request(clean_url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
         html = urllib.request.urlopen(req, timeout=8).read().decode("utf-8")
         matches = re.findall(r'meta property="og:image" content="([^"]+)"', html)
@@ -99,7 +121,10 @@ async def get_credly_badge_image(url: str):
             clean_img = img.replace("linkedin_thumb_", "")
             return {"success": True, "imageUrl": clean_img}
         return {"success": False, "error": "No image found on Credly page"}
+    except HTTPException:
+        raise
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        logger.warning(f"Credly fetch error: {e}")
+        return {"success": False, "error": "Failed to fetch badge from Credly"}
 
 

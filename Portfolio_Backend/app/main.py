@@ -7,15 +7,38 @@ from app.config import settings
 import cloudinary
 import asyncio
 
+import os
+from app.middleware.security import SecurityMiddleware
+
 app = FastAPI(title=settings.PROJECT_NAME)
 
-# --- 1. CORS CONFIGURATION ---
+# --- 1. DEFENSIVE SECURITY & RATE LIMITING MIDDLEWARE ---
+app.add_middleware(SecurityMiddleware)
+
+# --- 2. HARDENED CORS CONFIGURATION ---
+env_origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+allowed_origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+    "https://shahabdulmazid.com",
+    "https://www.shahabdulmazid.com",
+    "https://shah-abdul-mazid.vercel.app",
+    "https://shah-abdul-mazid-portfolio.onrender.com",
+]
+for origin in env_origins:
+    if origin not in allowed_origins:
+        allowed_origins.append(origin)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*-shah-abdul-mazid.*\.vercel\.app",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["Retry-After"],
 )
 
 # --- 2. DB EVENTS ---

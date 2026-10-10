@@ -24,18 +24,56 @@ async def expire_message(message_id: str):
         del mock_memory_store.temp_messages[message_id]
         logger.info(f"🔥 [TRIGGER] Message {message_id} expired & deleted after 30 seconds.")
 
+from pydantic import BaseModel, Field
+import html
+import re
+
+class MessageInput(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    email: str = Field(..., min_length=3, max_length=120)
+    phone: Optional[str] = Field(default="", max_length=30)
+    query: str = Field(..., min_length=1, max_length=3000)
+
+def sanitize_text(text: str) -> str:
+    """Removes script tags and escapes HTML to prevent Stored XSS."""
+    if not text:
+        return ""
+    # Strip script/iframe/object tags
+    cleaned = re.sub(r'<(script|iframe|object|embed)[^>]*>.*?</\1>', '', text, flags=re.IGNORECASE | re.DOTALL)
+    # Strip javascript: URIs
+    cleaned = re.sub(r'javascript:', '', cleaned, flags=re.IGNORECASE)
+    return html.escape(cleaned.strip())
+
 @router.post("")
 async def create_message(
     background_tasks: BackgroundTasks,
-    msg: dict = Body(...), 
+    payload: MessageInput, 
     db=Depends(get_database),
 ):
     """
     Submits a message and triggers background auto-replies.
-    Replicates Node's messageController.js logic.
+    Defended against:
+    - Stored XSS (HTML escaping and script tag stripping)
+    - Input overflow / buffer bombing (Strict field length caps)
+    - Automated spam (Protected via IP sliding-window rate limiting)
     """
     try:
-        msg["created_at"] = datetime.utcnow().isoformat()
+        # Validate email format
+        email_clean = payload.email.strip().lower()
+        if not re.match(r"^[^@]+@[^@]+\.[^@]+$", email_clean):
+            raise HTTPException(status_code=400, detail="Invalid email format")
+
+        clean_name = sanitize_text(payload.name)
+        clean_phone = sanitize_text(payload.phone or "")
+        clean_query = sanitize_text(payload.query)
+
+        msg = {
+            "name": clean_name,
+            "email": email_clean,
+            "phone": clean_phone,
+            "query": clean_query,
+            "created_at": datetime.utcnow().isoformat()
+        }
         msg_id = None
         
         # Save to real MongoDB

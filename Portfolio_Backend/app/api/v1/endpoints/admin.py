@@ -23,26 +23,44 @@ async def login(
     email = credentials.get("email")
     password = credentials.get("password")
     
-    admin = None
+    # 1. Input Sanitization & Type Validation (Defense against NoSQL/Type Injection)
+    if not isinstance(email, str) or not isinstance(password, str):
+        raise HTTPException(status_code=400, detail="Invalid credential format")
     
-
-            
-    # 2. Fallback to MongoDB
-    if not admin and db is not None:
-        admin = await db["admin_db"].find_one({"email": email})
+    email = email.strip().lower()
+    if not email or not password or len(email) > 120 or len(password) > 128:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+    admin = None
+    if db is not None:
+        # Strict string match prevents Mongo operator injection
+        admin = await db["admin_db"].find_one({"email": {"$eq": email}})
         
     if not admin:
         raise HTTPException(status_code=401, detail="Invalid email or password")
         
     # Verify password using bcrypt directly
     password_bytes = password.encode('utf-8')
-    hashed_bytes = admin.get("password").encode('utf-8')
+    stored_hash = admin.get("password", "")
+    if not stored_hash or not isinstance(stored_hash, str):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+    hashed_bytes = stored_hash.encode('utf-8')
     
     if not bcrypt.checkpw(password_bytes, hashed_bytes):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
+    # Enforce standard token expiration (Defense against indefinite token reuse)
+    expire_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire_time = datetime.utcnow() + expire_delta
+    
     token = jwt.encode(
-        {"id": str(admin["_id"]), "email": admin["email"], "role": admin.get("role")},
+        {
+            "id": str(admin["_id"]),
+            "email": admin["email"],
+            "role": admin.get("role", "admin"),
+            "exp": expire_time
+        },
         settings.JWT_SECRET,
         algorithm="HS256"
     )
@@ -50,7 +68,8 @@ async def login(
     return {
         "success": True, 
         "token": token, 
-        "admin": {"email": admin["email"], "role": admin.get("role")}
+        "expires_in": int(expire_delta.total_seconds()),
+        "admin": {"email": admin["email"], "role": admin.get("role", "admin")}
     }
 
 @router.post("/register")
@@ -58,37 +77,53 @@ async def register(
     data: dict = Body(...), 
     db=Depends(get_database),
 ):
+    """
+    Admin registration endpoint.
+    Defended against unauthorized account creation:
+    If an admin already exists, public registration is strictly blocked.
+    """
     email = data.get("email")
     password = data.get("password")
     
-    exists = False
-            
-    if not exists and db is not None:
-        if await db["admin_db"].find_one({"email": email}):
-            exists = True
-            
-    if exists:
-        raise HTTPException(status_code=400, detail="Admin already exists")
+    if not isinstance(email, str) or not isinstance(password, str):
+        raise HTTPException(status_code=400, detail="Invalid credential format")
         
-    # Generate hash using bcrypt directly
-    salt = bcrypt.gensalt()
+    email = email.strip().lower()
+    if not email or "@" not in email or len(email) > 120:
+        raise HTTPException(status_code=400, detail="A valid email address is required")
+        
+    if len(password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters long")
+        
+    if db is not None:
+        # Check if ANY admin already exists in the system
+        existing_admin_count = await db["admin_db"].count_documents({})
+        if existing_admin_count > 0:
+            raise HTTPException(
+                status_code=403, 
+                detail="Public admin registration is disabled. An administrator account already exists."
+            )
+            
+        # Check duplicate
+        if await db["admin_db"].find_one({"email": {"$eq": email}}):
+            raise HTTPException(status_code=400, detail="Admin with this email already exists")
+        
+    # Generate hash using bcrypt with high work factor
+    salt = bcrypt.gensalt(rounds=12)
     hashed = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
     
     doc_data = {
         "email": email,
         "password": hashed,
-        "role": "admin"
+        "role": "admin",
+        "created_at": datetime.utcnow()
     }
     
     # Save to MongoDB
     if db is not None:
-        mongo_doc = doc_data.copy()
-        mongo_doc["created_at"] = datetime.utcnow()
-        await db["admin_db"].insert_one(mongo_doc)
+        await db["admin_db"].insert_one(doc_data)
         
-
-        
-    return {"success": True, "message": "Admin created successfully"}
+    return {"success": True, "message": "Initial administrator account initialized successfully"}
 
 @router.get("/list")
 async def list_admins(

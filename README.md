@@ -199,19 +199,54 @@ Portfolio_Final/
 
 ---
 
-## 🔒 Security & Authentication
+## 🔒 20-Point Security Hardening Framework
 
-1. **JWT Bearer Token Authentication:**
-   * Admin routes require an `Authorization: Bearer <token>` header signed with a cryptographic secret (`JWT_SECRET`).
-   * Tokens carry an expiration period (default: 24 hours).
-2. **Cryptographic Password Hashing:**
-   * Passwords are encrypted using **BCrypt** with salted rounds. Plaintext credentials are never stored.
-3. **CORS Hardening:**
-   * Configured via FastAPI's `CORSMiddleware` with explicit methods and headers allowed.
-4. **Environment Isolation:**
-   * All production credentials (MongoDB URI, Cloudinary keys, Groq tokens) reside exclusively in `.env` files and are omitted from version control via `.gitignore`.
-5. **PWA Standalone Sandboxing:**
-   * Direct root route navigation (`/`) automatically detects if running inside an installed PWA window and routes the user directly to the `/login/admin` portal.
+This application is engineered with an enterprise-grade defense-in-depth model aligned with OWASP Top 10 and cloud application security standards:
+
+### 🛡️ Group 1: Injection & Input Validation
+1. **NoSQL & Parameter Injection Defense:** All database queries utilize strict typed parameter matching (`$eq`) and input sanitization to eliminate operator injection risks in MongoDB.
+2. **Cross-Site Scripting (XSS) Sanitization:**
+   * **Backend:** Server-side HTML escaping and regex stripping for `<script>`, `<iframe>`, `<object>`, and `javascript:` URIs on all incoming user submissions.
+   * **Frontend:** Dynamic markup rendered strictly via `DOMPurify` (`dist/assets/purify.es-*.js`).
+3. **Cross-Site Request Forgery (CSRF) Immunity:** All state-changing mutations require an explicit cryptographic `Authorization: Bearer <token>` header rather than implicit ambient cookies.
+4. **Strict File Upload Validation (`/api/upload`):**
+   * Mandatory Administrator JWT authorization.
+   * Whitelist-enforced file extension verification (`.png`, `.jpg`, `.jpeg`, `.webp`, `.svg`, `.pdf`).
+   * MIME content-type validation (`image/*`, `application/pdf`).
+   * Hard 10MB payload size limit preventing quota exhaustion and denial-of-service.
+5. **Server-Side Request Forgery (SSRF) Defense (`/api/portfolio/credly-image`):**
+   * Strict domain whitelist: Only requests directly targeting `credly.com` or `*.credly.com` are permitted.
+   * Internal loopback (`127.0.0.1`), private subnets (`10.*`, `172.16.*`, `192.168.*`), and cloud metadata IP (`169.254.169.254`) requests are unconditionally blocked.
+
+### 🔐 Group 2: Authentication & Access Control
+6. **Broken Object Level Authorization (BOLA) Prevention:** Every administrative endpoint (`/api/portfolio`, `/api/upload`, `/api/messages`, `/api/agent/generate-project`) verifies server-side JWT claims and enforces the `admin` role.
+7. **Sliding-Window Rate Limiting:** High-performance in-memory IP rate limiter protecting against brute-force attacks and abuse:
+   * `/api/admin/login`: Max 5 attempts per 5 minutes per IP (`429 Too Many Requests` with `Retry-After`).
+   * `/api/messages`: Max 5 contact submissions per 10 minutes per IP.
+   * `/api/portfolio/credly-image`: Max 30 requests per minute per IP.
+   * `/api/agent/generate-project`: Max 15 requests per minute.
+8. **Salted Password Hashing:** Passwords encrypted using **BCrypt** with high salted work factor (`rounds=12`). Minimum 8-character password enforcement.
+9. **Short-Lived Token Expiration:** JWTs carry explicit `exp` expiration timestamps (`ACCESS_TOKEN_EXPIRE_MINUTES`) preventing perpetual token replay attacks.
+10. **Server-Side Role Enforcement:** The server verifies permissions independently on every request; client-side tokens cannot elevate privileges.
+11. **Tenant & Data Isolation:** Singleton portfolio records strictly scoped to partition keys (`key: "main"`).
+12. **Public Admin Registration Locked:** The `/api/admin/register` endpoint automatically closes once an initial admin exists, preventing unauthorized administrative account creation.
+
+### 🔑 Group 3: Secrets & Token Safety
+13. **Server-Side Secret Isolation:** Cloudinary secrets, Groq LLM API keys, and MongoDB connection strings reside strictly on the server in `.env` and are never bundled into client-side code.
+14. **Frontend Environment Sanitization:** Frontend contains only public vanity URLs and non-sensitive identifiers (`VITE_API_BASE_URL`, `VITE_GITHUB_URL`).
+15. **Git Secret Shield:** Dual `.gitignore` configuration in both root and backend preventing accidental commits of `.env`, logs, and caches.
+
+### ⚙️ Group 4: Config & Web Hygiene
+16. **Hardened CORS Configuration:** Dynamic origin whitelisting restricting API communication exclusively to authorized production domains (`shahabdulmazid.com`, `shah-abdul-mazid.vercel.app`) and local development ports.
+17. **OWASP Defensive HTTP Security Headers:** Injected by backend middleware and frontend meta tags:
+   * `X-Content-Type-Options: nosniff` (prevents MIME confusion)
+   * `X-Frame-Options: SAMEORIGIN` (prevents Clickjacking)
+   * `X-XSS-Protection: 1; mode=block`
+   * `Referrer-Policy: strict-origin-when-cross-origin`
+   * `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()`
+18. **Production Source Map Stripping:** `build.sourcemap = false` in `vite.config.ts` prevents unminified code, internal path structures, and comments from leaking in production bundles.
+19. **Log Sanitization:** Passwords and JWT authorization tokens are scrubbed from server logs.
+20. **PWA Standalone Sandboxing:** Running the portfolio as an installed PWA automatically sandboxes navigation to `/login/admin`.
 
 ---
 
