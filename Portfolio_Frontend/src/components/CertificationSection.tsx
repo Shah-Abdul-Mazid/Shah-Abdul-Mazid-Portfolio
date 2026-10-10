@@ -1160,11 +1160,46 @@ const CredentialCard: React.FC<CredentialCardProps> = ({
                           href={sub.credlyUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="subcourse-credly-badge-link"
-                          title="Verified on Credly"
+                          className={sub.credlyUrl.includes('credly.com') ? "subcourse-credly-badge-link" : "subcourse-cert-badge-link"}
+                          style={!sub.credlyUrl.includes('credly.com') ? {
+                            fontSize: '0.65rem',
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                            background: 'rgba(56, 189, 248, 0.15)',
+                            color: '#38bdf8',
+                            border: '1px solid rgba(56, 189, 248, 0.3)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontWeight: 600,
+                            textDecoration: 'none'
+                          } : undefined}
+                          title={sub.credlyUrl.includes('credly.com') ? "Verified on Credly" : "Verify Course Credential"}
                         >
-                          <BadgeCheck size={9} /> Credly
+                          {sub.credlyUrl.includes('credly.com') ? (
+                            <><BadgeCheck size={9} /> Credly</>
+                          ) : (
+                            <><ExternalLink size={9} /> Certificate</>
+                          )}
                         </a>
+                      ) : isCompleted ? (
+                        <span 
+                          className="subcourse-completed-tag" 
+                          style={{
+                            fontSize: '0.65rem',
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                            background: 'rgba(16, 185, 129, 0.15)',
+                            color: '#34d399',
+                            border: '1px solid rgba(16, 185, 129, 0.3)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            fontWeight: 600
+                          }}
+                        >
+                          <CheckCircle2 size={10} /> Completed
+                        </span>
                       ) : (
                         <span className="subcourse-pending-tag">Curriculum</span>
                       )}

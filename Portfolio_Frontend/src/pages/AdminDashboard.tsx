@@ -2727,8 +2727,8 @@ const AdminDashboard = () => {
                                                             <div className="flex-group" style={{ marginBottom: '8px' }}>
                                                                 <div className="form-group w-50" style={{ marginBottom: 0 }}>
                                                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                                                        <label style={{ fontSize: '0.7rem', margin: 0 }}>Credly Badge Public URL (Optional)</label>
-                                                                        {sub.credlyUrl && (
+                                                                        <label style={{ fontSize: '0.7rem', margin: 0 }}>Verification Link / Credly URL (Optional)</label>
+                                                                        {sub.credlyUrl && sub.credlyUrl.includes('credly.com') && (
                                                                             <button
                                                                                 type="button"
                                                                                 onClick={async () => {
@@ -2755,7 +2755,7 @@ const AdminDashboard = () => {
                                                                     <input 
                                                                         type="text" 
                                                                         value={sub.credlyUrl || ''} 
-                                                                        placeholder="https://www.credly.com/badges/.../public_url" 
+                                                                        placeholder="https://credly.com/badges/... or https://coursera.org/verify/..." 
                                                                         onChange={e => {
                                                                             const val = e.target.value;
                                                                             updateSubCourse(i, sIdx, 'credlyUrl', val);
