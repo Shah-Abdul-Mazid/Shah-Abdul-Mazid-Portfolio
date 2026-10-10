@@ -130,11 +130,18 @@ Portfolio_Final/
 ### 2. Verified Credly Badges & Certifications System
 * **Cloud-First Media Pipeline:** **Zero badge image files stored inside Git or build bundles.** All badges stream dynamically from the official **Credly CDN** (`images.credly.com`) or **Cloudinary** (`res.cloudinary.com`).
 * **Canonical Deduplication:** Certifications and digital badges are mapped to single underlying achievements in [`src/data/certificationData.ts`](file:///c:/Users/LENOVO/Desktop/Portfolio_Final/Portfolio_Frontend/src/data/certificationData.ts).
+* **Parent-Child Progressive Hierarchy:**
+  * **Google AI Professional Certificate:** 8-course modular program featuring dynamic completion tracking (`2 / 8 Courses Completed`), expandable curriculum tray, and direct Credly verification links for individual courses (AI Fundamentals, AI for Brainstorming and Planning).
+  * **IBM Data Science Professional Certificate (V3):** 10-course modular program with verified child badges (Databases & SQL, Data Visualization, GenAI Essentials, Capstone).
+  * **Dynamic Progression:** Moving a course from `in-progress` to `verified` automatically updates the program completion progress bar.
+* **Instant Credly Auto-Fetch Integration:**
+  * Paste any public Credly badge URL (`https://www.credly.com/badges/...`) into the dashboard.
+  * The system automatically queries `/api/portfolio/credly-image` to scrape and extract the official `images.credly.com` CDN image link without requiring manual image searches.
 * **Multi-Tiered Classification:**
   * **Tier 1 — Professional Certificates:** High-level comprehensive credentials (e.g., Google AI Professional Certificate, IBM Data Science Professional Certificate).
   * **Tier 2 — Courses & Specializations:** Standalone verified courses across AWS, Microsoft, DeepLearning.AI, CertNexus, and IBM.
   * **Tier 3 — Verified Credly Badges Gallery:** Compact showcase of authentic Credly achievements with public verification URLs.
-* **Interactive Filtering:** Instant client-side search by title, issuer, credential ID, and badge status.
+* **Interactive Filtering:** Instant client-side search by title, issuer, credential ID, skills, and badge status.
 
 ### 3. Resume & CV Generation Engine (ATS + Visual)
 * **Dual Resume Formats:**
@@ -145,9 +152,16 @@ Portfolio_Final/
 
 ### 4. Admin Dashboard CMS & Automation
 * **Standalone Progressive Web App (PWA):** Installs as a standalone native-like desktop or mobile application (`/login/admin`).
+* **Parent-Child Curriculum Tray Manager:**
+  * Visual progress bar displaying percentage and completed course count (e.g. `2 / 8 Completed (25%)`).
+  * Course-by-course editor for Sub-Course Title, Status (`verified`, `completed`, `in-progress`, `curriculum`), Credly URL, and Completion Date.
+  * **1-Click Status Toggler:** Fast toggle between `In Progress` and `Verified` with automated Credly badge image retrieval.
+  * **Progressive Curriculum Converter:** Convert any single certification into a multi-course track via `+ Enable Progressive Curriculum`.
+* **Smart Credly Badge Auto-Fetch:**
+  * Automatic metadata resolver for Credly badge links in both parent certificates and modular sub-courses.
 * **Full CRUD Content Control:** Real-time visual editor for:
   * Profile Bio, Title & Contact Information
-  * Licenses & Certifications with Cloudinary image uploaders
+  * Licenses & Certifications with Cloudinary image uploaders and Credly integration
   * Projects Catalogue (featuring repository links, live demos, and technical tags)
   * Research Publications (with **BibTeX Auto-Parser** that instantly extracts title, authors, venue, DOI, and keywords)
   * Work Experience & Career Achievements
@@ -169,6 +183,7 @@ Portfolio_Final/
 |---|:---:|:---:|---|
 | `/api/portfolio` | `GET` | Public | Retrieves full portfolio document from MongoDB (`portfolio_content`) |
 | `/api/portfolio` | `POST` | Admin | Updates entire portfolio document in MongoDB (Protected via JWT) |
+| `/api/portfolio/credly-image` | `GET` | Public | Scrapes and extracts official CDN badge image from any public Credly badge URL |
 | `/api/admin/login` | `POST` | Public | Authenticates admin credentials and issues signed JWT bearer token |
 | `/api/admin/verify` | `GET` | Admin | Validates existing session token |
 | `/api/analytics` | `GET` | Public | Returns total website views count |
