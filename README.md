@@ -249,50 +249,51 @@ This application implements an enterprise-grade defense-in-depth model aligned w
 
 ### Audit Matrix & Implementation Details
 
-#### 🛡️ Group 1: Injection & Input Validation
-1. **NoSQL & Parameter Injection Defense:** All MongoDB operations strictly use typed string queries (`{"$eq": value}`). Passing dictionary objects with MongoDB operators (`$ne`, `$gt`, `$regex`) as user inputs is completely neutralized.
-2. **Cross-Site Scripting (XSS) Sanitization:**
-   * **Backend:** Server-side HTML escaping via `html.escape()` and regex stripping for `<script>`, `<iframe>`, `<object>`, `<embed>`, and `javascript:` URIs in contact submissions.
-   * **Frontend:** Dynamic markdown and badge descriptions rendered strictly via `DOMPurify` (`dist/assets/purify.es-*.js`).
-3. **Cross-Site Request Forgery (CSRF) Immunity:** All state-changing endpoints (`/api/portfolio`, `/api/upload`, `/api/admin/*`) require an explicit `Authorization: Bearer <token>` header rather than ambient browser cookies. Browsers do not attach custom Authorization headers on cross-origin requests.
-4. **Strict File Upload Validation (`/api/upload`):**
-   * Mandatory Administrator JWT authorization.
-   * Whitelist-enforced file extension verification (`.png`, `.jpg`, `.jpeg`, `.webp`, `.svg`, `.pdf`).
-   * MIME content-type validation (`image/*`, `application/pdf`).
-   * Hard 10MB payload size limit preventing quota exhaustion and denial-of-service.
-5. **Server-Side Request Forgery (SSRF) Defense (`/api/portfolio/credly-image`):**
-   * Strict domain whitelist: Only requests directly targeting `credly.com` or `*.credly.com` are permitted.
-   * Internal loopback (`127.0.0.1`), private subnets (`10.*`, `172.16.*`, `192.168.*`), and cloud metadata IP (`169.254.169.254`) requests are unconditionally blocked.
+### 🛡️ Group 1: Injection & Input Validation
 
-#### 🔐 Group 2: Authentication & Access Control
-6. **Broken Object Level Authorization (BOLA) Prevention:** Every administrative endpoint verifies server-side JWT claims and enforces the `admin` role independently on every request.
-7. **Sliding-Window Rate Limiting:** High-performance in-memory IP rate limiter protecting against brute-force attacks and abuse:
-   * `/api/admin/login`: Max 5 attempts per 5 minutes per IP (`429 Too Many Requests` with `Retry-After`).
-   * `/api/messages`: Max 5 contact submissions per 10 minutes per IP.
-   * `/api/portfolio/credly-image`: Max 30 requests per minute per IP.
-   * `/api/agent/generate-project`: Max 15 requests per minute.
-8. **Salted Password Hashing:** Passwords encrypted using **BCrypt** with high salted work factor (`rounds=12`). Minimum 8-character password enforcement.
-9. **Short-Lived Token Expiration:** JWTs carry explicit `exp` expiration timestamps (`ACCESS_TOKEN_EXPIRE_MINUTES`) preventing perpetual token replay attacks.
-10. **Server-Side Role Enforcement:** The server verifies permissions independently on every request; client-side tokens cannot elevate privileges.
-11. **Tenant & Data Isolation:** Singleton portfolio records strictly scoped to partition keys (`key: "main"`).
-12. **Public Admin Registration Locked:** The `/api/admin/register` endpoint automatically closes once an initial admin exists, preventing unauthorized administrative account creation.
+| # | Security Check | Status | Kya Action Liya Gaya? |
+|---|---|:---:|---|
+| 1 | **NoSQL / Parameter Injection** | ✅ Secure | MongoDB queries mein strict typed parameter matching (`$eq`) enforce kiya. User string input se MongoDB operator injection (`$ne`, `$gt`, etc.) completely block kar diya gaya hai. |
+| 2 | **Cross-Site Scripting (XSS)** | ✅ Secure | Backend par HTML escaping aur script regex sanitization add kiya (`<script>`, `<iframe>`, `javascript:` URIs stripped). Frontend par dynamically rendered content pehle se hi `DOMPurify` se sanitized hai. |
+| 3 | **CSRF Protection** | ✅ Secure | Saare state-changing endpoints (`/api/portfolio`, `/api/upload`, `/api/admin/*`) cookie-based ambient auth ke bajaye **Cryptographic Bearer JWT** use karte hain. Browsers cross-origin requests par custom Authorization headers automatically attach nahi kar sakte. |
+| 4 | **File Upload Validation** | ✅ Secure | `upload.py` ko harden kiya:<br>• **Admin Auth Mandatory**: Unauthenticated uploads block kar diye.<br>• **Extension Whitelist**: Sirf `.png`, `.jpg`, `.jpeg`, `.webp`, `.svg`, `.pdf` allowed hain.<br>• **MIME Check**: Content-Type verification.<br>• **Size Limit**: Maximum 10MB per file cap (quota exhaustion aur DoS se protection). |
+| 5 | **Server-Side Request Forgery (SSRF)** | ✅ Secure | `/api/portfolio/credly-image` par strict domain whitelist lagaya gaya hai. Sirf official `credly.com` domain se request accept hogi. Internal IP (`127.0.0.1`, `localhost`, `10.*`) aur cloud metadata IP (`169.254.169.254`) requests completely block hain. |
 
-#### 🔑 Group 3: Secrets & Token Safety
-13. **Server-Side Secret Isolation:** Cloudinary secrets, Groq LLM API keys, and MongoDB connection strings reside strictly on the server in `.env` and are never bundled into client-side code.
-14. **Frontend Environment Sanitization:** Frontend contains only public vanity URLs and non-sensitive identifiers (`VITE_API_BASE_URL`, `VITE_GITHUB_URL`).
-15. **Git Secret Shield:** Dual `.gitignore` configuration in both root and backend preventing accidental commits of `.env`, logs, and compiled bytecode (`__pycache__`).
+---
 
-#### ⚙️ Group 4: Config & Web Hygiene
-16. **Hardened CORS Configuration:** Dynamic origin whitelisting restricting API communication exclusively to authorized production domains (`shahabdulmazid.com`, `shah-abdul-mazid.vercel.app`) and local development ports.
-17. **OWASP Defensive HTTP Security Headers:** Injected by backend middleware and frontend meta tags:
-   * `X-Content-Type-Options: nosniff` (prevents MIME confusion)
-   * `X-Frame-Options: SAMEORIGIN` (prevents Clickjacking)
-   * `X-XSS-Protection: 1; mode=block`
-   * `Referrer-Policy: strict-origin-when-cross-origin`
-   * `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()`
-18. **Production Source Map Stripping:** `build.sourcemap = false` in `vite.config.ts` prevents unminified code, internal path structures, and comments from leaking in production bundles.
-19. **Log Sanitization:** Passwords and JWT authorization tokens are scrubbed from server logs.
-20. **PWA Standalone Sandboxing:** Running the portfolio as an installed PWA automatically sandboxes navigation to `/login/admin`.
+### 🔐 Group 2: Authentication & Access Control
+
+| # | Security Check | Status | Kya Action Liya Gaya? |
+|---|---|:---:|---|
+| 6 | **Broken Object Level Authorization (BOLA)** | ✅ Secure | Tamam administrative endpoints (`/api/portfolio`, `/api/upload`, `/api/messages`, `/api/agent/generate-project`) par server-side `get_admin_user` dependency enforce ki gayi hai. |
+| 7 | **Rate Limiting** | ✅ Secure | Production-grade in-memory sliding-window IP rate limiter middleware (`security.py`) deploy kiya:<br>• `/api/admin/login`: **Max 5 attempts / 5 mins** (brute-force defense, `429 Too Many Requests` + `Retry-After`).<br>• `/api/messages`: **Max 5 contact messages / 10 mins** (anti-spam bot).<br>• `/api/portfolio/credly-image`: **Max 30 req / min**.<br>• AI Project Generation: **Max 15 req / min**. |
+| 8 | **Secure Password Hashing** | ✅ Secure | Passwords **BCrypt** with high salt work factor (`rounds=12`) se hash hote hain. Registration par minimum 8-character password length enforce ki gayi hai. |
+| 9 | **Token Expiration (exp)** | ✅ Secure | JWT tokens mein standard expiration timestamp (`exp: ACCESS_TOKEN_EXPIRE_MINUTES`) shamil kiya gaya hai taake leaked tokens hamesha ke liye valid na rahein. |
+| 10 | **Permissions Server-Side Enforced** | ✅ Secure | Client-side claims par trust nahi kiya jata; server har request par independently `role == "admin"` verify karta hai. |
+| 11 | **Row-Level / Tenant Isolation** | ✅ Secure | Portfolio collection strictly single singleton document key (`key: "main"`) par scoped hai. |
+| 12 | **Public Registration Locked** | ✅ Secure | `/api/admin/register` endpoint ab public internet ke liye **locked** hai agar system mein pehle se admin exist karta hai (`403 Forbidden`). |
+
+---
+
+### 🔑 Group 3: Secrets & Token Safety
+
+| # | Security Check | Status | Kya Action Liya Gaya? |
+|---|---|:---:|---|
+| 13 | **Server-Side API Secrets** | ✅ Secure | Cloudinary secret keys, Groq API keys, aur MongoDB connection string sirf server `.env` file mein hain. Client-side bundle mein koi private secret expose nahi hai. |
+| 14 | **Frontend Environment Sanitized** | ✅ Secure | Frontend `.env` mein sirf public vanity links hain (`VITE_API_BASE_URL`, `VITE_GITHUB_URL`). |
+| 15 | **Git Secret Leak Prevention** | ✅ Secure | Root aur Backend dono jagah `.gitignore` updated hai. `.env`, logs, aur python compiled bytecode files (`__pycache__`) git tracking se eliminate kar di gayi hain. |
+
+---
+
+### ⚙️ Group 4: Config & Web Hygiene
+
+| # | Security Check | Status | Kya Action Liya Gaya? |
+|---|---|:---:|---|
+| 16 | **CORS Settings Tightened** | ✅ Secure | Wildcard `allow_origins=["*"]` hata kar **explicit origin whitelist** lagaya gaya (`shahabdulmazid.com`, `shah-abdul-mazid.vercel.app`, local dev ports + Vercel preview regex). |
+| 17 | **OWASP Security Headers** | ✅ Secure | Har HTTP response par defensive security headers inject hote hain:<br>• `X-Content-Type-Options: nosniff`<br>• `X-Frame-Options: SAMEORIGIN` (Clickjacking defense)<br>• `X-XSS-Protection: 1; mode=block`<br>• `Referrer-Policy: strict-origin-when-cross-origin`<br>• `Permissions-Policy: camera=(), microphone=(), geolocation=()` |
+| 18 | **Exposed Source Maps Removed** | ✅ Secure | `vite.config.ts` mein `build.sourcemap = false` set kiya gaya hai taake production mein original TypeScript code, directory tree ya comments leak na ho sakein. |
+| 19 | **Sensitive Data Kept Out of Logs** | ✅ Secure | Login request logging se passwords aur tokens ko redact kiya gaya hai. |
+| 20 | **PWA Sandboxing & Clean Build** | ✅ Secure | Frontend PWA window mode detect karke admin portal par safe redirect karta hai. Production build (`npm run build`) 0 errors ke sath pass hua (`✓ built in 5.94s`). |
 
 ---
 
