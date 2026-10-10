@@ -441,13 +441,107 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     title: "IBM AI Engineering",
     issuer: "IBM",
     category: "professional",
-    credentialType: "Professional Certificate",
+    credentialType: "Specialization",
     date: "May 16, 2026",
     credentialId: "CRH40FK3BKPQ",
     verificationUrl: "https://coursera.org/verify/professional-cert/CRH40FK3BKPQ",
     sourcePlatform: "IBM",
     status: "verified",
-    skills: ["Apache Spark", "Computer Vision", "Data Science", "Fine-tuning", "Generative AI", "Keras", "Machine Learning", "Prompt Engineering"]
+    programNote: "Comprehensive 13-course IBM Specialization covering Machine Learning, Deep Learning (Keras, PyTorch, TensorFlow), Transformers, LLM fine-tuning, RAG, and AI agent architectures with LangChain.",
+    skills: ["Deep Learning", "Machine Learning", "PyTorch", "TensorFlow", "Keras", "Neural Networks", "Generative AI", "LLMs", "Transformers", "Fine-Tuning", "RAG", "LangChain", "AI Agents", "Computer Vision", "NLP"],
+    subCourses: [
+      {
+        id: "ibm-aie-c1",
+        order: 1,
+        title: "Machine Learning with Python",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c2",
+        order: 2,
+        title: "Introduction to Deep Learning & Neural Networks with Keras",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c3",
+        order: 3,
+        title: "Deep Learning with Keras and Tensorflow",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c4",
+        order: 4,
+        title: "Introduction to Neural Networks and PyTorch",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c5",
+        order: 5,
+        title: "Deep Learning with PyTorch",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c6",
+        order: 6,
+        title: "AI Capstone Project with Deep Learning",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c7",
+        order: 7,
+        title: "Generative AI and LLMs: Architecture and Data Preparation",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c8",
+        order: 8,
+        title: "Gen AI Foundational Models for NLP & Language Understanding",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c9",
+        order: 9,
+        title: "Generative AI Language Modeling with Transformers",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c10",
+        order: 10,
+        title: "Generative AI Engineering and Fine-Tuning Transformers",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c11",
+        order: 11,
+        title: "Generative AI Advanced Fine-Tuning for LLMs",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c12",
+        order: 12,
+        title: "Fundamentals of AI Agents Using RAG and LangChain",
+        status: "completed",
+        completionDate: "May 2026"
+      },
+      {
+        id: "ibm-aie-c13",
+        order: 13,
+        title: "Project: Generative AI Applications with RAG and LangChain",
+        status: "completed",
+        completionDate: "May 2026"
+      }
+    ]
   },
   {
     id: "ibm-genai-engineering",
@@ -661,6 +755,7 @@ export function getNormalizedCertifications(apiCerts?: Array<{
       if (canon.id === "google-ai-prof" && (acName === "google ai" || acName.includes("google ai"))) return true;
       if (canon.id === "ibm-data-science-prof" && (acName === "ibm data science" || acName === "data science")) return true;
       if (canon.id === "ibm-ai-developer" && (acName.includes("ibm ai developer") || acName.includes("ai developer"))) return true;
+      if (canon.id === "ibm-ai-engineering" && (acName.includes("ibm ai engineering") || acName.includes("ai engineering"))) return true;
       return false;
     });
 

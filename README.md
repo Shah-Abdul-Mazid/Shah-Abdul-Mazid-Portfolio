@@ -131,14 +131,16 @@ Portfolio_Final/
 * **Cloud-First Media Pipeline:** **Zero badge image files stored inside Git or build bundles.** All badges stream dynamically from the official **Credly CDN** (`images.credly.com`) or **Cloudinary** (`res.cloudinary.com`).
 * **Canonical Deduplication:** Certifications and digital badges are mapped to single underlying achievements in [`src/data/certificationData.ts`](file:///c:/Users/LENOVO/Desktop/Portfolio_Final/Portfolio_Frontend/src/data/certificationData.ts).
 * **Parent-Child Progressive Hierarchy:**
-  * **Google AI Professional Certificate:** 8-course modular program featuring dynamic completion tracking (`2 / 8 Courses Completed`), expandable curriculum tray, and direct Credly verification links for individual courses (AI Fundamentals, AI for Brainstorming and Planning).
-  * **IBM Data Science Professional Certificate (V3):** 10-course modular program with verified child badges (Databases & SQL, Data Visualization, GenAI Essentials, Capstone).
-  * **Dynamic Progression:** Moving a course from `in-progress` to `verified` automatically updates the program completion progress bar.
+  * **Google AI Professional Certificate:** 8-course modular program featuring dynamic completion tracking (`8 / 8 Courses Completed`), expandable curriculum tray, direct Coursera course links, and Credly verification badges for modular courses (AI Fundamentals, AI for Brainstorming and Planning).
+  * **IBM Data Science Professional Certificate (V3):** 12-course comprehensive curriculum with 5 verified Credly badges (Databases & SQL, Data Visualization, Applied Capstone, GenAI Essentials, Career Guide & Interview Prep) and 7 verified Coursera milestones.
+  * **IBM AI Engineering Specialization:** 13-course advanced track covering Machine Learning, Deep Learning (Keras, PyTorch, TensorFlow), Transformers, LLM Fine-Tuning, RAG, and AI Agent workflows with LangChain.
+  * **IBM AI Developer Specialization:** 10-course software and generative AI track covering Python, Flask, HTML/CSS/JS, Prompt Engineering, and custom Generative AI application development.
+  * **Dynamic Progression & Smart Links:** Automatically displays `🏅 Credly` for Credly badges, `↗ Coursera` for Coursera course links, or `✓ Completed` for finished milestones without dedicated badges.
 * **Instant Credly Auto-Fetch Integration:**
   * Paste any public Credly badge URL (`https://www.credly.com/badges/...`) into the dashboard.
   * The system automatically queries `/api/portfolio/credly-image` to scrape and extract the official `images.credly.com` CDN image link without requiring manual image searches.
 * **Multi-Tiered Classification:**
-  * **Tier 1 — Professional Certificates:** High-level comprehensive credentials (e.g., Google AI Professional Certificate, IBM Data Science Professional Certificate).
+  * **Tier 1 — Professional Certificates:** High-level comprehensive credentials (e.g., Google AI Professional Certificate, IBM Data Science Professional Certificate, IBM AI Engineering, IBM AI Developer).
   * **Tier 2 — Courses & Specializations:** Standalone verified courses across AWS, Microsoft, DeepLearning.AI, CertNexus, and IBM.
   * **Tier 3 — Verified Credly Badges Gallery:** Compact showcase of authentic Credly achievements with public verification URLs.
 * **Interactive Filtering:** Instant client-side search by title, issuer, credential ID, skills, and badge status.
@@ -153,8 +155,8 @@ Portfolio_Final/
 ### 4. Admin Dashboard CMS & Automation
 * **Standalone Progressive Web App (PWA):** Installs as a standalone native-like desktop or mobile application (`/login/admin`).
 * **Parent-Child Curriculum Tray Manager:**
-  * Visual progress bar displaying percentage and completed course count (e.g. `2 / 8 Completed (25%)`).
-  * Course-by-course editor for Sub-Course Title, Status (`verified`, `completed`, `in-progress`, `curriculum`), Credly URL, and Completion Date.
+  * Visual progress bar displaying percentage and completed course count (e.g. `13 / 13 Completed (100%)`).
+  * Course-by-course editor for Sub-Course Title, Status (`verified`, `completed`, `in-progress`, `curriculum`), Verification Link (Credly or Coursera), and Completion Date.
   * **1-Click Status Toggler:** Fast toggle between `In Progress` and `Verified` with automated Credly badge image retrieval.
   * **Progressive Curriculum Converter:** Convert any single certification into a multi-course track via `+ Enable Progressive Curriculum`.
 * **Smart Credly Badge Auto-Fetch:**
