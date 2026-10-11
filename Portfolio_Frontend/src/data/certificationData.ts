@@ -184,7 +184,7 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
         title: "AI for Research and Insights (1h)",
         status: "completed",
         credlyUrl: "https://www.coursera.org/learn/google-ai-for-research-and-insights?specialization=google-ai",
-        completionDate: "2026"
+        completionDate: "Sep 2026"
       },
       {
         id: "google-ai-c4",
@@ -192,7 +192,7 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
         title: "AI for Writing and Communicating (1h)",
         status: "completed",
         credlyUrl: "https://www.coursera.org/learn/google-ai-for-writing-and-communicating?specialization=google-ai",
-        completionDate: "2026"
+        completionDate: "Sep 2026"
       },
       {
         id: "google-ai-c5",
@@ -200,7 +200,7 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
         title: "AI for Content Creation (2h)",
         status: "completed",
         credlyUrl: "https://www.coursera.org/learn/google-ai-for-content-creation?specialization=google-ai",
-        completionDate: "2026"
+        completionDate: "Sep 2026"
       },
       {
         id: "google-ai-c6",
@@ -208,7 +208,7 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
         title: "AI for Data Analysis (1h)",
         status: "completed",
         credlyUrl: "https://www.coursera.org/learn/google-ai-for-data-analysis?specialization=google-ai",
-        completionDate: "2026"
+        completionDate: "Sep 2026"
       },
       {
         id: "google-ai-c7",
@@ -216,7 +216,7 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
         title: "AI for App Building (2h)",
         status: "completed",
         credlyUrl: "https://www.coursera.org/learn/google-ai-for-app-building?specialization=google-ai",
-        completionDate: "2026"
+        completionDate: "Sep 2026"
       },
       {
         id: "google-ai-c8",
@@ -224,7 +224,7 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
         title: "AI for App Deployment (2h)",
         status: "completed",
         credlyUrl: "https://www.coursera.org/learn/google-ai-for-app-deployment?specialization=google-ai",
-        completionDate: "2026"
+        completionDate: "Sep 2026"
       }
     ]
   },
@@ -554,7 +554,26 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://www.coursera.org/account/accomplishments/professional-cert/certificate/DSNNEP85OO8Z",
     sourcePlatform: "IBM",
     status: "verified",
-    skills: ["Generative AI", "Prompt Engineering", "Large Language Models", "Fine-tuning", "Vector Databases", "Embeddings"]
+    programNote: "16-course IBM Specialization covering the full stack of Generative AI engineering: prompt engineering, Python, Flask, deep learning, LLMs, fine-tuning transformers, RAG, and agentic AI.",
+    skills: ["Generative AI", "Prompt Engineering", "Large Language Models", "Fine-tuning", "Vector Databases", "Embeddings"],
+    subCourses: [
+      { id: "ibm-genaie-c1", order: 1, title: "Introduction to Artificial Intelligence (AI)", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c2", order: 2, title: "Generative AI: Introduction and Applications", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c3", order: 3, title: "Generative AI: Prompt Engineering Basics", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c4", order: 4, title: "Python for Data Science, AI & Development", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c5", order: 5, title: "Developing AI Applications with Python and Flask", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c6", order: 6, title: "Building Generative AI-Powered Applications with Python", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c7", order: 7, title: "Data Analysis with Python", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c8", order: 8, title: "Machine Learning with Python", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c9", order: 9, title: "Introduction to Deep Learning & Neural Networks with Keras", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c10", order: 10, title: "Generative AI and LLMs: Architecture and Data Preparation", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c11", order: 11, title: "Gen AI Foundational Models for NLP & Language Understanding", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c12", order: 12, title: "Generative AI Language Modeling with Transformers", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c13", order: 13, title: "Generative AI Engineering and Fine-Tuning Transformers", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c14", order: 14, title: "Generative AI Advanced Fine-Tuning for LLMs", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c15", order: 15, title: "Fundamentals of AI Agents Using RAG and LangChain", status: "completed", completionDate: "2026" },
+      { id: "ibm-genaie-c16", order: 16, title: "Project: Generative AI Applications with RAG and LangChain", status: "completed", completionDate: "2026" }
+    ]
   },
   {
     id: "aws-bedrock-genai",
@@ -567,7 +586,13 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://www.coursera.org/verify/professional-cert/IEBJJK8W4GA0",
     sourcePlatform: "AWS",
     status: "verified",
-    skills: ["Amazon Bedrock", "Generative AI Agents", "Agentic Workflows", "LangChain", "Responsible AI", "Model Optimization"]
+    programNote: "3-course AWS specialization covering generative AI application development, Amazon Bedrock usage, and advanced customization, optimization & automation of AI agents.",
+    skills: ["Amazon Bedrock", "Generative AI Agents", "Agentic Workflows", "LangChain", "Responsible AI", "Model Optimization"],
+    subCourses: [
+      { id: "aws-bedrock-c1", order: 1, title: "Getting Started with AWS Generative AI for Developers", status: "completed", completionDate: "May 2026" },
+      { id: "aws-bedrock-c2", order: 2, title: "Generative AI Applications with Amazon Bedrock", status: "completed", completionDate: "May 2026" },
+      { id: "aws-bedrock-c3", order: 3, title: "Amazon Bedrock Customization, Optimization & Automation", status: "completed", completionDate: "May 2026" }
+    ]
   },
   {
     id: "ms-azure-dp100",
@@ -580,7 +605,15 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://www.coursera.org/account/accomplishments/professional-cert/certificate/IMA89TK87FLE",
     sourcePlatform: "Microsoft",
     status: "verified",
-    skills: ["Azure Machine Learning", "Model Training", "Pipeline Automation", "MLOps", "Model Deployment"]
+    programNote: "5-course Microsoft Azure specialization preparing for the DP-100 exam: machine learning, Azure ML workspace, model pipelines, Azure Databricks, and exam preparation.",
+    skills: ["Azure Machine Learning", "Model Training", "Pipeline Automation", "MLOps", "Model Deployment"],
+    subCourses: [
+      { id: "ms-dp100-c1", order: 1, title: "Create Machine Learning Models in Microsoft Azure", status: "completed", completionDate: "2026" },
+      { id: "ms-dp100-c2", order: 2, title: "Microsoft Azure Machine Learning for Data Scientists", status: "completed", completionDate: "2026" },
+      { id: "ms-dp100-c3", order: 3, title: "Build and Operate Machine Learning Solutions with Azure", status: "completed", completionDate: "2026" },
+      { id: "ms-dp100-c4", order: 4, title: "Perform data science with Azure Databricks", status: "completed", completionDate: "2026" },
+      { id: "ms-dp100-c5", order: 5, title: "Prepare for DP-100: Data Science on Microsoft Azure Exam", status: "completed", completionDate: "2026" }
+    ]
   },
   {
     id: "ms-ai-ml-engineering",
@@ -594,7 +627,15 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     badgeUrl: "https://res.cloudinary.com/dxjv3zwse/image/upload/v1791368527/portfolio_uploads/stream_sydx3e.png",
     sourcePlatform: "Microsoft",
     status: "verified",
-    skills: ["Machine Learning", "Deep Learning", "Azure Cognitive Services", "Natural Language Processing", "Computer Vision"]
+    programNote: "5-course Microsoft specialization spanning AI/ML foundations, algorithms, Azure deployment, intelligent agent building, and advanced ML capstone techniques.",
+    skills: ["Machine Learning", "Deep Learning", "Azure Cognitive Services", "Natural Language Processing", "Computer Vision"],
+    subCourses: [
+      { id: "ms-aiml-c1", order: 1, title: "Foundations of AI and Machine Learning", status: "completed", completionDate: "2026" },
+      { id: "ms-aiml-c2", order: 2, title: "AI and Machine Learning Algorithms and Techniques", status: "completed", completionDate: "2026" },
+      { id: "ms-aiml-c3", order: 3, title: "Building Intelligent Troubleshooting Agents", status: "completed", completionDate: "2026" },
+      { id: "ms-aiml-c4", order: 4, title: "Microsoft Azure for AI and Machine Learning", status: "completed", completionDate: "2026" },
+      { id: "ms-aiml-c5", order: 5, title: "Advanced AI and Machine Learning Techniques and Capstone", status: "completed", completionDate: "2026" }
+    ]
   },
   {
     id: "deeplearning-dataeng",
@@ -607,7 +648,14 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://www.coursera.org/account/accomplishments/professional-cert/certificate/MOHN5RMGP99D",
     sourcePlatform: "Coursera",
     status: "verified",
-    skills: ["Data Pipelines", "ETL Architecture", "Data Modeling", "Distributed Systems", "SQL & NoSQL"]
+    programNote: "4-course specialization by DeepLearning.AI & AWS covering the full data engineering lifecycle: ingestion, storage, modeling, transformation, and serving.",
+    skills: ["Data Pipelines", "ETL Architecture", "Data Modeling", "Distributed Systems", "SQL & NoSQL"],
+    subCourses: [
+      { id: "dlai-de-c1", order: 1, title: "Introduction to Data Engineering", status: "completed", completionDate: "2026" },
+      { id: "dlai-de-c2", order: 2, title: "Source Systems, Data Ingestion, and Pipelines", status: "completed", completionDate: "2026" },
+      { id: "dlai-de-c3", order: 3, title: "Data Storage and Queries", status: "completed", completionDate: "2026" },
+      { id: "dlai-de-c4", order: 4, title: "Data Modeling, Transformation, and Serving", status: "completed", completionDate: "2026" }
+    ]
   },
   {
     id: "certnexus-cdsp",
@@ -620,7 +668,15 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://www.coursera.org/account/accomplishments/professional-cert/certificate/GVQQ9VG3UVN6",
     sourcePlatform: "CertNexus",
     status: "verified",
-    skills: ["Data Science Methodology", "Model Evaluation", "Cross-Validation", "Ethical AI", "Predictive Analytics"]
+    programNote: "5-course CertNexus CDSP specialization covering the complete data science project lifecycle: business framing, data extraction, analysis, ML model training, and project finalization.",
+    skills: ["Data Science Methodology", "Model Evaluation", "Cross-Validation", "Ethical AI", "Predictive Analytics"],
+    subCourses: [
+      { id: "certnexus-c1", order: 1, title: "Address Business Issues with Data Science", status: "completed", completionDate: "2026" },
+      { id: "certnexus-c2", order: 2, title: "Extract, Transform, and Load Data", status: "completed", completionDate: "2026" },
+      { id: "certnexus-c3", order: 3, title: "Analyze Data", status: "completed", completionDate: "2026" },
+      { id: "certnexus-c4", order: 4, title: "Train Machine Learning Models", status: "completed", completionDate: "2026" },
+      { id: "certnexus-c5", order: 5, title: "Finalize a Data Science Project", status: "completed", completionDate: "2026" }
+    ]
   },
   {
     id: "ibm-data-science-foundations",
@@ -633,7 +689,18 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://www.coursera.org/account/accomplishments/professional-cert/certificate/MDA6GAQG73OZ",
     sourcePlatform: "IBM",
     status: "verified",
-    skills: ["Data Science Methodology", "Exploratory Data Analysis", "Big Data", "Jupyter Notebooks"]
+    programNote: "8-course University of London & IBM specialization covering data science career fundamentals, Python, statistics, clustering, algorithms, and a capstone predicting bicycle rentals.",
+    skills: ["Data Science Methodology", "Exploratory Data Analysis", "Big Data", "Jupyter Notebooks"],
+    subCourses: [
+      { id: "ibm-dsf-c1", order: 1, title: "The Data Science Profession – Student View", status: "completed", completionDate: "2026" },
+      { id: "ibm-dsf-c2", order: 2, title: "What is Data Science?", status: "completed", completionDate: "2026" },
+      { id: "ibm-dsf-c3", order: 3, title: "Tools for Data Science", status: "completed", completionDate: "2026" },
+      { id: "ibm-dsf-c4", order: 4, title: "Problems, Algorithms and Flowcharts", status: "completed", completionDate: "2026" },
+      { id: "ibm-dsf-c5", order: 5, title: "Python for Data Science, AI & Development", status: "completed", completionDate: "2026" },
+      { id: "ibm-dsf-c6", order: 6, title: "Statistics and Clustering in Python", status: "completed", completionDate: "2026" },
+      { id: "ibm-dsf-c7", order: 7, title: "Data Science Project Capstone: Predicting Bicycle Rental", status: "completed", completionDate: "2026" },
+      { id: "ibm-dsf-c8", order: 8, title: "Python Project for Data Science", status: "completed", completionDate: "2026" }
+    ]
   },
   {
     id: "ibm-rag-genai-apps",
@@ -646,7 +713,14 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://www.coursera.org/account/accomplishments/professional-cert/certificate/42VGENM9PAIW",
     sourcePlatform: "IBM",
     status: "verified",
-    skills: ["Retrieval-Augmented Generation", "Vector Search", "LangChain", "Embeddings", "LLM Applications"]
+    programNote: "4-course IBM specialization on building Retrieval-Augmented Generation systems: from getting started with GenAI apps to advanced RAG with vector databases and retrievers.",
+    skills: ["Retrieval-Augmented Generation", "Vector Search", "LangChain", "Embeddings", "LLM Applications"],
+    subCourses: [
+      { id: "ibm-rag-c1", order: 1, title: "Develop Generative AI Applications: Get Started", status: "completed", completionDate: "2026" },
+      { id: "ibm-rag-c2", order: 2, title: "Build RAG Applications: Get Started", status: "completed", completionDate: "2026" },
+      { id: "ibm-rag-c3", order: 3, title: "Vector Databases for RAG: An Introduction", status: "completed", completionDate: "2026" },
+      { id: "ibm-rag-c4", order: 4, title: "Advanced RAG with Vector Databases and Retrievers", status: "completed", completionDate: "2026" }
+    ]
   },
 
   // ── 4. COURSES & SPECIALIZATIONS (STANDALONE) ──
@@ -661,7 +735,15 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://www.coursera.org/account/accomplishments/specialization/TENLZY3OX867",
     sourcePlatform: "IBM",
     status: "verified",
-    skills: ["PyTorch", "TensorFlow", "Keras", "Convolutional Neural Networks", "GANs", "Deep Learning"]
+    programNote: "5-course IBM Specialization covering deep learning fundamentals through Keras, TensorFlow, and PyTorch frameworks with a final AI capstone project.",
+    skills: ["PyTorch", "TensorFlow", "Keras", "Convolutional Neural Networks", "GANs", "Deep Learning"],
+    subCourses: [
+      { id: "ibm-dl-c1", order: 1, title: "Introduction to Deep Learning & Neural Networks with Keras", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-dl-c2", order: 2, title: "Deep Learning with Keras and Tensorflow", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-dl-c3", order: 3, title: "Introduction to Neural Networks and PyTorch", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-dl-c4", order: 4, title: "Deep Learning with PyTorch", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-dl-c5", order: 5, title: "AI Capstone Project with Deep Learning", status: "completed", completionDate: "May 2026" }
+    ]
   },
   {
     id: "deeplearning-tensorflow",
@@ -674,7 +756,14 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://www.coursera.org/account/accomplishments/specialization/QBAPQLI938QW",
     sourcePlatform: "Coursera",
     status: "verified",
-    skills: ["TensorFlow", "Neural Networks", "Computer Vision", "NLP", "Time Series Forecasting"]
+    programNote: "4-course DeepLearning.AI specialization teaching TensorFlow for building and training deep learning models including CNNs, NLP systems, and time series forecasting.",
+    skills: ["TensorFlow", "Neural Networks", "Computer Vision", "NLP", "Time Series Forecasting"],
+    subCourses: [
+      { id: "dlai-tf-c1", order: 1, title: "Introduction to TensorFlow for Artificial Intelligence, Machine Learning, and Deep Learning", status: "completed", completionDate: "May 2026" },
+      { id: "dlai-tf-c2", order: 2, title: "Convolutional Neural Networks in TensorFlow", status: "completed", completionDate: "May 2026" },
+      { id: "dlai-tf-c3", order: 3, title: "Natural Language Processing in TensorFlow", status: "completed", completionDate: "May 2026" },
+      { id: "dlai-tf-c4", order: 4, title: "Sequences, Time Series and Prediction", status: "completed", completionDate: "May 2026" }
+    ]
   },
   {
     id: "ibm-machine-learning",
@@ -687,7 +776,16 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://www.coursera.org/account/accomplishments/specialization/FH70V3MBDOKA",
     sourcePlatform: "IBM",
     status: "verified",
-    skills: ["Supervised Learning", "Unsupervised Learning", "Deep Learning", "Reinforcement Learning", "Dimensionality Reduction"]
+    programNote: "6-course IBM Machine Learning specialization covering EDA, supervised regression & classification, unsupervised learning, deep learning, reinforcement learning, and a final capstone.",
+    skills: ["Supervised Learning", "Unsupervised Learning", "Deep Learning", "Reinforcement Learning", "Dimensionality Reduction"],
+    subCourses: [
+      { id: "ibm-ml-c1", order: 1, title: "Exploratory Data Analysis for Machine Learning", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-ml-c2", order: 2, title: "Supervised Machine Learning: Regression", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-ml-c3", order: 3, title: "Supervised Machine Learning: Classification", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-ml-c4", order: 4, title: "Unsupervised Machine Learning", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-ml-c5", order: 5, title: "Deep Learning and Reinforcement Learning", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-ml-c6", order: 6, title: "Machine Learning Capstone", status: "completed", completionDate: "May 2026" }
+    ]
   },
   {
     id: "ibm-rag-agentic-ai",
@@ -700,7 +798,20 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://www.coursera.org/account/accomplishments/specialization/TC68B12KZMGK",
     sourcePlatform: "IBM",
     status: "verified",
-    skills: ["Agentic Systems", "LangGraph", "LangChain", "Model Context Protocol", "AI Orchestration"]
+    programNote: "10-course IBM specialization covering the complete RAG and agentic AI stack: from foundational GenAI apps to multimodal generation, LangChain/LangGraph agents, CrewAI, AutoGen, MCP, and a capstone project.",
+    skills: ["Agentic Systems", "LangGraph", "LangChain", "Model Context Protocol", "AI Orchestration"],
+    subCourses: [
+      { id: "ibm-raa-c1", order: 1, title: "Develop Generative AI Applications: Get Started", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-raa-c2", order: 2, title: "Build RAG Applications: Get Started", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-raa-c3", order: 3, title: "Vector Databases for RAG: An Introduction", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-raa-c4", order: 4, title: "Advanced RAG with Vector Databases and Retrievers", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-raa-c5", order: 5, title: "Build Multimodal Generative AI Applications", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-raa-c6", order: 6, title: "Fundamentals of Building AI Agents", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-raa-c7", order: 7, title: "Agentic AI with LangChain and LangGraph", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-raa-c8", order: 8, title: "Agentic AI with LangGraph, CrewAI, AutoGen and BeeAI", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-raa-c9", order: 9, title: "Build AI Agents using MCP", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-raa-c10", order: 10, title: "RAG and Agentic AI Capstone Project", status: "completed", completionDate: "May 2026" }
+    ]
   },
   {
     id: "ibm-ai-agents-workflows",
@@ -713,7 +824,13 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     verificationUrl: "https://coursera.org/verify/specialization/XS7OUKLSLYDK",
     sourcePlatform: "IBM",
     status: "verified",
-    skills: ["Agentic Workflows", "LangChain", "LangGraph", "Autonomous Agents", "Prompt Chaining"]
+    programNote: "3-course IBM specialization on building autonomous AI agents with LangChain, LangGraph, CrewAI, AutoGen, and BeeAI frameworks for orchestrated agentic workflows.",
+    skills: ["Agentic Workflows", "LangChain", "LangGraph", "Autonomous Agents", "Prompt Chaining"],
+    subCourses: [
+      { id: "ibm-aiaw-c1", order: 1, title: "Fundamentals of Building AI Agents", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-aiaw-c2", order: 2, title: "Agentic AI with LangChain and LangGraph", status: "completed", completionDate: "May 2026" },
+      { id: "ibm-aiaw-c3", order: 3, title: "Agentic AI with LangGraph, CrewAI, AutoGen and BeeAI", status: "completed", completionDate: "May 2026" }
+    ]
   }
 ];
 

@@ -1,0 +1,8 @@
+FROM qwen3.6:27b
+PARAMETER num_ctx 32768
+
+
+32b7SyWMAVu6FYVU7nOSXespNn2_7GDhNRh2gkU94PDn2bWqL
+
+
+curl.exe -v -H "Host: 7f69-103-175-130-18.ngrok-free.app" http://127.0.0.1:11434/api/version
