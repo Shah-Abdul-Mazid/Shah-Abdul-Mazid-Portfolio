@@ -1399,7 +1399,14 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                 }
 
                 @media (max-width: 768px) {
-                    .projects-title { font-size: 2.2rem; }
+                    .project-list-section { padding: 85px 0 40px; }
+                    .projects-container { padding: 0 16px; }
+                    .projects-title { font-size: 1.95rem; }
+                    .projects-subtitle { font-size: 0.92rem; }
+                    .projects-header { margin-bottom: 28px; }
+                    .project-group { margin-bottom: 36px; }
+                    .group-header { margin-bottom: 20px; }
+                    .group-title { font-size: 1.25rem; }
                     .proj-timeline {
                         padding-left: 24px;
                     }

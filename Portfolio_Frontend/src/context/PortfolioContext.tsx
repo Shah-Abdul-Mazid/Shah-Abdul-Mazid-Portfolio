@@ -888,12 +888,40 @@ const sanitizeData = (obj: any): any => {
 };
 
 export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [data, setData] = useState<PortfolioData>(defaultData);
+    // 1. Instant 0ms load: synchronously initialize from localStorage if available, else defaultData
+    const [data, setData] = useState<PortfolioData>(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const saved = localStorage.getItem('portfolio_data');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    const merged = {
+                        ...defaultData,
+                        ...parsed,
+                        sections: { ...defaultData.sections, ...(parsed.sections || {}) },
+                        contact: { ...defaultData.contact, ...(parsed.contact || {}) },
+                        skills: (parsed.skills && parsed.skills.length > 0) ? parsed.skills : defaultData.skills,
+                        papers: (parsed.papers && parsed.papers.length > 0) ? parsed.papers : defaultData.papers,
+                        certifications: mergeCertificationsWithCanonical(parsed.certifications)
+                    };
+                    return sanitizeData(merged);
+                }
+            } catch {
+                // fallback to defaultData
+            }
+        }
+        return defaultData;
+    });
 
+    // 2. Background revalidation: fetch fresh data with 5s timeout so Render cold starts never hang the app
     useEffect(() => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
         const load = async () => {
             try {
-                const res = await fetch('/api/portfolio');
+                const res = await fetch('/api/portfolio', { signal: controller.signal });
+                clearTimeout(timeoutId);
                 if (res.ok) {
                     const apiData = await res.json();
                     if (apiData && typeof apiData === 'object' && Object.keys(apiData).length > 0) {
@@ -909,35 +937,23 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
                         const sanitized = sanitizeData(merged);
                         setData(sanitized);
                         localStorage.setItem('portfolio_data', JSON.stringify(sanitized));
-                        return;
                     }
                 }
-            } catch (err) {
-                console.warn('Backend API unreachable, falling back to localStorage...', err);
-            }
-
-            const saved = localStorage.getItem('portfolio_data');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    const merged = {
-                        ...defaultData,
-                        ...parsed,
-                        sections: { ...defaultData.sections, ...(parsed.sections || {}) },
-                        contact: { ...defaultData.contact, ...(parsed.contact || {}) },
-                        skills: (parsed.skills && parsed.skills.length > 0) ? parsed.skills : defaultData.skills,
-                        papers: (parsed.papers && parsed.papers.length > 0) ? parsed.papers : defaultData.papers,
-                        certifications: mergeCertificationsWithCanonical(parsed.certifications)
-                    };
-                    setData(sanitizeData(merged));
-                    return;
-                } catch {
-                    // fallback
+            } catch (err: any) {
+                if (err?.name === 'AbortError') {
+                    console.info('Backend initial request timed out (cold start), using instant cached portfolio data.');
+                } else {
+                    console.warn('Backend API unreachable, using instant cached data...', err);
                 }
             }
-            setData(defaultData);
         };
+
         load();
+
+        return () => {
+            clearTimeout(timeoutId);
+            controller.abort();
+        };
     }, []);
 
     useEffect(() => {

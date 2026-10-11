@@ -422,8 +422,9 @@ const FloatingContactForm = () => {
                 .submit-btn:disabled { cursor: not-allowed; opacity: 0.8; }
 
                 @media (max-width: 480px) {
-                    .form-drawer { width: calc(100vw - 40px); right: -10px; bottom: 80px; }
-                    .form-drawer.chat-layout { width: calc(100vw - 40px); }
+                    .floating-container { bottom: 20px; right: 16px; }
+                    .form-drawer { width: calc(100vw - 32px); right: 0; bottom: 70px; max-height: calc(100dvh - 100px); }
+                    .form-drawer.chat-layout { width: calc(100vw - 32px); }
                 }
             `}</style>
         </div>

@@ -48,9 +48,9 @@ const ProfilePage = () => {
       <IntelligenceMatrix />
       <Header />
       <main className="profile-page-main">
-        <div className="profile-container fade-in" ref={addToRefs}>
+        <div className="profile-container">
           {/* Profile Header */}
-          <div className="profile-header">
+          <div className="profile-header fade-in" ref={addToRefs}>
             <h1 className="profile-title">Profile</h1>
             <p className="profile-subtitle">
               Academic background, professional experience, research
@@ -59,8 +59,7 @@ const ProfilePage = () => {
           </div>
 
           {/* Short Biography Card */}
-          {/* Short Biography Card */}
-          <div className="bio-card">
+          <div className="bio-card fade-in" ref={addToRefs}>
             <h2 className="section-heading">Short Biography</h2>
 
             {/* Heading / Hero Tagline */}
@@ -312,7 +311,7 @@ const ProfilePage = () => {
           {/* Two-Column timeline layout: Education and Professional Experience side by side */}
           <div className="timeline-grid">
             {/* Education Column */}
-            <div className="timeline-column">
+            <div className="timeline-column fade-in" ref={addToRefs}>
               <h2 className="section-heading line-below">Education</h2>
               <div className="timeline">
                 <div className="timeline-line"></div>
@@ -395,7 +394,7 @@ const ProfilePage = () => {
             </div>
 
             {/* Experience Column */}
-            <div className="timeline-column">
+            <div className="timeline-column fade-in" ref={addToRefs}>
               <h2 className="section-heading line-below">
                 Professional Experience
               </h2>
@@ -433,7 +432,7 @@ const ProfilePage = () => {
           </div>
 
           {/* Certifications Section */}
-          <div className="certifications-section">
+          <div className="certifications-section fade-in" ref={addToRefs}>
             <h2 className="section-heading line-below">
               Certifications & Licenses
             </h2>
@@ -448,11 +447,14 @@ const ProfilePage = () => {
       <style>{`
         /* Profile Page Styles */
         .profile-page-main {
+          position: relative;
+          z-index: 1;
           padding-top: 140px;
           padding-bottom: 80px;
           display: flex;
           justify-content: center;
           width: 100%;
+          min-height: 100vh;
         }
 
         .profile-container {
@@ -1332,27 +1334,115 @@ const ProfilePage = () => {
         }
 
         @media (max-width: 900px) {
+          .profile-page-main {
+            padding-top: 100px;
+            padding-bottom: 60px;
+          }
           .timeline-grid {
             grid-template-columns: 1fr;
-            gap: 40px;
+            gap: 28px;
           }
           .profile-title {
             font-size: 2.2rem;
           }
           .bio-card {
-            padding: 24px 28px;
+            padding: 24px 22px;
           }
         }
 
         @media (max-width: 600px) {
+          .profile-page-main {
+            padding-top: 85px;
+            padding-bottom: 40px;
+          }
+          .profile-container {
+            padding: 0 16px;
+          }
           .profile-header {
-            padding: 20px 18px;
+            padding: 20px 16px;
+            border-radius: 18px;
+            margin-bottom: 24px;
+          }
+          .profile-title {
+            font-size: 1.85rem;
+          }
+          .profile-subtitle {
+            font-size: 0.92rem;
           }
           .bio-card {
             padding: 20px 16px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+          }
+          .bio-hero-tagline {
+            font-size: 0.78rem;
+          }
+          .bio-para {
+            font-size: 0.95rem;
+          }
+          .bio-links {
+            gap: 10px;
+          }
+          .bio-btn {
+            padding: 8px 14px;
+            font-size: 0.82rem;
           }
           .timeline-column {
-            padding: 24px 16px;
+            padding: 22px 16px;
+            border-radius: 16px;
+          }
+          .timeline {
+            padding-left: 22px;
+          }
+          .timeline-line {
+            left: 5px;
+          }
+          .timeline-dot {
+            left: -22px;
+            width: 12px;
+            height: 12px;
+          }
+          .coursework-badges {
+            gap: 6px;
+          }
+          .course-badge {
+            font-size: 0.72rem;
+            padding: 2px 8px;
+          }
+          .certifications-section {
+            margin-top: 32px;
+          }
+          .credly-profile-showcase {
+            padding: 20px 16px;
+            border-radius: 18px;
+            margin-top: 32px;
+          }
+          .credly-badges-grid {
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 12px;
+          }
+          .credly-single-badge-card {
+            padding: 12px 8px;
+          }
+          .credly-single-badge-img-wrap {
+            width: 58px;
+            height: 58px;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .profile-container {
+            padding: 0 12px;
+          }
+          .profile-header, .bio-card, .timeline-column {
+            padding: 16px 12px;
+          }
+          .profile-title {
+            font-size: 1.6rem;
+          }
+          .bio-btn {
+            width: 100%;
+            justify-content: center;
           }
         }
       `}</style>

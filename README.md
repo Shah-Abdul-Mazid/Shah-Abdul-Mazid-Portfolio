@@ -14,6 +14,8 @@ A modern, high-performance, full-stack portfolio and Content Management System (
   - [3. Resume & CV Generation Engine (ATS + Visual)](#3-resume--cv-generation-engine-ats--visual)
   - [4. Admin Dashboard CMS & Automation](#4-admin-dashboard-cms--automation)
   - [5. AI Agent & LLM Project Assistant](#5-ai-agent--llm-project-assistant)
+  - [6. Mobile & Cross-Platform Responsive Architecture (iOS, Android, Desktop)](#6-mobile--cross-platform-responsive-architecture-ios-android-desktop)
+  - [7. Performance & Cold-Start Optimization (Stale-While-Revalidate)](#7-performance--cold-start-optimization-stale-while-revalidate)
 - [Backend Services & Protected API Endpoints](#-backend-services--protected-api-endpoints)
 - [🔒 20-Point Security Hardening Framework](#-20-point-security-hardening-framework)
   - [Threat Model & Defense-in-Depth Architecture](#threat-model--defense-in-depth-architecture)
@@ -136,12 +138,25 @@ Portfolio_Final/
 ### 2. Verified Credly Badges & Certifications System
 * **Cloud-First Media Pipeline:** **Zero badge image files stored inside Git or build bundles.** All badges stream dynamically from the official **Credly CDN** (`images.credly.com`) or **Cloudinary** (`res.cloudinary.com`).
 * **Canonical Deduplication:** Certifications and digital badges are mapped to single underlying achievements in [`src/data/certificationData.ts`](file:///c:/Users/LENOVO/Desktop/Portfolio_Final/Portfolio_Frontend/src/data/certificationData.ts).
-* **Parent-Child Progressive Hierarchy:**
-  * **Google AI Professional Certificate:** 8-course modular program (`8 / 8 Courses Completed`) featuring dynamic completion tracking, expandable curriculum tray, direct Coursera course links, and verified Credly badges for foundational modules (*AI Fundamentals*, *AI for Brainstorming and Planning*).
+* **Parent-Child Progressive Hierarchy (All 17 Programs Mapped):**
+  * **Google AI Professional Certificate:** 8-course modular program (`8 / 8 Courses Completed`) featuring dynamic completion tracking, expandable curriculum tray, direct Coursera course links, and verified Credly badges (*AI Fundamentals*, *AI for Brainstorming and Planning*).
   * **IBM Data Science Professional Certificate (V3):** 12-course comprehensive curriculum (`12 / 12 Courses Completed`) featuring 5 verified Credly child badges (*Databases & SQL, Data Visualization, Applied Capstone, GenAI Essentials, Career Guide & Interview Prep*) and 7 verified Coursera milestones.
-  * **IBM AI Engineering Specialization:** 13-course advanced track (`13 / 13 Courses Completed`) covering Machine Learning, Deep Learning (Keras, PyTorch, TensorFlow), Transformers, LLM Fine-Tuning, RAG, and AI Agent workflows with LangChain.
   * **IBM AI Developer Specialization:** 10-course software engineering & GenAI track (`10 / 10 Courses Completed`) covering Python, Flask, HTML/CSS/JS, Prompt Engineering, and custom Generative AI application development.
-  * **Smart Provider Link Detection:** Automatically displays `🏅 Credly` for Credly badges, `↗ Coursera` for Coursera course links, or `✓ Completed` for finished milestones without dedicated badges.
+  * **IBM AI Engineering Specialization:** 13-course advanced track (`13 / 13 Courses Completed`) covering Machine Learning, Deep Learning (Keras, PyTorch, TensorFlow), Transformers, LLM Fine-Tuning, RAG, and AI Agent workflows with LangChain.
+  * **IBM Generative AI Engineering Specialization:** 16-course comprehensive engineering curriculum (`16 / 16 Courses Completed`) from foundational NLP & Transformers to fine-tuning and autonomous multi-agent systems.
+  * **AWS Generative AI & AI Agents with Amazon Bedrock:** 3-course AWS specialization (`3 / 3 Courses Completed`) on foundation models, Bedrock agents, and serverless AI deployment.
+  * **Microsoft Azure DP-100 Exam Prep:** 5-course certification prep track (`5 / 5 Courses Completed`) covering Azure Machine Learning workspace, model training, MLflow, and production endpoints.
+  * **Microsoft AI & Machine Learning Engineering:** 5-course enterprise AI track (`5 / 5 Courses Completed`) on cognitive services, computer vision, and responsible AI.
+  * **DeepLearning.AI Data Engineering Specialization:** 4-course pipeline track (`4 / 4 Courses Completed`) covering data modeling, ETL, storage systems, and analytics pipelines.
+  * **CertNexus CDSP:** 5-course Certified Data Science Practitioner curriculum (`5 / 5 Courses Completed`).
+  * **Data Science Foundations (UoL & IBM):** 8-course university-level foundational track (`8 / 8 Courses Completed`).
+  * **IBM RAG for Generative AI Applications:** 4-course retrieval-augmented generation track (`4 / 4 Courses Completed`).
+  * **IBM Deep Learning with PyTorch, Keras and Tensorflow:** 5-course neural network track (`5 / 5 Courses Completed`).
+  * **DeepLearning.AI TensorFlow Developer:** 4-course computer vision, NLP, and time series track (`4 / 4 Courses Completed`).
+  * **IBM Machine Learning:** 6-course comprehensive ML curriculum (`6 / 6 Courses Completed`).
+  * **IBM RAG and Agentic AI:** 10-course advanced agentic systems track (`10 / 10 Courses Completed`) featuring LangGraph, CrewAI, AutoGen, and BeeAI.
+  * **Building AI Agents and Agentic Workflows:** 3-course focused specialization (`3 / 3 Courses Completed`) on autonomous agent architectures.
+  * **Smart Provider Link Detection:** Automatically displays `🏅 Credly` for Credly badges, `↗ Coursera` for Coursera course links, or `✓ Completed` for finished milestones.
 * **Instant Credly Auto-Fetch Integration:**
   * Paste any public Credly badge URL (`https://www.credly.com/badges/...`) into the dashboard.
   * The system automatically queries `/api/portfolio/credly-image` to scrape and extract the official `images.credly.com` CDN image link without requiring manual image searches.
@@ -182,6 +197,25 @@ Portfolio_Final/
 * **Hybrid LLM Provider Support:**
   * **Production Mode:** Ultra-fast cloud inference powered by **Groq** (`openai/gpt-oss-120b` or `mixtral-8x7b-32768`).
   * **Local / Zero-Cost Mode:** Local offline inference powered by **Ollama** (`openchat` or custom model files).
+
+### 6. Mobile & Cross-Platform Responsive Architecture (iOS, Android, Desktop)
+* **Comprehensive Multi-Device Compatibility:** Fully engineered and verified for **iOS** (iPhone Safari, iPad), **Android** (Chrome, Samsung Internet, Firefox), and **Desktop** (Chrome, Edge, Safari, Firefox).
+* **iOS Safari & Safe Area Integration:**
+  * Meta viewport configured with `viewport-fit=cover` to support edge-to-edge rendering.
+  * `@supports (padding-top: env(safe-area-inset-top))` dynamically accommodates iPhone notches, Dynamic Island, and home indicators.
+  * Modern dynamic viewport height units (`100dvh`) eliminate Safari bottom address bar clipping in navigation menus and drawers.
+  * `-webkit-text-size-adjust: 100%` prevents unintended text scaling during orientation changes.
+  * `-webkit-tap-highlight-color: transparent` provides clean, native-feeling touch interactions.
+* **Responsive 2-Per-Row Grid Architecture:**
+  * Certification and specialization cards standardized to `repeat(2, minmax(0, 1fr))` on desktop/tablet for optimal side-by-side readability with expanded multi-course trays.
+  * Seamlessly collapses to a single-column layout (`1fr`) on mobile devices (`<= 768px`) with zero horizontal overflow (`overflow-x: hidden`).
+* **Resilient Element Reveal Animations:**
+  * Custom `useIntersectionObserver` with pre-trigger bounds checks and pure CSS `@keyframes mobileReveal` fallback ensures zero hidden elements even when mobile browsers throttle JavaScript events.
+
+### 7. Performance & Cold-Start Optimization (Stale-While-Revalidate)
+* **Zero-Latency First Paint (0ms Render):** Synchronous `localStorage` state initialization renders cached portfolio data immediately on first paint, completely eliminating loading spinners and white screens during Render free-tier cold starts (~30s delay).
+* **Silent Background Revalidation:** Background `fetch('/api/portfolio')` with an automatic 5-second timeout controller updates client state and persists refreshed data silently.
+* **Code-Splitting with Dynamic Imports:** Secondary routes (`ProfilePage`, `SkillsPage`, `PublicationsPage`, `ProjectsPage`, `AdminDashboard`, `ATSResumePage`) lazy-loaded via `React.lazy` + `Suspense`, reducing the initial JavaScript payload by over 70% (from 1.3 MB down to 367 kB).
 
 ---
 

@@ -623,8 +623,10 @@ const IntelligenceMatrix: React.FC = () => {
                     position: fixed;
                     top: 0;
                     left: 0;
-                    width: 100vw;
-                    height: 100vh;
+                    right: 0;
+                    bottom: 0;
+                    width: 100%;
+                    height: 100%;
                     height: -webkit-fill-available;
                     height: 100dvh;
                     /* Fill: stretches image to exactly fill viewport — no cropping */
@@ -645,8 +647,8 @@ const IntelligenceMatrix: React.FC = () => {
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    width: 100vw;
-                    height: 100vh;
+                    width: 100%;
+                    height: 100%;
                     height: 100dvh;
                     background: rgba(2, 6, 23, 0.58);
                     pointer-events: none;

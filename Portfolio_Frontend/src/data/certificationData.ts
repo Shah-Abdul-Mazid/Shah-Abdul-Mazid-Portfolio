@@ -817,7 +817,7 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     id: "ibm-ai-agents-workflows",
     title: "Building AI Agents and Agentic Workflows",
     issuer: "IBM",
-    category: "course",
+    category: "professional",
     credentialType: "Specialization",
     date: "May 06, 2026",
     credentialId: "XS7OUKLSLYDK",

@@ -41,6 +41,7 @@ html {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -128,18 +129,44 @@ body {
 
 .fade-in {
     opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(20px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
 }
 
 .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+/* Mobile safety: Ensure content is always smoothly revealed even if IntersectionObserver is inactive or throttled on mobile */
+@media (max-width: 768px) {
+    .fade-in {
+        animation: mobileReveal 0.5s ease-out 0.15s forwards;
+    }
+}
+
+@keyframes mobileReveal {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Scroll behavior */
 html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Safe area support for iOS notches */
+@supports (padding-top: env(safe-area-inset-top)) {
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
 }
 
 .remove-btn { background: #ef444455; color: #ef4444; border: 1px solid #ef444488; border-radius: 8px; padding: 4px 10px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 13px; } .remove-btn:hover { background: #ef4444; color: white; }

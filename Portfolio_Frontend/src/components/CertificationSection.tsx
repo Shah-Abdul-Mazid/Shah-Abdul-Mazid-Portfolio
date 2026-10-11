@@ -488,11 +488,11 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
           font-weight: 500;
         }
 
-        /* ── Cert Grid ── */
+        /* ── Cert Grid: Exactly 2 cards per row ── */
         .cert-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-          gap: 20px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 22px;
         }
 
         /* ── Base Card ── */
@@ -1031,11 +1031,28 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
         }
 
         @media (max-width: 768px) {
-          .cert-filter-bar { flex-direction: column; align-items: stretch; }
-          .cert-search-controls { width: 100%; flex-direction: column; align-items: stretch; }
-          .cert-search-box { max-width: none; }
-          .cert-grid { grid-template-columns: 1fr; }
-          .credly-badge-grid { grid-template-columns: 1fr; }
+          .cert-filter-bar { flex-direction: column; align-items: stretch; padding: 12px 14px; gap: 12px; }
+          .cert-category-tabs { width: 100%; justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+          .cert-tab-btn { flex-shrink: 0; font-size: 0.75rem; padding: 7px 12px; }
+          .cert-search-controls { width: 100%; flex-direction: column; align-items: stretch; min-width: 0; }
+          .cert-search-box { max-width: none; width: 100%; }
+          .cert-issuer-select { width: 100%; }
+          .cert-grid { grid-template-columns: 1fr; gap: 16px; }
+          .credly-badge-grid { grid-template-columns: 1fr; gap: 16px; }
+          .cert-card-item { padding: 16px; border-radius: 16px; }
+          .cert-badge-frame { width: 48px; height: 48px; min-width: 48px; }
+          .cert-title-text { font-size: 0.95rem; }
+        }
+
+        @media (max-width: 480px) {
+          .cert-card-header { gap: 10px; }
+          .cert-card-item { padding: 14px; border-radius: 14px; }
+          .subcourse-tray { padding: 10px; }
+          .subcourse-item { padding: 6px; }
+          .subcourse-title-text { font-size: 0.72rem; word-break: break-word; }
+          .cert-card-footer { flex-direction: column; align-items: flex-start; gap: 10px; }
+          .cert-action-links { width: 100%; justify-content: flex-start; }
+          .cert-primary-verify-btn, .cert-secondary-credly-btn { flex: 1; justify-content: center; text-align: center; }
         }
       `}</style>
     </div>

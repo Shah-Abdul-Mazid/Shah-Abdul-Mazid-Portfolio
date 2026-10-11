@@ -795,13 +795,26 @@ const Papers = ({ addToRefs }: { addToRefs?: (el: HTMLElement | null) => void })
                     background: #16a34a;
                 }
 
+                @media (max-width: 768px) {
+                    .research-profiles-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+                }
+
                 @media (max-width: 640px) {
-                    .pub-section { padding-top: 110px; }
-                    .pub-page-title { font-size: 1.8rem; }
-                    .pub-item-card { padding: 16px 18px; gap: 12px; flex-direction: column; }
+                    .pub-section { padding-top: 85px; padding-bottom: 40px; }
+                    .pub-container { padding: 0 16px; }
+                    .pub-page-title { font-size: 1.85rem; }
+                    .pub-page-sub { font-size: 0.92rem; }
+                    .pub-item-card { padding: 16px 14px; gap: 12px; flex-direction: column; }
                     .pub-year-badge-col { width: auto; }
                     .pub-tabs { gap: 6px; }
                     .pub-tab { padding: 7px 12px; font-size: 0.82rem; }
+                    .research-id-card { padding: 10px 12px; }
+                }
+
+                @media (max-width: 380px) {
+                    .pub-container { padding: 0 12px; }
+                    .research-profiles-bar { grid-template-columns: 1fr; }
+                    .pub-page-title { font-size: 1.6rem; }
                 }
             `}</style>
         </section>

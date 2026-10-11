@@ -40,9 +40,9 @@ const SkillsPage = () => {
       <IntelligenceMatrix />
       <Header />
       <main className="skills-page-main">
-        <div className="skills-page-container fade-in" ref={addToRefs}>
+        <div className="skills-page-container">
           {/* Page Header */}
-          <div className="skills-page-header">
+          <div className="skills-page-header fade-in" ref={addToRefs}>
             <div className="skills-header-badge">
               <span className="badge-glow-dot"></span>
               <span>TECHNICAL ARSENAL & TOOLKIT</span>
@@ -63,7 +63,7 @@ const SkillsPage = () => {
           {skills.length > 0 ? (
             <div className="skills-page-grid">
               {skills.map((cat, ci) => (
-                <div key={ci} className="skill-page-card">
+                <div key={ci} className="skill-page-card fade-in" ref={addToRefs}>
                   <div className="skill-card-header">
                     <span className="skill-card-index">{String(ci + 1).padStart(2, '0')}</span>
                     <h3 className="skill-card-category">{cat.name}</h3>
@@ -138,11 +138,14 @@ const SkillsPage = () => {
 
       <style>{`
         .skills-page-main {
+          position: relative;
+          z-index: 1;
           padding-top: 140px;
           padding-bottom: 80px;
           display: flex;
           justify-content: center;
           width: 100%;
+          min-height: 100vh;
         }
 
         .skills-page-container {
@@ -370,23 +373,33 @@ const SkillsPage = () => {
         }
 
         @media (max-width: 992px) {
-          .skills-page-grid {
-            column-count: 2;
-          }
+          .skills-page-main { padding-top: 100px; padding-bottom: 60px; }
+          .skills-page-grid { column-count: 2; }
           .skill-card-body.grid-layout {
             grid-template-columns: 1fr;
-            gap: 22px;
+            gap: 20px;
           }
         }
 
         @media (max-width: 768px) {
-          .skills-page-title { font-size: 2.2rem; }
+          .skills-page-main { padding-top: 85px; padding-bottom: 40px; }
+          .skills-page-container { padding: 0 16px; }
+          .skills-page-header { padding: 22px 16px; border-radius: 18px; margin-bottom: 24px; }
+          .skills-page-title { font-size: 1.95rem; }
+          .skills-page-subtitle { font-size: 0.92rem; }
           .skills-page-grid { column-count: 1; }
-          .skill-page-card { padding: 24px; border-radius: 16px; margin-bottom: 20px; }
+          .skill-page-card { padding: 20px 16px; border-radius: 16px; margin-bottom: 16px; }
           .skill-card-body.grid-layout {
             grid-template-columns: 1fr;
-            gap: 22px;
+            gap: 16px;
           }
+        }
+
+        @media (max-width: 380px) {
+          .skills-page-container { padding: 0 12px; }
+          .skills-page-header { padding: 18px 12px; }
+          .skills-page-title { font-size: 1.65rem; }
+          .skill-page-card { padding: 16px 12px; }
         }
       `}</style>
     </div>
