@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { getBrowserInstanceId, getDeviceIdentifier, getDeviceInfo } from '../utils/deviceFingerprint';
+import { getBrowserInstanceId, getDeviceIdentifier, getDeviceInfo, getClientPublicIp } from '../utils/deviceFingerprint';
 
 /**
  * Visitor tracking hook — two-step flow with cross-browser linking support:
@@ -65,6 +65,7 @@ export const useVisitorTracker = () => {
 
                 const hardwareFingerprint = await getDeviceIdentifier();
                 const deviceInfo = getDeviceInfo();
+                const clientIp = await getClientPublicIp();
 
                 // Step 1: Register/sync browser instance (idempotent on backend)
                 try {
@@ -76,7 +77,8 @@ export const useVisitorTracker = () => {
                             hardware_fingerprint: hardwareFingerprint,
                             device_id: hardwareFingerprint || browserInstanceId,
                             device: deviceInfo,
-                            user_agent: navigator.userAgent
+                            user_agent: navigator.userAgent,
+                            client_ip: clientIp
                         })
                     });
 
@@ -110,7 +112,8 @@ export const useVisitorTracker = () => {
                             device_id: hardwareFingerprint || browserInstanceId,
                             mac_address: hardwareFingerprint || browserInstanceId,
                             device: deviceInfo,
-                            user_agent: navigator.userAgent
+                            user_agent: navigator.userAgent,
+                            client_ip: clientIp
                         })
                     });
 

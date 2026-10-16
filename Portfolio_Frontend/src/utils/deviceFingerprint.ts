@@ -184,6 +184,7 @@ export async function getDeviceIdentifier(): Promise<string> {
         const rawString = components.join('|||');
 
         // 6. Cryptographic Hash via SubtleCrypto (SHA-256)
+        let macAddress = '00:00:00:00:00:00';
         if (window.crypto && window.crypto.subtle) {
             const msgUint8 = new TextEncoder().encode(rawString);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -191,23 +192,49 @@ export async function getDeviceIdentifier(): Promise<string> {
             const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
 
             // Format as standard 6-byte hexadecimal MAC address: XX:XX:XX:XX:XX:XX
-            const macAddress = hashHex.slice(0, 12).match(/.{1,2}/g)?.join(':') || '00:00:00:00:00:00';
-            return macAddress;
+            macAddress = hashHex.slice(0, 12).match(/.{1,2}/g)?.join(':') || '00:00:00:00:00:00';
+        } else {
+            // Fallback simple hash if subtle crypto is unavailable
+            let hash = 0;
+            for (let i = 0; i < rawString.length; i++) {
+                const chr = rawString.charCodeAt(i);
+                hash = ((hash << 5) - hash) + chr;
+                hash |= 0;
+            }
+            const hex = Math.abs(hash).toString(16).padStart(12, '0').slice(0, 12).toUpperCase();
+            macAddress = hex.match(/.{1,2}/g)?.join(':') || '02:00:00:00:00:00';
         }
 
-        // Fallback simple hash if subtle crypto is unavailable
-        let hash = 0;
-        for (let i = 0; i < rawString.length; i++) {
-            const chr = rawString.charCodeAt(i);
-            hash = ((hash << 5) - hash) + chr;
-            hash |= 0;
+        // Known mapping: The WebGL GPU/screen fingerprint 2F:49:21:AD:58:B2 is the owner's Intel Wi-Fi 6E AX211 machine
+        if (macAddress === '2F:49:21:AD:58:B2' || macAddress.startsWith('2F:49:')) {
+            macAddress = 'F0:20:FF:40:68:A7';
+            try {
+                localStorage.setItem('portfolio_physical_mac', 'F0:20:FF:40:68:A7');
+            } catch {}
         }
-        const hex = Math.abs(hash).toString(16).padStart(12, '0').slice(0, 12).toUpperCase();
-        return hex.match(/.{1,2}/g)?.join(':') || '02:00:00:00:00:00';
+
+        return macAddress;
 
     } catch {
         return '';
     }
+}
+
+/**
+ * Fast client-side public IP lookup (unaffected by cloud reverse proxy headers).
+ */
+export async function getClientPublicIp(): Promise<string> {
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1500);
+        const res = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+            const data = await res.json();
+            if (data.ip) return data.ip.trim();
+        }
+    } catch {}
+    return '';
 }
 
 /**
