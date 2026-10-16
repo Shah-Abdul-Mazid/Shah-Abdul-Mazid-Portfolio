@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles, CheckCircle2, ChevronDown, ChevronUp, Layers, MapPin, Monitor, Cpu, Search, X, Globe, ShieldCheck, Link2 } from 'lucide-react';
+import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles, CheckCircle2, ChevronDown, ChevronUp, Layers, MapPin, Monitor, Cpu, Search, X, Globe, ShieldCheck } from 'lucide-react';
 import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, PaperItem, SkillCategory } from '../context/PortfolioContext';
 import './AdminDashboard.css';
 
@@ -22,8 +22,6 @@ const AdminDashboard = () => {
     const [visitorViewMode, setVisitorViewMode] = useState<'devices' | 'flat'>('devices');
     const [canonicalDevices, setCanonicalDevices] = useState<any[]>([]);
     const [expandedDeviceId, setExpandedDeviceId] = useState<string | null>(null);
-    const [linkTokenInfo, setLinkTokenInfo] = useState<{ token: string; expires_at: string } | null>(null);
-    const [linkTokenLoading, setLinkTokenLoading] = useState(false);
     const [adminsList, setAdminsList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -464,7 +462,21 @@ const AdminDashboard = () => {
             });
             if (res.ok) {
                 const data = await res.json();
-                setVisitors(Array.isArray(data) ? data : []);
+                if (Array.isArray(data)) {
+                    // Enforce exactly 1 entry per physical MAC / Device ID
+                    const seen = new Set<string>();
+                    const deduped: any[] = [];
+                    for (const v of data) {
+                        const devId = (v.device_id || v.mac_address || v.ip || '').trim().toUpperCase();
+                        if (devId && !seen.has(devId)) {
+                            seen.add(devId);
+                            deduped.push(v);
+                        }
+                    }
+                    setVisitors(deduped);
+                } else {
+                    setVisitors([]);
+                }
             }
         } catch (err) {
             console.error('Failed to load visitors:', err);
@@ -479,44 +491,28 @@ const AdminDashboard = () => {
             });
             if (res.ok) {
                 const data = await res.json();
-                setCanonicalDevices(Array.isArray(data) ? data : []);
+                if (Array.isArray(data)) {
+                    // Enforce exactly 1 entry per physical MAC / Device ID
+                    const seen = new Set<string>();
+                    const deduped: any[] = [];
+                    for (const d of data) {
+                        const mac = (d.primary_fingerprint || d.mac_address || d.canonical_device_id || '').trim().toUpperCase();
+                        if (mac && !seen.has(mac)) {
+                            seen.add(mac);
+                            deduped.push(d);
+                        }
+                    }
+                    setCanonicalDevices(deduped);
+                } else {
+                    setCanonicalDevices([]);
+                }
             }
         } catch (err) {
             console.error('Failed to load canonical devices:', err);
         }
     };
 
-    const generateLinkToken = async () => {
-        const browserInstanceId = localStorage.getItem('portfolio_browser_id');
-        if (!browserInstanceId) {
-            showNotification('❌ Browser instance ID not found. Visit your portfolio page first.');
-            return;
-        }
-        setLinkTokenLoading(true);
-        try {
-            const res = await fetch('/api/analytics/link-request', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ browser_instance_id: browserInstanceId })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setLinkTokenInfo({ token: data.token, expires_at: data.expires_at });
-                // Build the claim URL
-                const claimUrl = `${window.location.origin}/?link_token=${data.token}`;
-                await navigator.clipboard.writeText(claimUrl).catch(() => {});
-                showNotification('🔗 Link token generated! URL copied to clipboard. Paste in another browser within 5 minutes.');
-            } else {
-                const err = await res.json().catch(() => ({}));
-                showNotification(`❌ ${err.detail || 'Failed to generate link token'}`);
-            }
-        } catch (err) {
-            console.error(err);
-            showNotification('❌ Failed to generate link token');
-        } finally {
-            setLinkTokenLoading(false);
-        }
-    };
+
 
     const handleSetCanonicalMac = async (targetDeviceId?: string) => {
         let defaultMac = localStorage.getItem('portfolio_physical_mac') || 'F0:20:FF:40:68:A7';
@@ -593,6 +589,30 @@ const AdminDashboard = () => {
         } catch (err) {
             console.error(err);
             showNotification('❌ Failed to clear visitor data');
+        }
+    };
+
+    const handleDedupCleanup = async () => {
+        try {
+            const token = localStorage.getItem('admin_token');
+            const res = await fetch('/api/analytics/dedup-cleanup', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const result = await res.json();
+                showNotification(`✅ ${result.message}`);
+                await fetchDevices();
+                await fetchVisitors();
+                // Update the views counter to the corrected count
+                setStats(prev => ({ ...prev, views: result.true_unique_devices ?? prev.views }));
+            } else {
+                const err = await res.json().catch(() => ({}));
+                showNotification(`❌ ${err.detail || 'Cleanup failed'}`);
+            }
+        } catch (err) {
+            console.error(err);
+            showNotification('❌ Failed to run dedup cleanup');
         }
     };
 
@@ -1956,6 +1976,14 @@ const AdminDashboard = () => {
                                         Refresh
                                     </button>
                                     <button
+                                        onClick={handleDedupCleanup}
+                                        className="btn btn-secondary"
+                                        title="Merge duplicate device entries and fix visitor count"
+                                        style={{ background: '#7c3aed', color: '#ffffff', border: 'none' }}
+                                    >
+                                        🔧 Fix Duplicates
+                                    </button>
+                                    <button
                                         onClick={handleClearVisitors}
                                         className="btn btn-danger-solid"
                                         style={{ background: '#ef4444', color: '#ffffff', border: 'none' }}
@@ -1965,68 +1993,6 @@ const AdminDashboard = () => {
                                 </div>
                             </div>
 
-                            {/* Link Token Generator Panel */}
-                            <div style={{
-                                background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08))',
-                                border: '1px solid rgba(99,102,241,0.25)',
-                                borderRadius: '12px',
-                                padding: '16px 20px',
-                                marginBottom: '20px',
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                gap: '16px',
-                                flexWrap: 'wrap'
-                            }}>
-                                <div style={{ flex: 1, minWidth: '250px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                                        <Link2 size={16} style={{ color: '#818cf8' }} />
-                                        <strong style={{ fontSize: '0.9rem', color: 'var(--text)' }}>Cross-Browser Device Linking</strong>
-                                        <span style={{ fontSize: '0.75rem', background: 'rgba(99,102,241,0.15)', color: '#818cf8', padding: '2px 8px', borderRadius: '20px' }}>Verified</span>
-                                    </div>
-                                    <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                                        Open your portfolio in Chrome first, then generate a link token. Paste the URL in Firefox or Edge on the same computer to link them as one canonical device.
-                                        This creates a <strong>verified</strong> association (not just a probabilistic fingerprint match).
-                                    </p>
-                                    {linkTokenInfo && (
-                                        <div style={{ marginTop: '10px', padding: '10px 12px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '8px' }}>
-                                            <div style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 600, marginBottom: '4px' }}>✅ Token Generated (expires {new Date(linkTokenInfo.expires_at).toLocaleTimeString()})</div>
-                                            <code style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', wordBreak: 'break-all' }}>
-                                                {window.location.origin}/?link_token={linkTokenInfo.token.slice(0, 16)}…
-                                            </code>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                                                URL copied to clipboard. Paste in another browser within 5 minutes.
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                    <button
-                                        onClick={() => handleSetCanonicalMac()}
-                                        style={{
-                                            padding: '9px 16px', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.4)',
-                                            background: 'rgba(16,185,129,0.12)', color: '#10b981', cursor: 'pointer',
-                                            fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px',
-                                            whiteSpace: 'nowrap'
-                                        }}
-                                        title="Bind this device's physical Wi-Fi/Ethernet MAC address"
-                                    >
-                                        <ShieldCheck size={15} /> Set Hardware MAC
-                                    </button>
-                                    <button
-                                        onClick={generateLinkToken}
-                                        disabled={linkTokenLoading}
-                                        style={{
-                                            padding: '9px 18px', borderRadius: '8px', border: '1px solid rgba(99,102,241,0.4)',
-                                            background: 'rgba(99,102,241,0.12)', color: '#818cf8', cursor: linkTokenLoading ? 'not-allowed' : 'pointer',
-                                            fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px',
-                                            whiteSpace: 'nowrap', opacity: linkTokenLoading ? 0.7 : 1
-                                        }}
-                                    >
-                                        <Link2 size={15} />
-                                        {linkTokenLoading ? 'Generating…' : 'Generate Link Token'}
-                                    </button>
-                                </div>
-                            </div>
 
                             {/* ── Canonical Device Registry View ── */}
                             {visitorViewMode === 'devices' && (

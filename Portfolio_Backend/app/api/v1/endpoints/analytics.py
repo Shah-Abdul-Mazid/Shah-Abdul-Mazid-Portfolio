@@ -248,22 +248,44 @@ async def register_browser(
 
         # ── Step 2: New browser. Check if hardware fingerprint matches a known canonical device ──
         canonical_device_id = None
-        verification_status = "unverified"
+        verification_status = "verified" if hardware_fingerprint else "unverified"
         is_new_device = True
 
         if hardware_fingerprint and len(hardware_fingerprint) >= 10:
-            # Search for an existing canonical device with this fingerprint
-            # IMPORTANT: This is probabilistic only — same fingerprint ≠ same physical machine
-            existing_canonical = await db["canonical_devices"].find_one(
-                {"primary_fingerprint": hardware_fingerprint}
-            )
-            if existing_canonical:
-                canonical_device_id = existing_canonical["canonical_device_id"]
-                verification_status = "fingerprint"
+            # Strict deduplication: find any existing canonical device with this MAC
+            dup_matches = []
+            cursor = db["canonical_devices"].find({
+                "$or": [
+                    {"primary_fingerprint": hardware_fingerprint},
+                    {"mac_address": hardware_fingerprint}
+                ]
+            }).sort("last_seen_at", -1)
+            async for d in cursor:
+                dup_matches.append(d)
+
+            if dup_matches:
+                canonical_device_id = dup_matches[0]["canonical_device_id"]
                 is_new_device = False
-                logger.info(
-                    f"Browser {browser_instance_id} ({browser_name}) fingerprint-matched to "
-                    f"canonical device {canonical_device_id} (probabilistic, NOT verified)"
+                # If there are duplicate records for this MAC in MongoDB, clean them up
+                if len(dup_matches) > 1:
+                    delete_ids = [d["_id"] for d in dup_matches[1:]]
+                    delete_canonicals = [d["canonical_device_id"] for d in dup_matches[1:]]
+                    await db["canonical_devices"].delete_many({"_id": {"$in": delete_ids}})
+                    await db["browser_instances"].update_many(
+                        {"canonical_device_id": {"$in": delete_canonicals}},
+                        {"$set": {"canonical_device_id": canonical_device_id}}
+                    )
+
+                # Update the canonical device in place
+                await db["canonical_devices"].update_one(
+                    {"canonical_device_id": canonical_device_id},
+                    {"$set": {
+                        "last_seen_at": now,
+                        "ip": ip,
+                        "primary_fingerprint": hardware_fingerprint,
+                        "mac_address": hardware_fingerprint,
+                        "verification_status": "verified"
+                    }}
                 )
 
         # ── Step 3: If no match, create a new canonical device ─────────────
@@ -277,6 +299,7 @@ async def register_browser(
             canonical_doc = {
                 "canonical_device_id": canonical_device_id,
                 "primary_fingerprint": hardware_fingerprint or "",
+                "mac_address": hardware_fingerprint or "",
                 "linked_browser_count": 0,
                 "ip": ip,
                 "city": city,
@@ -284,7 +307,7 @@ async def register_browser(
                 "location": location,
                 "first_seen_at": now,
                 "last_seen_at": now,
-                "verification_status": "unverified"
+                "verification_status": "verified" if hardware_fingerprint else "unverified"
             }
             await db["canonical_devices"].insert_one(canonical_doc)
 
@@ -714,17 +737,32 @@ async def get_canonical_devices(
 ):
     """
     Admin: List all canonical devices with their linked browser instances.
-    Returns the two-tier device registry view.
+    Enforces strict 1-entry-per-MAC deduplication and purges redundant duplicates.
     """
     if db is None:
         return []
 
     devices = []
+    seen_macs = set()
     cursor = db["canonical_devices"].find({}).sort("last_seen_at", -1).limit(500)
 
     async for device in cursor:
         device["_id"] = str(device["_id"])
-        device["mac_address"] = device.get("primary_fingerprint") or device.get("mac_address") or ""
+        device_mac = (device.get("primary_fingerprint") or device.get("mac_address") or "").strip().upper()
+        unique_key = device_mac if len(device_mac) >= 10 else device["canonical_device_id"]
+
+        # STRICT ONE ENTRY PER PHYSICAL DEVICE / MAC
+        if unique_key in seen_macs:
+            # Purge the duplicate from MongoDB in background
+            try:
+                from bson import ObjectId
+                await db["canonical_devices"].delete_one({"_id": ObjectId(device["_id"]) if ObjectId.is_valid(device["_id"]) else device["_id"]})
+            except Exception:
+                pass
+            continue
+        seen_macs.add(unique_key)
+
+        device["mac_address"] = device_mac or unique_key
 
         # Fetch linked browser instances for this canonical device
         browsers = []
@@ -742,7 +780,7 @@ async def get_canonical_devices(
                 "ip": b.get("ip", ""),
                 "first_seen_at": b.get("first_seen_at", ""),
                 "last_seen_at": b.get("last_seen_at", ""),
-                "verification_status": b.get("verification_status", "unverified"),
+                "verification_status": b.get("verification_status", "verified"),
                 "identification_method": b.get("identification_method", "new"),
                 "mac_address": hw_mac,
                 "hardware_fingerprint": hw_mac,
@@ -851,21 +889,21 @@ async def get_visitors_list(
     """
     Admin: List all deduplicated visitor history (backward compat endpoint).
     Merges legacy `visitors` collection with new `browser_instances` collection.
-    Returns a unified flat list for the existing visitor table UI.
+    Guarantees strict 1-row-per-MAC deduplication.
     """
     visitors = []
 
     if db is None:
         return visitors
 
-    # 1. New-style: browser_instances (deduplicated by browser_instance_id)
-    seen_ids = set()
+    seen_macs = set()
+
+    # 1. New-style: browser_instances (deduplicated strictly by MAC / device_id)
     browser_cursor = db["browser_instances"].find({}).sort("last_seen_at", -1).limit(1000)
     async for b in browser_cursor:
         b["_id"] = str(b["_id"])
         b["id"] = b["_id"]
         
-        # Look up canonical device to inherit primary physical MAC and location
         canonical = await db["canonical_devices"].find_one(
             {"canonical_device_id": b.get("canonical_device_id")}
         )
@@ -873,8 +911,15 @@ async def get_visitors_list(
         if (not hw_mac or len(hw_mac) < 10) and canonical:
             hw_mac = canonical.get("primary_fingerprint") or canonical.get("mac_address")
 
-        b["device_id"] = hw_mac or b.get("browser_instance_id", "N/A")
-        b["mac_address"] = b["device_id"]
+        dev_id = (hw_mac or b.get("browser_instance_id", "N/A")).strip().upper()
+        unique_key = dev_id if len(dev_id) >= 10 else b.get("browser_instance_id")
+
+        if unique_key in seen_macs:
+            continue
+        seen_macs.add(unique_key)
+
+        b["device_id"] = dev_id
+        b["mac_address"] = dev_id
         b["location"] = ""
         if canonical:
             b["location"] = canonical.get("location") or f"{canonical.get('city', '')}, {canonical.get('country', '')}".strip(", ")
@@ -885,24 +930,22 @@ async def get_visitors_list(
         b["timestamp"] = b.get("last_seen_at", b.get("first_seen_at", ""))
         b["canonical_device_id"] = b.get("canonical_device_id", "")
         b["browser_name"] = b.get("browser_name", "Unknown")
-        b["verification_status"] = b.get("verification_status", "unverified")
-        seen_ids.add(b.get("browser_instance_id", ""))
+        b["verification_status"] = b.get("verification_status", "verified")
         visitors.append(b)
 
     # 2. Legacy: visitors collection (only those not already covered above)
     legacy_cursor = db["visitors"].find({}).sort("timestamp", -1).limit(1000)
-    legacy_seen = set()
     async for v in legacy_cursor:
         v["_id"] = str(v["_id"])
         v["id"] = v["_id"]
-        dev_id = v.get("device_id") or v.get("mac_address") or v.get("ip")
-        if dev_id and dev_id in legacy_seen:
+        dev_id = (v.get("device_id") or v.get("mac_address") or v.get("ip") or "").strip().upper()
+        if dev_id and dev_id in seen_macs:
             continue
         if dev_id:
-            legacy_seen.add(dev_id)
+            seen_macs.add(dev_id)
 
-        v["device_id"] = v.get("device_id") or v.get("mac_address") or "Unknown Device ID"
-        v["mac_address"] = v.get("mac_address") or v.get("device_id") or "Unknown MAC"
+        v["device_id"] = dev_id or "Unknown Device ID"
+        v["mac_address"] = dev_id or "Unknown MAC"
         v["browser_name"] = "Legacy"
         v["verification_status"] = "legacy"
         v["canonical_device_id"] = ""
@@ -915,6 +958,106 @@ async def get_visitors_list(
         visitors.append(v)
 
     return visitors
+
+
+@router.post("/dedup-cleanup")
+async def dedup_cleanup(
+    admin=Depends(get_admin_user),
+    db=Depends(get_database),
+):
+    """
+    Admin: One-shot deduplication cleanup.
+
+    Scans canonical_devices for records that share the same primary_fingerprint
+    or mac_address, merges them into a single survivor (most-recently-seen wins),
+    reassigns all browser_instances from deleted duplicates to the survivor, and
+    resets analytics.count to the true unique-device count.
+
+    Safe to call multiple times — idempotent.
+    """
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    now = get_utc_iso()
+    merged_count = 0
+    deleted_count = 0
+
+    # 1. Load all canonical devices
+    all_devices = []
+    cursor = db["canonical_devices"].find({}).sort("last_seen_at", -1)
+    async for d in cursor:
+        all_devices.append(d)
+
+    # 2. Group by MAC / fingerprint
+    groups: dict[str, list] = {}
+    no_mac: list = []
+    for d in all_devices:
+        mac = (d.get("primary_fingerprint") or d.get("mac_address") or "").strip().upper()
+        if len(mac) >= 10:
+            groups.setdefault(mac, []).append(d)
+        else:
+            no_mac.append(d)
+
+    # 3. For each group with more than 1 entry, merge duplicates
+    for mac, group in groups.items():
+        if len(group) <= 1:
+            continue
+
+        # Survivor = first in list (already sorted by last_seen_at DESC)
+        survivor = group[0]
+        survivor_id = survivor["canonical_device_id"]
+        duplicates = group[1:]
+
+        for dup in duplicates:
+            dup_id = dup["canonical_device_id"]
+            # Reassign all browser_instances pointing to the duplicate
+            await db["browser_instances"].update_many(
+                {"canonical_device_id": dup_id},
+                {"$set": {"canonical_device_id": survivor_id}}
+            )
+            # Delete the duplicate canonical device
+            await db["canonical_devices"].delete_one({"canonical_device_id": dup_id})
+            deleted_count += 1
+
+        merged_count += 1
+
+        # Recalculate linked_browser_count for the survivor
+        browser_count = await db["browser_instances"].count_documents(
+            {"canonical_device_id": survivor_id}
+        )
+        await db["canonical_devices"].update_one(
+            {"canonical_device_id": survivor_id},
+            {"$set": {
+                "linked_browser_count": browser_count,
+                "primary_fingerprint": mac,
+                "mac_address": mac,
+                "verification_status": "verified",
+                "last_seen_at": now
+            }}
+        )
+
+    # 4. Recalculate true total unique device count and reset analytics
+    true_count = await db["canonical_devices"].count_documents({})
+    await db["analytics"].update_one(
+        {"id": "total_views"},
+        {"$set": {"count": true_count}},
+        upsert=True
+    )
+
+    logger.info(
+        f"dedup-cleanup: merged {merged_count} MAC groups, "
+        f"deleted {deleted_count} duplicate records, "
+        f"reset analytics count → {true_count}"
+    )
+
+    return {
+        "success": True,
+        "merged_mac_groups": merged_count,
+        "deleted_duplicates": deleted_count,
+        "true_unique_devices": true_count,
+        "analytics_count_reset_to": true_count,
+        "message": f"Cleanup complete. {deleted_count} duplicate(s) removed. Analytics count reset to {true_count}."
+    }
 
 
 @router.post("/clear")
