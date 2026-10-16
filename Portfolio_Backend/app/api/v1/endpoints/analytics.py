@@ -238,10 +238,6 @@ async def register_browser(
         client_device = body.get("device") or ""
         body_ip = body.get("client_ip") or body.get("ip") or ""
 
-        # Map known device fingerprints to physical MAC address (Intel Wi-Fi 6E AX211, Ezan)
-        if hardware_fingerprint == "2F:49:21:AD:58:B2" or hardware_fingerprint.startswith("2F:49:"):
-            hardware_fingerprint = "F0:20:FF:40:68:A7"
-
         if not browser_instance_id:
             raise HTTPException(status_code=400, detail="browser_instance_id is required")
 
@@ -800,10 +796,6 @@ async def get_canonical_devices(
     async for device in cursor:
         device["_id"] = str(device["_id"])
         device_mac = (device.get("primary_fingerprint") or device.get("mac_address") or "").strip().upper()
-        if device_mac == "2F:49:21:AD:58:B2" or device_mac.startswith("2F:49:"):
-            device_mac = "F0:20:FF:40:68:A7"
-            device["primary_fingerprint"] = "F0:20:FF:40:68:A7"
-            device["mac_address"] = "F0:20:FF:40:68:A7"
 
         # Correct Vercel Mumbai proxy IP to visitor's true Bangladesh IP
         if device.get("ip", "").startswith("52.66.") or "Mumbai" in (device.get("location") or ""):
@@ -975,8 +967,6 @@ async def get_visitors_list(
             hw_mac = canonical.get("primary_fingerprint") or canonical.get("mac_address")
 
         dev_id = (hw_mac or b.get("browser_instance_id", "N/A")).strip().upper()
-        if dev_id == "2F:49:21:AD:58:B2" or dev_id.startswith("2F:49:"):
-            dev_id = "F0:20:FF:40:68:A7"
 
         unique_key = dev_id if len(dev_id) >= 10 else b.get("browser_instance_id")
 
@@ -1055,26 +1045,6 @@ async def dedup_cleanup(
     merged_count = 0
     deleted_count = 0
 
-    # 0. Migrate any temporary fingerprint "2F:49:21:AD:58:B2" to true physical MAC "F0:20:FF:40:68:A7"
-    await db["canonical_devices"].update_many(
-        {"$or": [
-            {"primary_fingerprint": {"$regex": "^2F:49:", "$options": "i"}},
-            {"mac_address": {"$regex": "^2F:49:", "$options": "i"}}
-        ]},
-        {"$set": {
-            "primary_fingerprint": "F0:20:FF:40:68:A7",
-            "mac_address": "F0:20:FF:40:68:A7",
-            "device_name": "Intel(R) Wi-Fi 6E AX211",
-            "verification_status": "verified"
-        }}
-    )
-    await db["browser_instances"].update_many(
-        {"hardware_fingerprint": {"$regex": "^2F:49:", "$options": "i"}},
-        {"$set": {
-            "hardware_fingerprint": "F0:20:FF:40:68:A7",
-            "verification_status": "verified"
-        }}
-    )
     # Fix any proxy IP / Mumbai location on devices to true visitor IP 103.175.131.29 (Dhaka, Bangladesh)
     await db["canonical_devices"].update_many(
         {"$or": [

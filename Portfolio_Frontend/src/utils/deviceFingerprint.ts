@@ -205,14 +205,6 @@ export async function getDeviceIdentifier(): Promise<string> {
             macAddress = hex.match(/.{1,2}/g)?.join(':') || '02:00:00:00:00:00';
         }
 
-        // Known mapping: The WebGL GPU/screen fingerprint 2F:49:21:AD:58:B2 is the owner's Intel Wi-Fi 6E AX211 machine
-        if (macAddress === '2F:49:21:AD:58:B2' || macAddress.startsWith('2F:49:')) {
-            macAddress = 'F0:20:FF:40:68:A7';
-            try {
-                localStorage.setItem('portfolio_physical_mac', 'F0:20:FF:40:68:A7');
-            } catch {}
-        }
-
         return macAddress;
 
     } catch {

@@ -303,12 +303,6 @@ const AdminDashboard = () => {
     useEffect(() => {
         if (localStorage.getItem('admin_auth') !== 'true') {
             navigate('/login/admin');
-        } else {
-            try {
-                if (!localStorage.getItem('portfolio_physical_mac')) {
-                    localStorage.setItem('portfolio_physical_mac', 'F0:20:FF:40:68:A7');
-                }
-            } catch {}
             fetchRealTimeData();
         }
     }, [navigate]);
