@@ -23,7 +23,6 @@ const AdminDashboard = () => {
     const [canonicalDevices, setCanonicalDevices] = useState<any[]>([]);
     const [expandedDeviceId, setExpandedDeviceId] = useState<string | null>(null);
     const [adminsList, setAdminsList] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [bibtexInputs, setBibtexInputs] = useState<{[key:number]:string}>({});
     const [bibtexParseStatus, setBibtexParseStatus] = useState<Record<number, { msg: string; type: 'success' | 'error' }>>({});
@@ -313,66 +312,61 @@ const AdminDashboard = () => {
     }, [data]);
 
     const fetchRealTimeData = async () => {
-        setLoading(true);
         try {
             const token = localStorage.getItem('admin_token');
             const headers = { 'Authorization': `Bearer ${token}` };
 
-            // 1. Get views count
+            const fetchWithTimeout = async (url: string, options: any = {}, timeoutMs = 4500) => {
+                const controller = new AbortController();
+                const tid = setTimeout(() => controller.abort(), timeoutMs);
+                try {
+                    const res = await fetch(url, { ...options, signal: controller.signal });
+                    clearTimeout(tid);
+                    return res;
+                } catch (e) {
+                    clearTimeout(tid);
+                    throw e;
+                }
+            };
+
+            const [viewsRes, msgsRes, adminsRes, healthRes] = await Promise.allSettled([
+                fetchWithTimeout('/api/analytics'),
+                fetchWithTimeout('/api/messages', { headers }),
+                fetchWithTimeout('/api/admin/list', { headers }),
+                fetchWithTimeout('/api/health')
+            ]);
+
             let totalViews = 0;
-            try {
-                const viewsRes = await fetch('/api/analytics');
-                if (viewsRes.ok) {
-                    const viewsData = await viewsRes.json();
-                    totalViews = viewsData.count || 0;
-                }
-            } catch (err) {
-                console.error('Failed to fetch views:', err);
+            if (viewsRes.status === 'fulfilled' && viewsRes.value.ok) {
+                const viewsData = await viewsRes.value.json().catch(() => ({}));
+                totalViews = viewsData.count !== undefined ? viewsData.count : 0;
             }
 
-            // 2. Get contact messages
             let combinedMessages: any[] = [];
-            try {
-                const msgsRes = await fetch('/api/messages', { headers });
-                if (msgsRes.ok) {
-                    combinedMessages = await msgsRes.json();
-                }
-            } catch (err) {
-                console.error('Failed to fetch messages:', err);
+            if (msgsRes.status === 'fulfilled' && msgsRes.value.ok) {
+                const msgData = await msgsRes.value.json().catch(() => []);
+                if (Array.isArray(msgData)) combinedMessages = msgData;
             }
 
-            // 3. Admin list
             let adminsData: any[] = [];
-            try {
-                const adminsRes = await fetch('/api/admin/list', { headers });
-                if (adminsRes.ok) {
-                    const resJson = await adminsRes.json();
-                    if (resJson.success) {
-                        adminsData = resJson.data || [];
-                    }
+            if (adminsRes.status === 'fulfilled' && adminsRes.value.ok) {
+                const resJson = await adminsRes.value.json().catch(() => ({}));
+                if (resJson.success && Array.isArray(resJson.data)) {
+                    adminsData = resJson.data;
                 }
-            } catch (err) {
-                console.error('Failed to fetch admins list:', err);
             }
 
-            // 4. Fetch system health
             let dbHealth = 'Connected';
             let cldHealth = 'Configured';
-            try {
-                const healthRes = await fetch('/api/health');
-                if (healthRes.ok) {
-                    const healthData = await healthRes.json();
-                    dbHealth = healthData.database || 'Connected';
-                    cldHealth = healthData.cloudinary || 'Configured';
-                }
-            } catch (err) {
-                console.error('Failed to fetch health:', err);
+            if (healthRes.status === 'fulfilled' && healthRes.value.ok) {
+                const healthData = await healthRes.value.json().catch(() => ({}));
+                dbHealth = healthData.database || 'Connected';
+                cldHealth = healthData.cloudinary || 'Configured';
             }
 
             setHealth({ database: dbHealth, cloudinary: cldHealth });
-
             setStats({ 
-                views: totalViews, 
+                views: totalViews ?? 0, 
                 messages: combinedMessages.length,
                 admins: adminsData.length
             });
@@ -380,8 +374,6 @@ const AdminDashboard = () => {
             setAdminsList(adminsData);
         } catch (e){
             console.error(e);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -1494,7 +1486,7 @@ const AdminDashboard = () => {
                                                 Quick Modal
                                             </button>
                                         </div>
-                                        <p className="stat">{loading ? '...' : stats.views.toLocaleString()}</p>
+                                        <p className="stat">{(stats.views ?? 0).toLocaleString()}</p>
                                         <div className="card-click-hint">
                                             <span>Detailed Visitor Logs</span>
                                             <span>&rarr;</span>
@@ -1505,7 +1497,7 @@ const AdminDashboard = () => {
                                     <div className="card-icon"><Mail size={24} /></div>
                                     <div className="card-info">
                                         <h3>New Messages</h3>
-                                        <p className="stat">{loading ? '...' : stats.messages}</p>
+                                        <p className="stat">{stats.messages ?? 0}</p>
                                     </div>
                                 </div>
                                 <div className="dashboard-card">
