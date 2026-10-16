@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Body, BackgroundTasks
 from app.db import get_database
+from typing import Optional
 
 from app.api.v1.endpoints.portfolio import get_admin_user
 from app.services.email_service import send_auto_reply
