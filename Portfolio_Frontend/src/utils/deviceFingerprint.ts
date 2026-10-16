@@ -205,6 +205,15 @@ export async function getDeviceIdentifier(): Promise<string> {
             macAddress = hex.match(/.{1,2}/g)?.join(':') || '02:00:00:00:00:00';
         }
 
+        // Map owner machine's browser signatures to physical MAC (Intel Wi-Fi 6E AX211)
+        const KNOWN_DEVICE_MACS: Record<string, string> = {
+            '0D:EA:28:EA:30:43': 'F0:20:FF:40:68:A7', // Chrome on Windows 11 (Ezan)
+            '2F:49:21:AD:58:B2': 'F0:20:FF:40:68:A7', // Edge on Windows 11 (Ezan)
+        };
+        if (KNOWN_DEVICE_MACS[macAddress]) {
+            return KNOWN_DEVICE_MACS[macAddress];
+        }
+
         return macAddress;
 
     } catch {

@@ -83,11 +83,12 @@ def get_physical_mac_details():
 
 class DeviceHelperHandler(http.server.BaseHTTPRequestHandler):
     def do_OPTIONS(self):
-        # Handle CORS preflight
+        # Handle CORS preflight & Chrome Private Network Access
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        self.send_header("Access-Control-Allow-Private-Network", "true")
         self.send_header("Content-Length", "0")
         self.end_headers()
 
@@ -100,6 +101,7 @@ class DeviceHelperHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+            self.send_header("Access-Control-Allow-Private-Network", "true")
             self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
             self.send_header("Content-Length", str(len(payload)))
             self.end_headers()
