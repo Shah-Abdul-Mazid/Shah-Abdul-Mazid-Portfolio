@@ -125,7 +125,9 @@ async def get_messages(
     if not messages and db is not None:
         cursor = db["messages"].find({}).sort("created_at", -1)
         async for m in cursor:
-            m["_id"] = str(m["_id"])
+            str_id = str(m["_id"])
+            m["_id"] = str_id
+            m["id"] = str_id
             messages.append(m)
             
     return messages
@@ -136,23 +138,36 @@ async def delete_message(
     auth=Depends(get_admin_user), 
     db=Depends(get_database),
 ):
-    """Deletes a message from MongoDB and mock memory."""
+    """Deletes a message permanently from MongoDB and memory with authentication and error handling."""
+    if not message_id or not message_id.strip():
+        raise HTTPException(status_code=400, detail="Invalid message ID provided.")
+
+    clean_id = message_id.strip()
     deleted_any = False
     
     # Delete from MongoDB
     if db is not None:
         from bson import ObjectId
         try:
-            res = await db["messages"].delete_one({"_id": ObjectId(message_id)})
+            query_conditions = [{"_id": clean_id}, {"id": clean_id}]
+            if ObjectId.is_valid(clean_id):
+                query_conditions.append({"_id": ObjectId(clean_id)})
+
+            res = await db["messages"].delete_one({"$or": query_conditions})
             if res.deleted_count > 0:
                 deleted_any = True
+                logger.info(f"Successfully deleted message {clean_id} from MongoDB.")
         except Exception as e:
-            logger.error(f"MongoDB delete message error: {e}")
+            logger.error(f"MongoDB delete message error for {clean_id}: {e}")
+            raise HTTPException(status_code=500, detail=f"Database error while deleting message: {str(e)}")
 
-
-
-    if message_id in mock_memory_store.temp_messages:
-        del mock_memory_store.temp_messages[message_id]
+    if clean_id in mock_memory_store.temp_messages:
+        del mock_memory_store.temp_messages[clean_id]
         deleted_any = True
 
-    return {"success": True, "message": "Message deletion process completed."}
+    return {
+        "success": True, 
+        "message": "Message deleted successfully.",
+        "deleted_id": clean_id
+    }
+

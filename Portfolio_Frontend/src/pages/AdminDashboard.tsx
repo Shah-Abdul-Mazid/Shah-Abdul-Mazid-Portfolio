@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles, CheckCircle2, ChevronDown, ChevronUp, Layers } from 'lucide-react';
+import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles, CheckCircle2, ChevronDown, ChevronUp, Layers, MapPin, Monitor, Cpu, Search, X, Globe, ShieldCheck, Link2 } from 'lucide-react';
 import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, PaperItem, SkillCategory } from '../context/PortfolioContext';
 import './AdminDashboard.css';
 
@@ -17,6 +17,13 @@ const AdminDashboard = () => {
     const [stats, setStats] = useState({ views: 0, messages: 0, admins: 0 });
     const [messages, setMessages] = useState<any[]>([]);
     const [visitors, setVisitors] = useState<any[]>([]);
+    const [visitorSearch, setVisitorSearch] = useState('');
+    const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false);
+    const [visitorViewMode, setVisitorViewMode] = useState<'devices' | 'flat'>('devices');
+    const [canonicalDevices, setCanonicalDevices] = useState<any[]>([]);
+    const [expandedDeviceId, setExpandedDeviceId] = useState<string | null>(null);
+    const [linkTokenInfo, setLinkTokenInfo] = useState<{ token: string; expires_at: string } | null>(null);
+    const [linkTokenLoading, setLinkTokenLoading] = useState(false);
     const [adminsList, setAdminsList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -381,18 +388,34 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleDeleteMessage = async (id: string) => {
+    const handleDeleteMessage = async (id: string, promptConfirm = true) => {
+        if (!id) {
+            showNotification('❌ Invalid message ID');
+            return;
+        }
+        if (promptConfirm) {
+            const confirmed = window.confirm('Are you sure you want to permanently delete this message?');
+            if (!confirmed) return;
+        }
         try {
             const token = localStorage.getItem('admin_token');
             const res = await fetch(`/api/messages/${id}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 
+                    'Authorization': `Bearer ${token}` 
+                }
             });
             if (res.ok) {
-                showNotification('🗑️ Message cleared successfully');
-                fetchRealTimeData();
+                // Instantly remove from local state without requiring a full page refresh
+                setMessages(prev => prev.filter(m => (m._id || m.id) !== id));
+                setStats(prev => ({ 
+                    ...prev, 
+                    messages: Math.max(0, prev.messages - 1) 
+                }));
+                showNotification('🗑️ Message deleted successfully');
             } else {
-                showNotification('❌ Failed to delete message');
+                const errData = await res.json().catch(() => ({}));
+                showNotification(`❌ ${errData.detail || 'Failed to delete message'}`);
             }
         } catch (err) { 
             console.error(err);
@@ -402,7 +425,35 @@ const AdminDashboard = () => {
 
     const handleReplyAndDelete = async (id: string, email: string) => {
         window.location.href = `mailto:${email}?subject=RE: Portfolio Inquiry`;
-        handleDeleteMessage(id);
+        const confirmed = window.confirm('Would you like to remove this message from your inbox now?');
+        if (confirmed) {
+            handleDeleteMessage(id, false);
+        }
+    };
+
+    const formatBDTDate = (ts?: string) => {
+        if (!ts) return 'N/A';
+        try {
+            let normalized = ts.trim();
+            // If string lacks timezone designator, treat as UTC by appending 'Z'
+            if (!normalized.endsWith('Z') && !/[+-]\d{2}(:\d{2})?$/.test(normalized)) {
+                normalized += 'Z';
+            }
+            const d = new Date(normalized);
+            if (isNaN(d.getTime())) return ts;
+            return d.toLocaleString('en-US', {
+                timeZone: 'Asia/Dhaka',
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            }) + ' (BDT)';
+        } catch {
+            return ts;
+        }
     };
 
     const fetchVisitors = async () => {
@@ -413,14 +464,64 @@ const AdminDashboard = () => {
             });
             if (res.ok) {
                 const data = await res.json();
-                setVisitors(data);
+                setVisitors(Array.isArray(data) ? data : []);
             }
         } catch (err) {
             console.error('Failed to load visitors:', err);
         }
     };
 
+    const fetchDevices = async () => {
+        try {
+            const token = localStorage.getItem('admin_token');
+            const res = await fetch('/api/analytics/devices', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setCanonicalDevices(Array.isArray(data) ? data : []);
+            }
+        } catch (err) {
+            console.error('Failed to load canonical devices:', err);
+        }
+    };
+
+    const generateLinkToken = async () => {
+        const browserInstanceId = localStorage.getItem('portfolio_browser_id');
+        if (!browserInstanceId) {
+            showNotification('❌ Browser instance ID not found. Visit your portfolio page first.');
+            return;
+        }
+        setLinkTokenLoading(true);
+        try {
+            const res = await fetch('/api/analytics/link-request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ browser_instance_id: browserInstanceId })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setLinkTokenInfo({ token: data.token, expires_at: data.expires_at });
+                // Build the claim URL
+                const claimUrl = `${window.location.origin}/?link_token=${data.token}`;
+                await navigator.clipboard.writeText(claimUrl).catch(() => {});
+                showNotification('🔗 Link token generated! URL copied to clipboard. Paste in another browser within 5 minutes.');
+            } else {
+                const err = await res.json().catch(() => ({}));
+                showNotification(`❌ ${err.detail || 'Failed to generate link token'}`);
+            }
+        } catch (err) {
+            console.error(err);
+            showNotification('❌ Failed to generate link token');
+        } finally {
+            setLinkTokenLoading(false);
+        }
+    };
+
     const handleClearVisitors = async () => {
+        if (!window.confirm('Are you sure you want to permanently clear all visitor logs and reset view count?')) {
+            return;
+        }
         try {
             const token = localStorage.getItem('admin_token');
             const res = await fetch('/api/analytics/clear', {
@@ -429,6 +530,7 @@ const AdminDashboard = () => {
             });
             if (res.ok) {
                 setVisitors([]);
+                setCanonicalDevices([]);
                 setStats(prev => ({ ...prev, views: 0 }));
                 showNotification('🧹 All visitor logs cleared');
             } else {
@@ -441,10 +543,12 @@ const AdminDashboard = () => {
     };
 
     useEffect(() => {
-        if (activeTab === 'visitors') {
+        if (activeTab === 'visitors' || isVisitorModalOpen) {
             fetchVisitors();
+            fetchDevices();
         }
-    }, [activeTab]);
+    }, [activeTab, isVisitorModalOpen]);
+
 
     const handleLogout = () => {
         localStorage.removeItem('admin_auth');
@@ -1294,11 +1398,34 @@ const AdminDashboard = () => {
                         <div className="tab-pane">
                             <h2 className="pane-title">System Overview</h2>
                             <div className="dashboard-grid">
-                                <div className="dashboard-card">
+                                <div 
+                                    className="dashboard-card clickable-stat-card" 
+                                    onClick={() => setActiveTab('visitors')} 
+                                    style={{ cursor: 'pointer' }}
+                                    title="Click to view Visitor Logs"
+                                >
                                     <div className="card-icon"><Eye size={24} /></div>
                                     <div className="card-info">
-                                        <h3>Total Views</h3>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <h3>Total Views</h3>
+                                            <button 
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    fetchVisitors();
+                                                    setIsVisitorModalOpen(true);
+                                                }}
+                                                className="view-modal-pill"
+                                                title="Quick View Modal"
+                                            >
+                                                Quick Modal
+                                            </button>
+                                        </div>
                                         <p className="stat">{loading ? '...' : stats.views.toLocaleString()}</p>
+                                        <div className="card-click-hint">
+                                            <span>Detailed Visitor Logs</span>
+                                            <span>&rarr;</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="dashboard-card" onClick={() => setActiveTab('messages')} style={{ cursor: 'pointer' }}>
@@ -1331,26 +1458,29 @@ const AdminDashboard = () => {
                             <div className="messages-list">
                                 {messages.length === 0 ? (
                                     <div className="empty-state"><Mail size={48} /><p>No messages yet.</p></div>
-                                ) : messages.map((msg) => (
-                                    <div key={msg.id} className="message-card">
-                                        <div className="message-header">
-                                            <div className="user-info">
-                                                <div className="avatar">{msg.name.charAt(0)}</div>
-                                                <div>
-                                                    <h4>{msg.name}</h4>
-                                                    <p className="meta"><Mail size={12} /> {msg.email} {msg.phone && <><Phone size={12} /> {msg.phone}</>}</p>
+                                ) : messages.map((msg) => {
+                                    const msgId = msg._id || msg.id;
+                                    return (
+                                        <div key={msgId} className="message-card">
+                                            <div className="message-header">
+                                                <div className="user-info">
+                                                    <div className="avatar">{msg.name ? msg.name.charAt(0).toUpperCase() : '?'}</div>
+                                                    <div>
+                                                        <h4>{msg.name}</h4>
+                                                        <p className="meta"><Mail size={12} /> {msg.email} {msg.phone && <><Phone size={12} /> {msg.phone}</>}</p>
+                                                    </div>
                                                 </div>
+                                                <div className="message-date"><Calendar size={14} /> {msg.created_at ? new Date(msg.created_at).toLocaleDateString() : 'N/A'}</div>
                                             </div>
-                                            <div className="message-date"><Calendar size={14} /> {new Date(msg.created_at).toLocaleDateString()}</div>
+                                            <div className="message-body"><p>{msg.query}</p></div>
+                                            <div className="message-actions">
+                                                <a href={`mailto:${msg.email}?subject=RE: Portfolio Inquiry`} className="btn-small btn-secondary"><Reply size={14} /> Only Reply</a>
+                                                <button onClick={() => handleReplyAndDelete(msgId, msg.email)} className="btn-small btn-primary"><Mail size={14} /> Reply & Clear</button>
+                                                <button onClick={() => handleDeleteMessage(msgId)} className="btn-small btn-danger"><Trash2 size={14} /> Delete</button>
+                                            </div>
                                         </div>
-                                        <div className="message-body"><p>{msg.query}</p></div>
-                                        <div className="message-actions">
-                                            <a href={`mailto:${msg.email}?subject=RE: Portfolio Inquiry`} className="btn-small btn-secondary"><Reply size={14} /> Only Reply</a>
-                                            <button onClick={() => handleReplyAndDelete(msg.id, msg.email)} className="btn-small btn-primary"><Mail size={14} /> Reply & Clear</button>
-                                            <button onClick={() => handleDeleteMessage(msg.id)} className="btn-small btn-danger"><Trash2 size={14} /> Delete</button>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
@@ -1742,53 +1872,379 @@ const AdminDashboard = () => {
                         <div className="tab-pane">
                             <div className="pane-header">
                                 <div>
-                                    <h2 className="pane-title">Unique Visitors</h2>
-                                    <p className="pane-desc">Real-time log of IPs and device types visiting your portfolio.</p>
+                                    <h2 className="pane-title">Visitor Logs & Analytics</h2>
+                                    <p className="pane-desc">Cross-browser canonical device registry. Each physical device is tracked once, with individual browser instances linked to it.</p>
                                 </div>
-                                <div style={{ display: 'flex', gap: '8px' }}>
-                                    <button onClick={fetchVisitors} className="btn btn-secondary">Refresh List</button>
-                                    <button onClick={handleClearVisitors} className="btn btn-danger" style={{ background: '#ef4444', border: 'none' }}>Clear All Data</button>
+                                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                    <div style={{ display: 'flex', gap: '4px', background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: '8px', padding: '3px' }}>
+                                        <button
+                                            onClick={() => setVisitorViewMode('devices')}
+                                            style={{
+                                                padding: '5px 12px', borderRadius: '6px', fontSize: '0.82rem', border: 'none', cursor: 'pointer',
+                                                background: visitorViewMode === 'devices' ? 'var(--accent)' : 'transparent',
+                                                color: visitorViewMode === 'devices' ? '#fff' : 'var(--text-secondary)'
+                                            }}
+                                        >
+                                            <Cpu size={13} style={{ marginRight: '4px', verticalAlign: 'middle' }} />Devices
+                                        </button>
+                                        <button
+                                            onClick={() => setVisitorViewMode('flat')}
+                                            style={{
+                                                padding: '5px 12px', borderRadius: '6px', fontSize: '0.82rem', border: 'none', cursor: 'pointer',
+                                                background: visitorViewMode === 'flat' ? 'var(--accent)' : 'transparent',
+                                                color: visitorViewMode === 'flat' ? '#fff' : 'var(--text-secondary)'
+                                            }}
+                                        >
+                                            <Monitor size={13} style={{ marginRight: '4px', verticalAlign: 'middle' }} />Browser Logs
+                                        </button>
+                                    </div>
+                                    <button onClick={() => { fetchVisitors(); fetchDevices(); }} className="btn btn-secondary">
+                                        Refresh
+                                    </button>
+                                    <button
+                                        onClick={handleClearVisitors}
+                                        className="btn btn-danger-solid"
+                                        style={{ background: '#ef4444', color: '#ffffff', border: 'none' }}
+                                    >
+                                        <Trash2 size={16} /> Clear All Data
+                                    </button>
                                 </div>
                             </div>
 
-                            <div className="visitor-table-container" style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
-                                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
-                                    <thead>
-                                        <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
-                                            <th style={{ padding: '16px' }}>Visitor IP</th>
-                                            <th style={{ padding: '16px' }}>Device / Browser</th>
-                                            <th style={{ padding: '16px' }}>Last Seen</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {visitors.length === 0 ? (
-                                            <tr>
-                                                <td colSpan={3} style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                                                    <Users size={32} style={{ marginBottom: '12px', opacity: 0.3 }} />
-                                                    <p>No visitor logs available.</p>
-                                                </td>
-                                            </tr>
-                                        ) : (
-                                            visitors.map((v, idx) => (
-                                                <tr key={v._id || idx} style={{ borderBottom: '1px solid var(--border-color)', transition: '0.2s' }}>
-                                                    <td style={{ padding: '16px', color: 'var(--primary)', fontWeight: 700 }}>{v.ip}</td>
-                                                    <td style={{ padding: '16px', color: 'var(--text-secondary)', fontSize: '0.8rem', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.device}>
-                                                        {v.device}
-                                                    </td>
-                                                    <td style={{ padding: '16px', color: 'var(--text-muted)' }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                            <Calendar size={12} />
-                                                            {new Date(v.timestamp).toLocaleString()}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
+                            {/* Link Token Generator Panel */}
+                            <div style={{
+                                background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08))',
+                                border: '1px solid rgba(99,102,241,0.25)',
+                                borderRadius: '12px',
+                                padding: '16px 20px',
+                                marginBottom: '20px',
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: '16px',
+                                flexWrap: 'wrap'
+                            }}>
+                                <div style={{ flex: 1, minWidth: '250px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                                        <Link2 size={16} style={{ color: '#818cf8' }} />
+                                        <strong style={{ fontSize: '0.9rem', color: 'var(--text)' }}>Cross-Browser Device Linking</strong>
+                                        <span style={{ fontSize: '0.75rem', background: 'rgba(99,102,241,0.15)', color: '#818cf8', padding: '2px 8px', borderRadius: '20px' }}>Verified</span>
+                                    </div>
+                                    <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
+                                        Open your portfolio in Chrome first, then generate a link token. Paste the URL in Firefox or Edge on the same computer to link them as one canonical device.
+                                        This creates a <strong>verified</strong> association (not just a probabilistic fingerprint match).
+                                    </p>
+                                    {linkTokenInfo && (
+                                        <div style={{ marginTop: '10px', padding: '10px 12px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '8px' }}>
+                                            <div style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 600, marginBottom: '4px' }}>✅ Token Generated (expires {new Date(linkTokenInfo.expires_at).toLocaleTimeString()})</div>
+                                            <code style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', wordBreak: 'break-all' }}>
+                                                {window.location.origin}/?link_token={linkTokenInfo.token.slice(0, 16)}…
+                                            </code>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                                                URL copied to clipboard. Paste in another browser within 5 minutes.
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={generateLinkToken}
+                                    disabled={linkTokenLoading}
+                                    style={{
+                                        padding: '9px 18px', borderRadius: '8px', border: '1px solid rgba(99,102,241,0.4)',
+                                        background: 'rgba(99,102,241,0.12)', color: '#818cf8', cursor: linkTokenLoading ? 'not-allowed' : 'pointer',
+                                        fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px',
+                                        whiteSpace: 'nowrap', opacity: linkTokenLoading ? 0.7 : 1
+                                    }}
+                                >
+                                    <Link2 size={15} />
+                                    {linkTokenLoading ? 'Generating…' : 'Generate Link Token'}
+                                </button>
                             </div>
+
+                            {/* ── Canonical Device Registry View ── */}
+                            {visitorViewMode === 'devices' && (
+                                <div className="visitor-table-container">
+                                    <div className="visitor-table-toolbar">
+                                        <div className="search-box">
+                                            <Search size={16} />
+                                            <input
+                                                type="text"
+                                                placeholder="Search by IP, Fingerprint, Location, or Browser..."
+                                                value={visitorSearch}
+                                                onChange={(e) => setVisitorSearch(e.target.value)}
+                                            />
+                                            {visitorSearch && (
+                                                <button onClick={() => setVisitorSearch('')} className="clear-search-btn" title="Clear search">
+                                                    <X size={14} />
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="visitor-table-stats">
+                                            <span className="badge-count">
+                                                <ShieldCheck size={14} /> {canonicalDevices.length} Canonical Devices
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {canonicalDevices.length === 0 ? (
+                                        <div className="empty-visitors-td" style={{ textAlign: 'center', padding: '40px 20px' }}>
+                                            <Users size={40} style={{ opacity: 0.3 }} />
+                                            <p style={{ marginTop: '10px', fontSize: '0.95rem', fontWeight: 500 }}>No canonical device records yet.</p>
+                                            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Records appear when visitors browse your portfolio with a browser that has the new tracking code.</span>
+                                        </div>
+                                    ) : (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                            {canonicalDevices
+                                                .filter(d => {
+                                                    if (!visitorSearch.trim()) return true;
+                                                    const q = visitorSearch.toLowerCase();
+                                                    return (
+                                                        (d.ip || '').toLowerCase().includes(q) ||
+                                                        (d.primary_fingerprint || '').toLowerCase().includes(q) ||
+                                                        (d.location || '').toLowerCase().includes(q) ||
+                                                        (d.linked_browsers || []).some((b: any) => (b.browser_name || '').toLowerCase().includes(q) || (b.device || '').toLowerCase().includes(q))
+                                                    );
+                                                })
+                                                .map((device, idx) => {
+                                                    const isExpanded = expandedDeviceId === device.canonical_device_id;
+                                                    const status = device.verification_status || 'unverified';
+                                                    const statusColor = status === 'verified' ? '#10b981' : status === 'fingerprint' ? '#f59e0b' : '#64748b';
+                                                    const statusLabel = status === 'verified' ? '🔗 Verified' : status === 'fingerprint' ? '🖥 Fingerprint' : '❓ Unverified';
+                                                    const lastSeen = formatBDTDate(device.last_seen_at);
+
+                                                    return (
+                                                        <div key={device.canonical_device_id || idx} style={{
+                                                            background: 'var(--card-bg)',
+                                                            border: '1px solid var(--border)',
+                                                            borderRadius: '10px',
+                                                            overflow: 'hidden'
+                                                        }}>
+                                                            {/* Device card header */}
+                                                            <div
+                                                                onClick={() => setExpandedDeviceId(isExpanded ? null : device.canonical_device_id)}
+                                                                style={{
+                                                                    padding: '14px 16px',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '12px',
+                                                                    cursor: 'pointer',
+                                                                    flexWrap: 'wrap'
+                                                                }}
+                                                            >
+                                                                <div style={{
+                                                                    width: '36px', height: '36px', borderRadius: '8px',
+                                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                                                                }}>
+                                                                    <Cpu size={18} color="#fff" />
+                                                                </div>
+                                                                <div style={{ flex: 1, minWidth: '180px' }}>
+                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                                                        <code style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                                                                            {(device.canonical_device_id || '').slice(0, 18)}…
+                                                                        </code>
+                                                                        <span style={{
+                                                                            fontSize: '0.72rem', padding: '2px 8px', borderRadius: '20px',
+                                                                            background: `${statusColor}18`, color: statusColor, fontWeight: 600, border: `1px solid ${statusColor}30`
+                                                                        }}>
+                                                                            {statusLabel}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div style={{ marginTop: '3px', fontSize: '0.82rem', color: 'var(--text-secondary)', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                                                                        <span><Globe size={12} style={{ verticalAlign: 'middle' }} /> {device.ip || 'Unknown IP'}</span>
+                                                                        <span><MapPin size={12} style={{ verticalAlign: 'middle' }} /> {device.location || 'Unknown'}</span>
+                                                                        <span><Calendar size={12} style={{ verticalAlign: 'middle' }} /> Last: {lastSeen}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                    <span style={{
+                                                                        fontSize: '0.8rem', fontWeight: 600, color: '#6366f1',
+                                                                        background: 'rgba(99,102,241,0.1)', padding: '3px 10px', borderRadius: '20px'
+                                                                    }}>
+                                                                        {(device.linked_browsers || []).length} browser{(device.linked_browsers || []).length !== 1 ? 's' : ''}
+                                                                    </span>
+                                                                    {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Expanded: linked browser instances */}
+                                                            {isExpanded && (
+                                                                <div style={{ borderTop: '1px solid var(--border)', padding: '12px 16px', background: 'rgba(0,0,0,0.02)' }}>
+                                                                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                                        Linked Browser Instances
+                                                                    </div>
+                                                                    {(device.linked_browsers || []).length === 0 ? (
+                                                                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>No browser instances linked yet.</div>
+                                                                    ) : (
+                                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                                            {(device.linked_browsers || []).map((b: any, bi: number) => {
+                                                                                const bStatus = b.verification_status || 'unverified';
+                                                                                const bColor = bStatus === 'verified' ? '#10b981' : bStatus === 'fingerprint' ? '#f59e0b' : '#64748b';
+                                                                                const bLabel = bStatus === 'verified' ? '🔗 Verified' : bStatus === 'fingerprint' ? '🖥 Fingerprint' : '❓ Unverified';
+                                                                                const bLastSeen = formatBDTDate(b.last_seen_at);
+                                                                                return (
+                                                                                    <div key={bi} style={{
+                                                                                        display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
+                                                                                        padding: '8px 12px', background: 'var(--card-bg)',
+                                                                                        border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.82rem'
+                                                                                    }}>
+                                                                                        <Monitor size={14} style={{ color: '#6366f1', flexShrink: 0 }} />
+                                                                                        <span style={{ fontWeight: 600, color: 'var(--text)' }}>{b.browser_name || 'Unknown'}</span>
+                                                                                        <span style={{ color: 'var(--text-secondary)' }}>{b.operating_system || ''}</span>
+                                                                                        <span style={{
+                                                                                            fontSize: '0.72rem', padding: '1px 7px', borderRadius: '20px',
+                                                                                            background: `${bColor}18`, color: bColor, border: `1px solid ${bColor}30`
+                                                                                        }}>{bLabel}</span>
+                                                                                        <span style={{ color: 'var(--text-secondary)', marginLeft: 'auto' }}>
+                                                                                            <Globe size={11} style={{ verticalAlign: 'middle' }} /> {b.ip || '—'}
+                                                                                        </span>
+                                                                                        <span style={{ color: 'var(--text-secondary)' }}>
+                                                                                            <Calendar size={11} style={{ verticalAlign: 'middle' }} /> {bLastSeen}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    )}
+                                                                    <div style={{ marginTop: '10px', fontSize: '0.75rem', color: '#94a3b8', display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                                                                        <ShieldCheck size={12} style={{ flexShrink: 0, marginTop: '2px' }} />
+                                                                        <span>Fingerprint: <code>{device.primary_fingerprint || 'N/A'}</code> — This is a probabilistic hardware hash, not a verified hardware ID.</span>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* ── Flat Browser Log View (legacy + new) ── */}
+                            {visitorViewMode === 'flat' && (
+                                <div className="visitor-table-container">
+                                    <div className="visitor-table-toolbar">
+                                        <div className="search-box">
+                                            <Search size={16} />
+                                            <input
+                                                type="text"
+                                                placeholder="Search by IP, MAC / Device ID, Location, or Browser..."
+                                                value={visitorSearch}
+                                                onChange={(e) => setVisitorSearch(e.target.value)}
+                                            />
+                                            {visitorSearch && (
+                                                <button onClick={() => setVisitorSearch('')} className="clear-search-btn" title="Clear search">
+                                                    <X size={14} />
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="visitor-table-stats">
+                                            <span className="badge-count">
+                                                <ShieldCheck size={14} /> {visitors.filter(v => {
+                                                    if (!visitorSearch.trim()) return true;
+                                                    const q = visitorSearch.toLowerCase();
+                                                    const ip = (v.ip || '').toLowerCase();
+                                                    const devId = (v.device_id || v.mac_address || '').toLowerCase();
+                                                    const loc = (v.location || v.city || v.country || '').toLowerCase();
+                                                    const dev = (v.device || v.user_agent || '').toLowerCase();
+                                                    return ip.includes(q) || devId.includes(q) || loc.includes(q) || dev.includes(q);
+                                                }).length} Unique Browser Logs
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="table-responsive-wrapper">
+                                        <table className="visitor-table">
+                                            <thead>
+                                                <tr>
+                                                    <th><div className="th-content"><Globe size={14} /> IP Address</div></th>
+                                                    <th><div className="th-content"><Cpu size={14} /> Device ID / Fingerprint</div></th>
+                                                    <th><div className="th-content"><MapPin size={14} /> Location</div></th>
+                                                    <th><div className="th-content"><Calendar size={14} /> Timestamp</div></th>
+                                                    <th><div className="th-content"><Monitor size={14} /> Browser / Status</div></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {(() => {
+                                                    const filtered = visitors.filter(v => {
+                                                        if (!visitorSearch.trim()) return true;
+                                                        const q = visitorSearch.toLowerCase();
+                                                        const ip = (v.ip || '').toLowerCase();
+                                                        const devId = (v.device_id || v.mac_address || '').toLowerCase();
+                                                        const loc = (v.location || v.city || v.country || '').toLowerCase();
+                                                        const dev = (v.device || v.user_agent || '').toLowerCase();
+                                                        return ip.includes(q) || devId.includes(q) || loc.includes(q) || dev.includes(q);
+                                                    });
+
+                                                    if (filtered.length === 0) {
+                                                        return (
+                                                            <tr>
+                                                                <td colSpan={5} className="empty-visitors-td">
+                                                                    <Users size={40} />
+                                                                    <p style={{ marginTop: '10px', fontSize: '0.95rem', fontWeight: 500 }}>
+                                                                        {visitorSearch ? 'No matching visitor logs found.' : 'No visitor logs recorded yet.'}
+                                                                    </p>
+                                                                    <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                                                        {visitorSearch ? 'Try clearing or modifying your search filter.' : 'Logs will automatically populate when unique visitors browse your portfolio.'}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    }
+
+                                                    return filtered.map((v, idx) => {
+                                                        const devId = (v.device_id && v.device_id !== 'N/A') 
+                                                            ? v.device_id 
+                                                            : (v.mac_address && v.mac_address !== 'N/A') 
+                                                                ? v.mac_address 
+                                                                : (v.ip ? `Device (${v.ip.slice(0, 8)}…)` : 'N/A');
+                                                        const loc = v.location || (v.city && v.country ? `${v.city}, ${v.country}` : (v.city || v.country || 'Unknown'));
+                                                        const dateFormatted = formatBDTDate(v.timestamp);
+                                                        const vStatus = v.verification_status || 'legacy';
+                                                        const vColor = vStatus === 'verified' ? '#10b981' : vStatus === 'fingerprint' ? '#f59e0b' : vStatus === 'legacy' ? '#64748b' : '#94a3b8';
+                                                        const vLabel = vStatus === 'verified' ? '🔗 Verified' : vStatus === 'fingerprint' ? '🖥 Fingerprint' : vStatus === 'legacy' ? '📁 Legacy' : '❓ Unverified';
+
+                                                        return (
+                                                            <tr key={v._id || v.id || idx}>
+                                                                <td className="ip-cell">
+                                                                    <span className="ip-badge">{v.ip}</span>
+                                                                </td>
+                                                                <td className="device-id-cell">
+                                                                    <span className="mac-badge" title={`Device ID: ${devId}`}>
+                                                                        <Cpu size={12} />
+                                                                        <code>{devId.length > 24 ? devId.slice(0, 24) + '…' : devId}</code>
+                                                                    </span>
+                                                                </td>
+                                                                <td className="location-cell">
+                                                                    <div className="location-wrapper">
+                                                                        <MapPin size={14} className="location-icon" />
+                                                                        <span>{loc}</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="timestamp-cell">
+                                                                    <span className="timestamp-text">{dateFormatted}</span>
+                                                                </td>
+                                                                <td className="device-details-cell" title={v.user_agent || v.device}>
+                                                                    <div className="device-wrapper">
+                                                                        <Monitor size={14} className="device-icon" />
+                                                                        <span className="device-text">{v.device || v.browser_name || v.user_agent || 'Unknown Device'}</span>
+                                                                        <span style={{
+                                                                            fontSize: '0.7rem', padding: '1px 6px', borderRadius: '20px',
+                                                                            background: `${vColor}18`, color: vColor, border: `1px solid ${vColor}30`, marginLeft: '4px'
+                                                                        }}>{vLabel}</span>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    });
+                                                })()}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
+
 
                     {activeTab === 'skills' && (
                         <div className="tab-pane cms-pane">
@@ -3066,6 +3522,159 @@ const AdminDashboard = () => {
                     .message-actions { flex-direction: column; }
                 }
             `}</style>
+
+            {isVisitorModalOpen && (
+                <div className="visitor-modal-backdrop" onClick={() => setIsVisitorModalOpen(false)}>
+                    <div className="visitor-modal-dialog" onClick={(e) => e.stopPropagation()}>
+                        <div className="visitor-modal-header">
+                            <div className="modal-title-group">
+                                <div className="modal-icon-badge"><Eye size={20} /></div>
+                                <div>
+                                    <h3>Detailed Visitor Logs</h3>
+                                    <p>Hardware Device ID & Geolocation Deduplicated Records</p>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <button onClick={() => { fetchVisitors(); fetchDevices(); }} className="btn-small btn-secondary">Refresh</button>
+                                <button onClick={() => setIsVisitorModalOpen(false)} className="modal-close-btn" aria-label="Close modal">
+                                    <X size={20} />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="visitor-modal-body">
+                            <div className="visitor-table-container">
+                                <div className="visitor-table-toolbar">
+                                    <div className="search-box">
+                                        <Search size={16} />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Search by IP, MAC / Device ID, Location, or Browser..." 
+                                            value={visitorSearch}
+                                            onChange={(e) => setVisitorSearch(e.target.value)}
+                                        />
+                                        {visitorSearch && (
+                                            <button onClick={() => setVisitorSearch('')} className="clear-search-btn" title="Clear search">
+                                                <X size={14} />
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="visitor-table-stats">
+                                        <span className="badge-count">
+                                            <ShieldCheck size={14} /> {visitors.filter(v => {
+                                                if (!visitorSearch.trim()) return true;
+                                                const q = visitorSearch.toLowerCase();
+                                                const ip = (v.ip || '').toLowerCase();
+                                                const devId = (v.device_id || v.mac_address || '').toLowerCase();
+                                                const loc = (v.location || v.city || v.country || '').toLowerCase();
+                                                const dev = (v.device || v.user_agent || '').toLowerCase();
+                                                return ip.includes(q) || devId.includes(q) || loc.includes(q) || dev.includes(q);
+                                            }).length} Unique Visitors
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="table-responsive-wrapper">
+                                    <table className="visitor-table">
+                                        <thead>
+                                            <tr>
+                                                <th><div className="th-content"><Globe size={14} /> IP Address</div></th>
+                                                <th><div className="th-content"><Cpu size={14} /> MAC / Unique Device ID</div></th>
+                                                <th><div className="th-content"><MapPin size={14} /> Location</div></th>
+                                                <th><div className="th-content"><Calendar size={14} /> Timestamp</div></th>
+                                                <th><div className="th-content"><Monitor size={14} /> Device / Browser</div></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {(() => {
+                                                const filtered = visitors.filter(v => {
+                                                    if (!visitorSearch.trim()) return true;
+                                                    const q = visitorSearch.toLowerCase();
+                                                    const ip = (v.ip || '').toLowerCase();
+                                                    const devId = (v.device_id || v.mac_address || '').toLowerCase();
+                                                    const loc = (v.location || v.city || v.country || '').toLowerCase();
+                                                    const dev = (v.device || v.user_agent || '').toLowerCase();
+                                                    return ip.includes(q) || devId.includes(q) || loc.includes(q) || dev.includes(q);
+                                                });
+
+                                                if (filtered.length === 0) {
+                                                    return (
+                                                        <tr>
+                                                            <td colSpan={5} className="empty-visitors-td">
+                                                                <Users size={36} />
+                                                                <p style={{ marginTop: '8px', fontSize: '0.9rem' }}>
+                                                                    {visitorSearch ? 'No matching visitor logs found.' : 'No visitor logs recorded yet.'}
+                                                                </p>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+
+                                                return filtered.map((v, idx) => {
+                                                    const devId = (v.device_id && v.device_id !== 'N/A') 
+                                                        ? v.device_id 
+                                                        : (v.mac_address && v.mac_address !== 'N/A') 
+                                                            ? v.mac_address 
+                                                            : (v.ip ? `Device (${v.ip.slice(0, 8)}…)` : 'N/A');
+                                                    const loc = v.location || (v.city && v.country ? `${v.city}, ${v.country}` : (v.city || v.country || 'Unknown'));
+                                                    const dateFormatted = formatBDTDate(v.timestamp);
+                                                    const vStatus = v.verification_status || 'legacy';
+                                                    const vColor = vStatus === 'verified' ? '#10b981' : vStatus === 'fingerprint' ? '#f59e0b' : vStatus === 'legacy' ? '#64748b' : '#94a3b8';
+                                                    const vLabel = vStatus === 'verified' ? '🔗 Verified' : vStatus === 'fingerprint' ? '🖥 Fingerprint' : vStatus === 'legacy' ? '📁 Legacy' : '❓ Unverified';
+
+                                                    return (
+                                                        <tr key={v._id || v.id || idx}>
+                                                            <td className="ip-cell">
+                                                                <span className="ip-badge">{v.ip}</span>
+                                                            </td>
+                                                            <td className="device-id-cell">
+                                                                <span className="mac-badge" title={`Hardware Device ID: ${devId}`}>
+                                                                    <Cpu size={12} />
+                                                                    <code>{devId.length > 24 ? devId.slice(0, 24) + '…' : devId}</code>
+                                                                </span>
+                                                            </td>
+                                                            <td className="location-cell">
+                                                                <div className="location-wrapper">
+                                                                    <MapPin size={14} className="location-icon" />
+                                                                    <span>{loc}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="timestamp-cell">
+                                                                <span className="timestamp-text">{dateFormatted}</span>
+                                                            </td>
+                                                            <td className="device-details-cell" title={v.user_agent || v.device}>
+                                                                <div className="device-wrapper">
+                                                                    <Monitor size={14} className="device-icon" />
+                                                                    <span className="device-text">{v.device || v.browser_name || v.user_agent || 'Unknown Device'}</span>
+                                                                    <span style={{
+                                                                        fontSize: '0.7rem', padding: '1px 6px', borderRadius: '20px',
+                                                                        background: `${vColor}18`, color: vColor, border: `1px solid ${vColor}30`, marginLeft: '4px'
+                                                                    }}>{vLabel}</span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                });
+                                            })()}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="visitor-modal-footer">
+                            <button 
+                                onClick={() => {
+                                    setIsVisitorModalOpen(false);
+                                    setActiveTab('visitors');
+                                }} 
+                                className="btn btn-primary"
+                                style={{ fontSize: '0.88rem', padding: '8px 16px' }}
+                            >
+                                Open Full Tab View &rarr;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
