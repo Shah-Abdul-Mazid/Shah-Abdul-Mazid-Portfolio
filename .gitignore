@@ -7,6 +7,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+Shah_Abdul_Mazid.code-workspace
+
+
 # Node / Frontend build
 node_modules/
 dist/
