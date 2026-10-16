@@ -6,10 +6,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-Shah_Abdul_Mazid.code-workspace
-
-
 # Node / Frontend build
 node_modules/
 dist/
@@ -70,6 +66,8 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+*.code-workspace
+Shah_Abdul_Mazid.code-workspace
 
 # Large unoptimized source images — use WebP in src/assets/ instead
 # (public/ folder images like badges, PWA icons, and resume photos are kept)
