@@ -518,6 +518,60 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleSetCanonicalMac = async (targetDeviceId?: string) => {
+        let defaultMac = localStorage.getItem('portfolio_physical_mac') || 'F0:20:FF:40:68:A7';
+        // Try to query local daemon first if on localhost or available
+        try {
+            const controller = new AbortController();
+            const tid = setTimeout(() => controller.abort(), 600);
+            const res = await fetch('http://127.0.0.1:48123/device', { signal: controller.signal });
+            clearTimeout(tid);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.mac_address) {
+                    defaultMac = data.mac_address;
+                    localStorage.setItem('portfolio_physical_mac', defaultMac);
+                }
+            }
+        } catch {}
+
+        const userMac = window.prompt(
+            'Enter or confirm physical MAC address for this device:',
+            defaultMac
+        );
+        if (!userMac || !userMac.trim()) return;
+
+        const cleanMac = userMac.trim().toUpperCase();
+        try {
+            const token = localStorage.getItem('admin_token');
+            const res = await fetch('/api/analytics/set-canonical-mac', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    canonical_device_id: targetDeviceId || '',
+                    mac_address: cleanMac,
+                    device_name: 'Intel(R) Wi-Fi 6E AX211 (Ezan)'
+                })
+            });
+
+            if (res.ok) {
+                localStorage.setItem('portfolio_physical_mac', cleanMac);
+                showNotification(`✅ Physical MAC ${cleanMac} successfully bound to device!`);
+                await fetchDevices();
+                await fetchVisitors();
+            } else {
+                const err = await res.json().catch(() => ({}));
+                showNotification(`❌ ${err.detail || 'Failed to set MAC address'}`);
+            }
+        } catch (err) {
+            console.error(err);
+            showNotification('❌ Failed to update MAC address');
+        }
+    };
+
     const handleClearVisitors = async () => {
         if (!window.confirm('Are you sure you want to permanently clear all visitor logs and reset view count?')) {
             return;
@@ -1945,19 +1999,33 @@ const AdminDashboard = () => {
                                         </div>
                                     )}
                                 </div>
-                                <button
-                                    onClick={generateLinkToken}
-                                    disabled={linkTokenLoading}
-                                    style={{
-                                        padding: '9px 18px', borderRadius: '8px', border: '1px solid rgba(99,102,241,0.4)',
-                                        background: 'rgba(99,102,241,0.12)', color: '#818cf8', cursor: linkTokenLoading ? 'not-allowed' : 'pointer',
-                                        fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px',
-                                        whiteSpace: 'nowrap', opacity: linkTokenLoading ? 0.7 : 1
-                                    }}
-                                >
-                                    <Link2 size={15} />
-                                    {linkTokenLoading ? 'Generating…' : 'Generate Link Token'}
-                                </button>
+                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                    <button
+                                        onClick={() => handleSetCanonicalMac()}
+                                        style={{
+                                            padding: '9px 16px', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.4)',
+                                            background: 'rgba(16,185,129,0.12)', color: '#10b981', cursor: 'pointer',
+                                            fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                        title="Bind this device's physical Wi-Fi/Ethernet MAC address"
+                                    >
+                                        <ShieldCheck size={15} /> Set Hardware MAC
+                                    </button>
+                                    <button
+                                        onClick={generateLinkToken}
+                                        disabled={linkTokenLoading}
+                                        style={{
+                                            padding: '9px 18px', borderRadius: '8px', border: '1px solid rgba(99,102,241,0.4)',
+                                            background: 'rgba(99,102,241,0.12)', color: '#818cf8', cursor: linkTokenLoading ? 'not-allowed' : 'pointer',
+                                            fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px',
+                                            whiteSpace: 'nowrap', opacity: linkTokenLoading ? 0.7 : 1
+                                        }}
+                                    >
+                                        <Link2 size={15} />
+                                        {linkTokenLoading ? 'Generating…' : 'Generate Link Token'}
+                                    </button>
+                                </div>
                             </div>
 
                             {/* ── Canonical Device Registry View ── */}
@@ -2000,6 +2068,8 @@ const AdminDashboard = () => {
                                                     return (
                                                         (d.ip || '').toLowerCase().includes(q) ||
                                                         (d.primary_fingerprint || '').toLowerCase().includes(q) ||
+                                                        (d.mac_address || '').toLowerCase().includes(q) ||
+                                                        (d.device_name || '').toLowerCase().includes(q) ||
                                                         (d.location || '').toLowerCase().includes(q) ||
                                                         (d.linked_browsers || []).some((b: any) => (b.browser_name || '').toLowerCase().includes(q) || (b.device || '').toLowerCase().includes(q))
                                                     );
@@ -2010,6 +2080,7 @@ const AdminDashboard = () => {
                                                     const statusColor = status === 'verified' ? '#10b981' : status === 'fingerprint' ? '#f59e0b' : '#64748b';
                                                     const statusLabel = status === 'verified' ? '🔗 Verified' : status === 'fingerprint' ? '🖥 Fingerprint' : '❓ Unverified';
                                                     const lastSeen = formatBDTDate(device.last_seen_at);
+                                                    const displayMac = device.primary_fingerprint || device.mac_address || (device.canonical_device_id || '').slice(0, 18) + '…';
 
                                                     return (
                                                         <div key={device.canonical_device_id || idx} style={{
@@ -2039,23 +2110,43 @@ const AdminDashboard = () => {
                                                                 </div>
                                                                 <div style={{ flex: 1, minWidth: '180px' }}>
                                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                                                        <code style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                                                                            {(device.canonical_device_id || '').slice(0, 18)}…
-                                                                        </code>
+                                                                        <strong style={{ fontSize: '0.92rem', color: 'var(--text)', fontFamily: 'monospace' }}>
+                                                                            {displayMac}
+                                                                        </strong>
                                                                         <span style={{
                                                                             fontSize: '0.72rem', padding: '2px 8px', borderRadius: '20px',
                                                                             background: `${statusColor}18`, color: statusColor, fontWeight: 600, border: `1px solid ${statusColor}30`
                                                                         }}>
                                                                             {statusLabel}
                                                                         </span>
+                                                                        {device.device_name && (
+                                                                            <span style={{ fontSize: '0.75rem', color: '#818cf8', fontWeight: 600, background: 'rgba(99,102,241,0.1)', padding: '2px 8px', borderRadius: '6px' }}>
+                                                                                {device.device_name}
+                                                                            </span>
+                                                                        )}
                                                                     </div>
                                                                     <div style={{ marginTop: '3px', fontSize: '0.82rem', color: 'var(--text-secondary)', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                                                                        <span><Cpu size={12} style={{ verticalAlign: 'middle' }} /> UUID: {(device.canonical_device_id || '').slice(0, 10)}…</span>
                                                                         <span><Globe size={12} style={{ verticalAlign: 'middle' }} /> {device.ip || 'Unknown IP'}</span>
                                                                         <span><MapPin size={12} style={{ verticalAlign: 'middle' }} /> {device.location || 'Unknown'}</span>
                                                                         <span><Calendar size={12} style={{ verticalAlign: 'middle' }} /> Last: {lastSeen}</span>
                                                                     </div>
                                                                 </div>
                                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleSetCanonicalMac(device.canonical_device_id);
+                                                                        }}
+                                                                        title="Set / Edit Physical MAC Address"
+                                                                        style={{
+                                                                            padding: '4px 9px', borderRadius: '6px', border: '1px solid var(--border)',
+                                                                            background: 'var(--card-bg)', color: 'var(--text-secondary)', cursor: 'pointer',
+                                                                            fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px'
+                                                                        }}
+                                                                    >
+                                                                        <Cpu size={12} /> Set MAC
+                                                                    </button>
                                                                     <span style={{
                                                                         fontSize: '0.8rem', fontWeight: 600, color: '#6366f1',
                                                                         background: 'rgba(99,102,241,0.1)', padding: '3px 10px', borderRadius: '20px'

@@ -220,20 +220,28 @@ async def register_browser(
         )
 
         if existing_browser:
-            # Update last_seen and ip
+            # Update last_seen, ip, and hardware fingerprint if provided
+            browser_update = {"last_seen_at": now, "ip": ip, "user_agent": user_agent}
+            canonical_update = {"last_seen_at": now, "ip": ip}
+            if hardware_fingerprint:
+                browser_update["hardware_fingerprint"] = hardware_fingerprint
+                canonical_update["primary_fingerprint"] = hardware_fingerprint
+                canonical_update["mac_address"] = hardware_fingerprint
+
             await db["browser_instances"].update_one(
                 {"browser_instance_id": browser_instance_id},
-                {"$set": {"last_seen_at": now, "ip": ip, "user_agent": user_agent}}
+                {"$set": browser_update}
             )
-            # Also update the canonical device's last_seen
+            # Also update the canonical device's last_seen and fingerprint
             await db["canonical_devices"].update_one(
                 {"canonical_device_id": existing_browser["canonical_device_id"]},
-                {"$set": {"last_seen_at": now, "ip": ip}}
+                {"$set": canonical_update}
             )
             return {
                 "browser_instance_id": browser_instance_id,
                 "canonical_device_id": existing_browser["canonical_device_id"],
                 "verification_status": existing_browser.get("verification_status", "unverified"),
+                "mac_address": hardware_fingerprint or existing_browser.get("hardware_fingerprint", ""),
                 "is_new_browser": False,
                 "is_new_device": False
             }
@@ -716,6 +724,7 @@ async def get_canonical_devices(
 
     async for device in cursor:
         device["_id"] = str(device["_id"])
+        device["mac_address"] = device.get("primary_fingerprint") or device.get("mac_address") or ""
 
         # Fetch linked browser instances for this canonical device
         browsers = []
@@ -724,6 +733,7 @@ async def get_canonical_devices(
         ).sort("last_seen_at", -1)
         async for b in browser_cursor:
             b["_id"] = str(b["_id"])
+            hw_mac = b.get("hardware_fingerprint") or device.get("primary_fingerprint") or ""
             browsers.append({
                 "browser_instance_id": b.get("browser_instance_id", ""),
                 "browser_name": b.get("browser_name", "Unknown"),
@@ -734,6 +744,8 @@ async def get_canonical_devices(
                 "last_seen_at": b.get("last_seen_at", ""),
                 "verification_status": b.get("verification_status", "unverified"),
                 "identification_method": b.get("identification_method", "new"),
+                "mac_address": hw_mac,
+                "hardware_fingerprint": hw_mac,
             })
 
         device["linked_browsers"] = browsers
@@ -741,6 +753,79 @@ async def get_canonical_devices(
         devices.append(device)
 
     return devices
+
+
+@router.post("/set-canonical-mac")
+async def set_canonical_mac(
+    request: Request,
+    admin=Depends(get_admin_user),
+    db=Depends(get_database),
+):
+    """
+    Admin: Bind or update a canonical device's physical MAC address (e.g. F0:20:FF:40:68:A7).
+    Propagates the physical MAC to canonical device and all linked browser instances.
+    """
+    body = await request.json()
+    canonical_device_id = body.get("canonical_device_id", "").strip()
+    mac_address = body.get("mac_address", "").strip().upper()
+    device_name = body.get("device_name", "").strip()
+
+    if not mac_address:
+        raise HTTPException(status_code=400, detail="mac_address is required")
+
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
+    now = get_utc_iso()
+
+    # Find the target device
+    filter_query = {"canonical_device_id": canonical_device_id} if canonical_device_id else {}
+    target_device = await db["canonical_devices"].find_one(filter_query, sort=[("last_seen_at", -1)])
+
+    if not target_device:
+        canonical_device_id = canonical_device_id or str(uuid.uuid4())
+        target_device = {
+            "canonical_device_id": canonical_device_id,
+            "primary_fingerprint": mac_address,
+            "mac_address": mac_address,
+            "device_name": device_name or "Intel(R) Wi-Fi 6E AX211",
+            "linked_browser_count": 0,
+            "first_seen_at": now,
+            "last_seen_at": now,
+            "verification_status": "verified"
+        }
+        await db["canonical_devices"].insert_one(target_device)
+    else:
+        canonical_device_id = target_device["canonical_device_id"]
+        update_fields = {
+            "primary_fingerprint": mac_address,
+            "mac_address": mac_address,
+            "verification_status": "verified",
+            "last_seen_at": now
+        }
+        if device_name:
+            update_fields["device_name"] = device_name
+        await db["canonical_devices"].update_one(
+            {"canonical_device_id": canonical_device_id},
+            {"$set": update_fields}
+        )
+
+    # Propagate physical MAC to all browser instances under this canonical device
+    await db["browser_instances"].update_many(
+        {"canonical_device_id": canonical_device_id},
+        {"$set": {
+            "hardware_fingerprint": mac_address,
+            "verification_status": "verified",
+            "last_seen_at": now
+        }}
+    )
+
+    return {
+        "success": True,
+        "canonical_device_id": canonical_device_id,
+        "mac_address": mac_address,
+        "message": f"Successfully updated physical MAC address to {mac_address}"
+    }
 
 
 @router.get("")
@@ -779,17 +864,24 @@ async def get_visitors_list(
     async for b in browser_cursor:
         b["_id"] = str(b["_id"])
         b["id"] = b["_id"]
-        b["device_id"] = b.get("hardware_fingerprint") or b.get("browser_instance_id", "N/A")
-        b["mac_address"] = b["device_id"]
-        b["location"] = ""
-        # Try to get location from the canonical device
+        
+        # Look up canonical device to inherit primary physical MAC and location
         canonical = await db["canonical_devices"].find_one(
             {"canonical_device_id": b.get("canonical_device_id")}
         )
+        hw_mac = b.get("hardware_fingerprint")
+        if (not hw_mac or len(hw_mac) < 10) and canonical:
+            hw_mac = canonical.get("primary_fingerprint") or canonical.get("mac_address")
+
+        b["device_id"] = hw_mac or b.get("browser_instance_id", "N/A")
+        b["mac_address"] = b["device_id"]
+        b["location"] = ""
         if canonical:
             b["location"] = canonical.get("location") or f"{canonical.get('city', '')}, {canonical.get('country', '')}".strip(", ")
             if not b.get("ip"):
                 b["ip"] = canonical.get("ip", "")
+            if canonical.get("device_name"):
+                b["device_name"] = canonical.get("device_name")
         b["timestamp"] = b.get("last_seen_at", b.get("first_seen_at", ""))
         b["canonical_device_id"] = b.get("canonical_device_id", "")
         b["browser_name"] = b.get("browser_name", "Unknown")

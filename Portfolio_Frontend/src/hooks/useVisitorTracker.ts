@@ -63,15 +63,11 @@ export const useVisitorTracker = () => {
 
                 const hasTrackedSession = sessionStorage.getItem('portfolio_visited');
 
-                // Check if this browser has been registered (canonical_device_id stored)
-                const storedCanonicalId = localStorage.getItem('portfolio_canonical_id');
-                const isRegistered = !!storedCanonicalId;
-
                 const hardwareFingerprint = await getDeviceIdentifier();
                 const deviceInfo = getDeviceInfo();
 
-                // Step 1: Register browser if not yet registered
-                if (!isRegistered) {
+                // Step 1: Register/sync browser instance (idempotent on backend)
+                try {
                     const regRes = await fetch('/api/analytics/register-browser', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -89,11 +85,16 @@ export const useVisitorTracker = () => {
                         if (regData.canonical_device_id) {
                             try {
                                 localStorage.setItem('portfolio_canonical_id', regData.canonical_device_id);
-                            } catch {
-                                // localStorage might be unavailable — continue anyway
-                            }
+                            } catch {}
+                        }
+                        if (regData.mac_address) {
+                            try {
+                                localStorage.setItem('portfolio_physical_mac', regData.mac_address);
+                            } catch {}
                         }
                     }
+                } catch (regErr) {
+                    console.warn('Browser registration warning:', regErr);
                 }
 
                 // Step 2: Record this visit session (once per session)
