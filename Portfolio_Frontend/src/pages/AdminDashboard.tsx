@@ -302,6 +302,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         if (localStorage.getItem('admin_auth') !== 'true') {
             navigate('/login/admin');
+        } else {
             fetchRealTimeData();
         }
     }, [navigate]);
