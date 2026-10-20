@@ -1,7 +1,7 @@
-﻿﻿﻿﻿import { useEffect, useRef, useState } from 'react';
+﻿﻿﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles, CheckCircle2, ChevronDown, ChevronUp, Layers, MapPin, Monitor, Cpu, Search, X, Globe, ShieldCheck, Zap, User, GraduationCap, Briefcase, Rocket, Brain, ScrollText, Medal, BookOpen, Handshake, PenLine, Award, MessageSquare, Contact, ExternalLink, LogOut, Moon } from 'lucide-react';
+import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles, CheckCircle2, ChevronDown, ChevronUp, Layers, MapPin, Monitor, Cpu, Search, X, Globe, ShieldCheck, Zap, User, GraduationCap, Briefcase, Rocket, ScrollText, Medal, BookOpen, Handshake, PenLine, Award, MessageSquare, Contact, ExternalLink, LogOut, Moon } from 'lucide-react';
 import type { EducationItem, ExperienceItem, WorkItem, ProjectItem, PaperItem, SkillCategory } from '../context/PortfolioContext';
 import './AdminDashboard.css';
 
