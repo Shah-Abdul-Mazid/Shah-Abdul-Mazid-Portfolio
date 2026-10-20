@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { atsCvData } from '../../../data/atsCvData';
 import './ats-cv.css';
 
@@ -74,6 +74,7 @@ export const ATSCV: React.FC = () => {
                         <div className="ats-item-sub">{edu.institution}, {edu.location}</div>
                         {edu.major && <div className="ats-small-desc">• {edu.major}</div>}
                         {edu.details && !edu.major && <div className="ats-small-desc">• {edu.details}</div>}
+                        {edu.result && <div className="ats-small-desc">• Result: {edu.result}</div>}
                     </div>
                 ))}
             </section>

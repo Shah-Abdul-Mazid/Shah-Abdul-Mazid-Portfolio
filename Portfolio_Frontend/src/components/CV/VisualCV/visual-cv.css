@@ -1,4 +1,4 @@
-/* =========================================================
+﻿/* =========================================================
    VISUAL CV (VERSION 2) — Pixel-accurate to Overleaf LaTeX
    Standard A4 Dimensions: 210mm x 297mm (strictly enforced)
    Page Margins: top=10mm, bottom=10mm, left=11mm, right=11mm
@@ -216,7 +216,7 @@
 }
 
 #cv-page-1 .v2-edu-item {
-  margin-bottom: 6mm;
+  margin-bottom: 3.5mm;
 }
 
 #cv-page-1 .v2-edu-item:last-child {

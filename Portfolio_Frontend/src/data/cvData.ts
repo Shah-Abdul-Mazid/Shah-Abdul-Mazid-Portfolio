@@ -1,4 +1,4 @@
-﻿﻿export interface CVSkillCategory {
+﻿﻿﻿﻿export interface CVSkillCategory {
     category: string;
     items: string[];
 }
@@ -8,6 +8,9 @@ export interface CVEducationItem {
     institution: string;
     period: string;
     details: string;
+    result?: string;
+    major?: string;
+    group?: string;
 }
 
 export interface CVExperienceItem {
@@ -115,19 +118,25 @@ export const cvData: CVData = {
             degree: "B.Sc. in Computer Science & Engineering",
             institution: "East West University",
             period: "2021–2026",
-            details: "Major: Intelligent Systems & Data Science | GPA: 2.56",
+            major: "Major: Intelligent Systems & Data Science",
+            result: "2.56",
+            details: "Major: Intelligent Systems & Data Science",
         },
         {
             degree: "Higher Secondary Certificate",
             institution: "Dhaka Ideal College",
             period: "2018–2020",
-            details: "Science | GPA: 4.08",
+            group: "Science",
+            result: "4.08",
+            details: "Group: Science",
         },
         {
             degree: "Secondary School Certificate",
             institution: "Badshah Faisal Institute",
             period: "2016–2018",
-            details: "Science | GPA: 4.00",
+            group: "Science",
+            result: "4.00",
+            details: "Group: Science",
         },
     ],
     languages: [

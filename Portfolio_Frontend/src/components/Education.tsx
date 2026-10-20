@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿﻿import { useState } from 'react';
 import type { MouseEvent } from 'react';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { FileText, ExternalLink, Link as LinkIcon } from 'lucide-react';
@@ -30,7 +30,15 @@ const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void 
                     </h2>
                 </div>
                 <div className="card-stack">
-                    {education.map((item, index) => (
+                    {education.map((item, index) => {
+                        const isBSc = item.degree.toLowerCase().includes("b.sc") || item.degree.toLowerCase().includes("bachelor");
+                        const eduResult = item.result || (
+                            isBSc ? "2.56" :
+                            (item.degree.toLowerCase().includes("higher secondary") || item.degree.toLowerCase().includes("hsc")) ? "4.08" :
+                            (item.degree.toLowerCase().includes("secondary school") || item.degree.toLowerCase().includes("ssc")) ? "4.00" : ""
+                        );
+                        const displayMajor = !isBSc && (item.major?.toLowerCase() === "science" || item.major?.toLowerCase() === "group: science") ? "Group: Science" : item.major;
+                        return (
                         <div key={index} className="unified-card fade-in" ref={addToRefs}>
                             <div className="card-header">
                                 <div className="card-header-left">
@@ -46,8 +54,8 @@ const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void 
                                 </div>
                                 <div className="card-meta">
                                     <span className="card-period">{item.year}</span>
-                                    <span className="card-duration">{item.major}</span>
-                                    {item.result && <span className="card-result">GPA: {item.result}</span>}
+                                    <span className="card-duration">{displayMajor}</span>
+                                    {eduResult && <span className="card-result">Result: {eduResult}</span>}
                                 </div>
                             </div>
                             <div className="card-body">
@@ -76,7 +84,8 @@ const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void 
                                 )}
                             </div>
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
 

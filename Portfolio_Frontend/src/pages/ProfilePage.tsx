@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import FloatingContactForm from "../components/FloatingContactForm";
@@ -327,8 +327,18 @@ const ProfilePage = () => {
                         <h3 className="timeline-title">{item.degree}</h3>
                         <p className="timeline-institution">{item.school}</p>
                         {item.major && (
-                          <p className="timeline-desc">{item.major}</p>
+                          <p className="timeline-desc">
+                            {!isBSc && (item.major.toLowerCase() === 'science' || item.major.toLowerCase() === 'group: science') ? 'Group: Science' : item.major}
+                          </p>
                         )}
+                        {(() => {
+                          const res = item.result || (
+                            isBSc ? '2.56' :
+                            (item.degree.toLowerCase().includes('higher secondary') || item.degree.toLowerCase().includes('hsc')) ? '4.08' :
+                            (item.degree.toLowerCase().includes('secondary school') || item.degree.toLowerCase().includes('ssc')) ? '4.00' : ''
+                          );
+                          return res ? <p className="timeline-result" style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--accent, #f97316)', marginTop: '4px' }}>Result: {res}</p> : null;
+                        })()}
 
                         {/* Major Academic Highlights for B.Sc. */}
                         {isBSc && (

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+﻿import React, { useMemo } from 'react';
 import { MapPin, Mail, Phone, Linkedin, Github, GraduationCap } from 'lucide-react';
 import { visualCvData } from '../../../data/visualCvData';
 import { usePortfolio } from '../../../context/PortfolioContext';
@@ -159,17 +159,28 @@ export const VisualCV: React.FC = () => {
                         {/* Education */}
                         <div className="v2-sec-block">
                             <h3 className="v2-sec-heading">Education</h3>
-                            {education.map((edu, i) => (
+                            {education.map((edu, i) => {
+                                const isBSc = edu.degree.toLowerCase().includes("b.sc") || edu.degree.toLowerCase().includes("bachelor");
+                                const eduResult = (edu as any).result || (
+                                    isBSc ? "2.56" :
+                                    (edu.degree.toLowerCase().includes("higher secondary") || edu.degree.toLowerCase().includes("hsc")) ? "4.08" :
+                                    (edu.degree.toLowerCase().includes("secondary school") || edu.degree.toLowerCase().includes("ssc")) ? "4.00" : ""
+                                );
+                                const groupOrMajor = isBSc ? "Major: Intelligent Systems & Data Science" : "Group: Science";
+                                return (
                                 <div key={i} className="v2-edu-item">
-                                    <div className="v2-edu-degree">{edu.degree}</div>
                                     <div className="v2-edu-row">
-                                        <span className="v2-edu-inst">{edu.institution}</span>
+                                        <span className="v2-edu-degree">{edu.degree}</span>
                                         <span className="v2-edu-period">{edu.period}</span>
                                     </div>
-                                    <div className="v2-edu-details">{edu.details}</div>
+                                    <div className="v2-edu-inst">{edu.institution}</div>
+                                    <div className="v2-edu-details">{groupOrMajor}</div>
+                                    {eduResult && <div className="v2-edu-details">Result: {eduResult}</div>}
                                 </div>
-                            ))}
+                                );
+                            })}
                         </div>
+                        
 
                         {/* Languages — Anchored so bottom aligns with right column */}
                         <div className="v2-sec-block v2-lang-block">
