@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react';
+﻿﻿﻿import { useRef, useState, useMemo } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { Download, Loader, CheckCircle2, AlertCircle, Info, X, Zap, Mail, MapPin, Globe, Briefcase, Eye, FileDown, Phone, Linkedin, Github } from 'lucide-react';
 // @ts-ignore
@@ -335,7 +335,7 @@ const Resume = () => {
                                         <div key={i} className="rv-item">
                                             <div className="rv-item-top"><span className="rv-bold">{e.degree}</span><span className="rv-meta">{e.year}</span></div>
                                             <div className="rv-item-sub"><span className="rv-muted">{e.school}</span><span className="rv-meta">Dhaka, Bangladesh</span></div>
-                                            {e.major && <p className="rv-sm" style={{ color: '#4b5563', fontStyle: 'italic', fontSize: '11.5px', marginTop: '2px' }}>• {e.major}</p>}
+                                            {e.major && <p className="rv-sm" style={{ color: '#4b5563', fontStyle: 'italic', fontSize: '11.5px', marginTop: '2px' }}>• {e.major}{e.result ? ` | Result: ${e.result}` : ''}</p>}
                                         </div>
                                     ))}
                                 </div>
@@ -507,16 +507,19 @@ const Resume = () => {
                                             <div className="v2-bold">B.Sc. in Computer Science & Engineering</div>
                                             <div className="v2-sub">East West University <span className="v2-right-date">2021–2026</span></div>
                                             <div className="v2-small">Major: Intelligent Systems & Data Science</div>
+                                            <div className="v2-small">Result: 2.56</div>
                                         </div>
                                         <div className="v2-item">
                                             <div className="v2-bold">Higher Secondary Certificate</div>
                                             <div className="v2-sub">Dhaka Ideal College <span className="v2-right-date">2018–2020</span></div>
-                                            <div className="v2-small">Science</div>
+                                            <div className="v2-small">Group: Science</div>
+                                            <div className="v2-small">Result: 4.08</div>
                                         </div>
                                         <div className="v2-item">
                                             <div className="v2-bold">Secondary School Certificate</div>
                                             <div className="v2-sub">Badshah Faisal Institute <span className="v2-right-date">2016–2018</span></div>
-                                            <div className="v2-small">Science</div>
+                                            <div className="v2-small">Group: Science</div>
+                                            <div className="v2-small">Result: 4.00</div>
                                         </div>
                                     </div>
 

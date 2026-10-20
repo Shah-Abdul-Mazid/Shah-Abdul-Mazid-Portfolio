@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+﻿﻿import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { GITHUB_URL, SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL } from '../constants/researchLinks';
 import { CANONICAL_CREDENTIALS } from '../data/certificationData';
 
@@ -709,9 +709,9 @@ const defaultData: PortfolioData = {
         }
     ],
     education: [
-        { degree: 'B.Sc. in Computer Science & Engineering', school: 'East West University', year: '2021 â€“ 2026', major: 'Major: Intelligent Systems & Data Science' },
-        { degree: 'Higher Secondary Certificate (HSC)', school: 'Dhaka Ideal College', year: '2018 â€“ 2020', major: 'Science' },
-        { degree: 'Secondary School Certificate (SSC)', school: 'Badshah Faisal Institute', year: '2016 â€“ 2018', major: 'Science' }
+        { degree: 'B.Sc. in Computer Science & Engineering', school: 'East West University', year: '2021 – 2026', major: 'Major: Intelligent Systems & Data Science', result: '2.56' },
+        { degree: 'Higher Secondary Certificate (HSC)', school: 'Dhaka Ideal College', year: '2018 – 2020', major: 'Science', result: '4.08' },
+        { degree: 'Secondary School Certificate (SSC)', school: 'Badshah Faisal Institute', year: '2016 – 2018', major: 'Science', result: '4.00' }
     ],
     experience: [
         { role: 'Network War', company: 'EWU Telecommunication Club', period: '2024', desc: 'Participated in the specialized networking competition.', certificateUrl: '/data/work-certificate.png' },

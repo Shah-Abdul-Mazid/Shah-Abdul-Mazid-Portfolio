@@ -1,4 +1,4 @@
-﻿﻿import { useEffect, useRef, useState } from 'react';
+﻿﻿﻿﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
 import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles, CheckCircle2, ChevronDown, ChevronUp, Layers, MapPin, Monitor, Cpu, Search, X, Globe, ShieldCheck } from 'lucide-react';
@@ -1908,12 +1908,6 @@ const AdminDashboard = () => {
                                     </div>
                                     <div className="flex-group">
                                         <div className="form-group w-50">
-                                            <label>Result / GPA</label>
-                                            <input type="text" value={item.result || ''} placeholder="e.g. 3.85 / 4.00" onChange={e => updateListItem('education', i, 'result', e.target.value)} />
-                                        </div>
-                                    </div>
-                                    <div className="flex-group">
-                                        <div className="form-group w-50">
                                             <FileUploadInput 
                                                 label="Achievement Logo" 
                                                 value={item.logoUrl || ''} 
@@ -2768,12 +2762,6 @@ const AdminDashboard = () => {
                                         <div className="form-group w-50">
                                             <label>Keywords (semi-colon separated)</label>
                                             <input type="text" value={paper.keywords} onChange={e => updateListItem('papers', i, 'keywords', e.target.value)} />
-                                        </div>
-                                    </div>
-                                    <div className="flex-group">
-                                        <div className="form-group w-50">
-                                            <label>Result / GPA</label>
-                                            <input type="text" value={item.result || ''} placeholder="e.g. 3.85 / 4.00" onChange={e => updateListItem('education', i, 'result', e.target.value)} />
                                         </div>
                                     </div>
                                     <div className="flex-group">
