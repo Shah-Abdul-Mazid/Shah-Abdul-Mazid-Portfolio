@@ -970,16 +970,16 @@ const AdminDashboard = () => {
                     const result = await res.json();
                     if (result.success) {
                         onUpload(result.url);
-                        showNotification('âœ¨ File uploaded successfully!');
+                        showNotification('✨ File uploaded successfully!');
                     } else {
                         showNotification(`✅ ${result.message}`);
                     }
                 } else {
-                    showNotification('âŒ Connection failed during file upload');
+                    showNotification('❌ Connection failed during file upload');
                 }
             } catch (err) {
                 console.error('Upload failed:', err);
-                showNotification('âŒ Connection failed during file upload');
+                showNotification('❌ Connection failed during file upload');
             } finally {
                 setUploading(false);
             }
@@ -1092,7 +1092,7 @@ const AdminDashboard = () => {
 
         const uploadFile = async (file: File) => {
             if (!file.type.startsWith('image/')) {
-                showNotification('âŒ Please upload an image file (PNG, SVG, JPG)');
+                showNotification('❌ Please upload an image file (PNG, SVG');
                 return;
             }
             setUploading(true);
@@ -1114,10 +1114,10 @@ const AdminDashboard = () => {
                         showNotification(`✅ ${result.message}`);
                     }
                 } else {
-                    showNotification('âŒ Upload connection failed');
+                    showNotification('❌ Upload connection failed');
                 }
             } catch {
-                showNotification('âŒ Upload connection failed');
+                showNotification('❌ Upload connection failed');
             } finally {
                 setUploading(false);
             }
@@ -1135,7 +1135,7 @@ const AdminDashboard = () => {
         const fetchImageFromCredly = async (targetUrl?: string) => {
             const link = targetUrl || publicUrl;
             if (!link || !link.includes('credly.com')) {
-                showNotification('âš ï¸ Please enter a valid Credly badge public URL first');
+                showNotification('⚠️ Please enter a valid Credly badge');
                 return;
             }
             setFetchingCredly(true);
@@ -1145,12 +1145,12 @@ const AdminDashboard = () => {
                 if (data.success && data.imageUrl) {
                     onUpload(data.imageUrl);
                     setUrlInput(data.imageUrl);
-                    showNotification('âœ¨ Badge image auto-fetched from Credly!');
+                    showNotification('✨ Badge image auto-fetched from Credly');
                 } else {
                     showNotification(`âš ï¸ Could not auto-detect image: ${data.error || 'Check URL'}`);
                 }
             } catch {
-                showNotification('âŒ Failed to connect to Credly fetch service');
+                showNotification('❌ Failed to connect to Credly fetch se');
             } finally {
                 setFetchingCredly(false);
             }
@@ -1224,7 +1224,7 @@ const AdminDashboard = () => {
                                     ) : dragOver ? (
                                         <span style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}>Drop badge here!</span>
                                     ) : value ? (
-                                        <span style={{ fontSize: '0.8rem', color: '#10b981' }}>âœ… Badge uploaded â€” drop or click to replace</span>
+                                        <span style={{ fontSize: '0.8rem', color: '#10b981' }}>✅ Badge uploaded — drop or click to replace</span>
                                     ) : (
                                         <>
                                             <span style={{ fontSize: '1.5rem' }}>ðŸ…</span>
@@ -1309,7 +1309,7 @@ const AdminDashboard = () => {
                                 flexShrink: 0 
                             }}
                         >
-                            {fetchingCredly ? 'â³ Fetching...' : <><Sparkles size={12} /> Auto-Fetch Image</>}
+                            {fetchingCredly ? '🔄 Fetching...' : <><Sparkles size={12} /> Auto-Fetch Image</>}
                         </button>
                     )}
                     {publicUrl && (
@@ -1397,10 +1397,10 @@ const AdminDashboard = () => {
                 </h2>
                 <div className="flex gap-4 mt-2">
                     <span style={{ fontSize: '0.75rem', opacity: 0.7, color: health.database === 'Connected' ? '#10b981' : '#f43f5e' }}>
-                       â— MongoDB: {health.database}
+                       ● MongoDB: {health.database}
                     </span>
                     <span style={{ fontSize: '0.75rem', opacity: 0.7, color: health.cloudinary === 'Configured' ? '#0ea5e9' : '#f59e0b' }}>
-                       â— Cloudinary: {health.cloudinary}
+                       ● Cloudinary: {health.cloudinary}
                     </span>
                 </div>
                 <p className="pane-desc">Edit and save your content changes.</p>
@@ -1554,7 +1554,7 @@ const AdminDashboard = () => {
                     {activeTab === 'profile' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             
                             <div className="form-section enhanced-profile">
                                 <h3 className="text-xl font-semibold mb-6 flex items-center gap-2" style={{ color: '#60a5fa' }}>
@@ -1588,7 +1588,7 @@ const AdminDashboard = () => {
                                     </div>
                                     <div className="form-group">
                                         <label>Today's Date</label>
-                                        <input type="text" value={new Date().toLocaleDateString('a', { month: 'long', day: '2-digit', year: 'numeric' })} disabled className="enhanced-input" style={{ opacity: 0.8, cursor: 'not-allowed' }} />
+                                        <input type="text" value={new Date().toLocaleDateString('en-US', { month: 'long', day: '2-digit', year: 'numeric' })} disabled className="enhanced-input" style={{ opacity: 0.8, cursor: 'not-allowed' }} />
                                     </div>
                                     <div className="form-group">
                                         <label>Current Age (Auto-calculated)</label>
@@ -1727,7 +1727,7 @@ const AdminDashboard = () => {
                     {activeTab === 'education' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="education" />
                             {editData.education.map((item: EducationItem, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -1798,7 +1798,7 @@ const AdminDashboard = () => {
                     {activeTab === 'work' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="work" />
                             {editData.work.map((job: WorkItem, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -1878,7 +1878,7 @@ const AdminDashboard = () => {
                     {activeTab === 'experience' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="experience" />
                             {editData.experience.map((item: ExperienceItem, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -2042,9 +2042,9 @@ const AdminDashboard = () => {
                                                     const isExpanded = expandedDeviceId === device.canonical_device_id;
                                                     const status = device.verification_status || 'unverified';
                                                     const statusColor = status === 'verified' ? '#10b981' : status === 'fingerprint' ? '#f59e0b' : '#64748b';
-                                                    const statusLabel = status === 'verified' ? 'ðŸ”— Verified' : status === 'fingerprint' ? 'ðŸ–¥ Fingerprint' : 'â“ Unverified';
+                                                    const statusLabel = status === 'verified' ? 'ðŸ”— Verified' : status === 'fingerprint' ? '🔏 Fingerprint' : '❓ Unverified';
                                                     const lastSeen = formatBDTDate(device.last_seen_at);
-                                                    const displayMac = device.primary_fingerprint || device.mac_address || (device.canonical_device_id || '').slice(0, 18) + 'â€¦';
+                                                    const displayMac = device.primary_fingerprint || device.mac_address || (device.canonical_device_id || '').slice(0, 18) + '...';
 
                                                     return (
                                                         <div key={device.canonical_device_id || idx} style={{
@@ -2134,7 +2134,7 @@ const AdminDashboard = () => {
                                                                             {(device.linked_browsers || []).map((b: any, bi: number) => {
                                                                                 const bStatus = b.verification_status || 'unverified';
                                                                                 const bColor = bStatus === 'verified' ? '#10b981' : bStatus === 'fingerprint' ? '#f59e0b' : '#64748b';
-                                                                                const bLabel = bStatus === 'verified' ? 'ðŸ”— Verified' : bStatus === 'fingerprint' ? 'ðŸ–¥ Fingerprint' : 'â“ Unverified';
+                                                                                const bLabel = bStatus === 'verified' ? 'ðŸ”— Verified' : bStatus === 'fingerprint' ? '🔏 Fingerprint' : '❓ Unverified';
                                                                                 const bLastSeen = formatBDTDate(b.last_seen_at);
                                                                                 return (
                                                                                     <div key={bi} style={{
@@ -2150,7 +2150,7 @@ const AdminDashboard = () => {
                                                                                             background: `${bColor}18`, color: bColor, border: `1px solid ${bColor}30`
                                                                                         }}>{bLabel}</span>
                                                                                         <span style={{ color: 'var(--text-secondary)', marginLeft: 'auto' }}>
-                                                                                            <Globe size={11} style={{ verticalAlign: 'middle' }} /> {b.ip || 'â€”'}
+                                                                                            <Globe size={11} style={{ verticalAlign: 'middle' }} /> {b.ip || '...'}
                                                                                         </span>
                                                                                         <span style={{ color: 'var(--text-secondary)' }}>
                                                                                             <Calendar size={11} style={{ verticalAlign: 'middle' }} /> {bLastSeen}
@@ -2256,7 +2256,7 @@ const AdminDashboard = () => {
                                                         const dateFormatted = formatBDTDate(v.timestamp);
                                                         const vStatus = v.verification_status || 'legacy';
                                                         const vColor = vStatus === 'verified' ? '#10b981' : vStatus === 'fingerprint' ? '#f59e0b' : vStatus === 'legacy' ? '#64748b' : '#94a3b8';
-                                                        const vLabel = vStatus === 'verified' ? 'ðŸ”— Verified' : vStatus === 'fingerprint' ? 'ðŸ–¥ Fingerprint' : vStatus === 'legacy' ? 'ðŸ“ Legacy' : 'â“ Unverified';
+                                                        const vLabel = vStatus === 'verified' ? 'ðŸ”— Verified' : vStatus === 'fingerprint' ? '🔏 Fingerprint' : vStatus === 'legacy' ? '📝 Legacy' : '❓ Unverified';
 
                                                         return (
                                                             <tr key={v._id || v.id || idx}>
@@ -2266,7 +2266,7 @@ const AdminDashboard = () => {
                                                                 <td className="device-id-cell">
                                                                     <span className="mac-badge" title={`Device ID: ${devId}`}>
                                                                         <Cpu size={12} />
-                                                                        <code>{devId.length > 24 ? devId.slice(0, 24) + 'â€¦' : devId}</code>
+                                                                        <code>{devId.length > 24 ? devId.slice(0, 24) + '...' : devId}</code>
                                                                     </span>
                                                                 </td>
                                                                 <td className="location-cell">
@@ -2304,7 +2304,7 @@ const AdminDashboard = () => {
                     {activeTab === 'skills' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="skills" />
                             {editData.skills.map((cat: SkillCategory, ci: number) => (
                                 <div key={ci} className="form-section item-card">
@@ -2422,7 +2422,7 @@ const AdminDashboard = () => {
                     {activeTab === 'projects' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="projects" />
                             {editData.projects.map((project: ProjectItem, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -2678,7 +2678,7 @@ const AdminDashboard = () => {
                     {activeTab === 'papers' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="papers" />
                             {editData.papers.map((paper: PaperItem, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -2794,7 +2794,7 @@ const AdminDashboard = () => {
                     {activeTab === 'activities' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="activities" />
                             {editData.activities?.map((activity: any, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -2850,7 +2850,7 @@ const AdminDashboard = () => {
                     {activeTab === 'references' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="references" />
                             {editData.references?.map((ref: any, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -2900,7 +2900,7 @@ const AdminDashboard = () => {
                     {activeTab === 'blogs' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="blogs" />
                             {editData.blogs?.map((blog: any, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -2938,7 +2938,7 @@ const AdminDashboard = () => {
                     {activeTab === 'certifications' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="certifications" />
                             {editData.certifications?.map((cert: any, i: number) => {
                                 const hasSubCourses = !!cert.subCourses && cert.subCourses.length > 0;
@@ -3202,7 +3202,7 @@ const AdminDashboard = () => {
                                                                         }}
                                                                     >
                                                                         {isVerified ? (
-                                                                            <>âœ“ Verified on Credly</>
+                                                                            <>✅ Verified on Credly</>
                                                                         ) : (
                                                                             <>â—‹ Mark as Verified</>
                                                                         )}
@@ -3357,7 +3357,7 @@ const AdminDashboard = () => {
                     {activeTab === 'contact' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">✅ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="contact" />
 
                             <div className="form-section">
@@ -3674,7 +3674,7 @@ const AdminDashboard = () => {
                                                     const dateFormatted = formatBDTDate(v.timestamp);
                                                     const vStatus = v.verification_status || 'legacy';
                                                     const vColor = vStatus === 'verified' ? '#10b981' : vStatus === 'fingerprint' ? '#f59e0b' : vStatus === 'legacy' ? '#64748b' : '#94a3b8';
-                                                    const vLabel = vStatus === 'verified' ? 'ðŸ”— Verified' : vStatus === 'fingerprint' ? 'ðŸ–¥ Fingerprint' : vStatus === 'legacy' ? 'ðŸ“ Legacy' : 'â“ Unverified';
+                                                    const vLabel = vStatus === 'verified' ? 'ðŸ”— Verified' : vStatus === 'fingerprint' ? '🔏 Fingerprint' : vStatus === 'legacy' ? '📝 Legacy' : '❓ Unverified';
 
                                                     return (
                                                         <tr key={v._id || v.id || idx}>
@@ -3684,7 +3684,7 @@ const AdminDashboard = () => {
                                                             <td className="device-id-cell">
                                                                 <span className="mac-badge" title={`Hardware Device ID: ${devId}`}>
                                                                     <Cpu size={12} />
-                                                                    <code>{devId.length > 24 ? devId.slice(0, 24) + 'â€¦' : devId}</code>
+                                                                    <code>{devId.length > 24 ? devId.slice(0, 24) + '...' : devId}</code>
                                                                 </span>
                                                             </td>
                                                             <td className="location-cell">
