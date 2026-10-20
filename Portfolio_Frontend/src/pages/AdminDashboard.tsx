@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
 import { Mail, Eye, Calendar, Phone, Trash2, Reply, Plus, Minus, Upload, Link as LinkIcon, CheckCircle, Users, Sparkles, CheckCircle2, ChevronDown, ChevronUp, Layers, MapPin, Monitor, Cpu, Search, X, Globe, ShieldCheck } from 'lucide-react';
@@ -95,7 +95,7 @@ const AdminDashboard = () => {
                     projects: updatedProjects
                 });
                 
-                alert('✨ AI successfully generated and pre-filled case study fields!');
+                alert('âœ¨ AI successfully generated and pre-filled case study fields!');
             } else {
                 alert(`AI Generation failed: ${result.error || 'Unknown error'}`);
             }
@@ -113,7 +113,7 @@ const AdminDashboard = () => {
         if (!str) {
             setBibtexParseStatus(prev => ({
                 ...prev,
-                [index]: { msg: '⚠️ Please paste a BibTeX snippet first!', type: 'error' }
+                [index]: { msg: 'âš ï¸ Please paste a BibTeX snippet first!', type: 'error' }
             }));
             setTimeout(() => {
                 setBibtexParseStatus(prev => {
@@ -256,7 +256,7 @@ const AdminDashboard = () => {
         if (fieldsExtracted === 0 && !prefix) {
             setBibtexParseStatus(prev => ({
                 ...prev,
-                [index]: { msg: '⚠️ No BibTeX fields found. Check format.', type: 'error' }
+                [index]: { msg: 'âš ï¸ No BibTeX fields found. Check format.', type: 'error' }
             }));
             setTimeout(() => {
                 setBibtexParseStatus(prev => {
@@ -287,9 +287,9 @@ const AdminDashboard = () => {
 
         setBibtexParseStatus(prev => ({
             ...prev,
-            [index]: { msg: `✓ Extracted ${fieldsExtracted} fields!`, type: 'success' }
+            [index]: { msg: `âœ“ Extracted ${fieldsExtracted} fields!`, type: 'success' }
         }));
-        showNotification(`✓ Extracted ${fieldsExtracted} fields from BibTeX!`);
+        showNotification(`âœ“ Extracted ${fieldsExtracted} fields from BibTeX!`);
         setTimeout(() => {
             setBibtexParseStatus(prev => {
                 const next = { ...prev };
@@ -380,7 +380,7 @@ const AdminDashboard = () => {
 
     const handleDeleteMessage = async (id: string, promptConfirm = true) => {
         if (!id) {
-            showNotification('❌ Invalid message ID');
+            showNotification('âŒ Invalid message ID');
             return;
         }
         if (promptConfirm) {
@@ -402,14 +402,14 @@ const AdminDashboard = () => {
                     ...prev, 
                     messages: Math.max(0, prev.messages - 1) 
                 }));
-                showNotification('🗑️ Message deleted successfully');
+                showNotification('ðŸ—‘ï¸ Message deleted successfully');
             } else {
                 const errData = await res.json().catch(() => ({}));
-                showNotification(`❌ ${errData.detail || 'Failed to delete message'}`);
+                showNotification(`âŒ ${errData.detail || 'Failed to delete message'}`);
             }
         } catch (err) { 
             console.error(err);
-            showNotification('❌ Failed to delete message'); 
+            showNotification('âŒ Failed to delete message'); 
         }
     };
 
@@ -547,16 +547,16 @@ const AdminDashboard = () => {
 
             if (res.ok) {
                 localStorage.setItem('portfolio_physical_mac', cleanMac);
-                showNotification(`✅ Physical MAC ${cleanMac} successfully bound to device!`);
+                showNotification(`âœ… Physical MAC ${cleanMac} successfully bound to device!`);
                 await fetchDevices();
                 await fetchVisitors();
             } else {
                 const err = await res.json().catch(() => ({}));
-                showNotification(`❌ ${err.detail || 'Failed to set MAC address'}`);
+                showNotification(`âŒ ${err.detail || 'Failed to set MAC address'}`);
             }
         } catch (err) {
             console.error(err);
-            showNotification('❌ Failed to update MAC address');
+            showNotification('âŒ Failed to update MAC address');
         }
     };
 
@@ -574,13 +574,13 @@ const AdminDashboard = () => {
                 setVisitors([]);
                 setCanonicalDevices([]);
                 setStats(prev => ({ ...prev, views: 0 }));
-                showNotification('🧹 All visitor logs cleared');
+                showNotification('ðŸ§¹ All visitor logs cleared');
             } else {
-                showNotification('❌ Failed to clear visitor data');
+                showNotification('âŒ Failed to clear visitor data');
             }
         } catch (err) {
             console.error(err);
-            showNotification('❌ Failed to clear visitor data');
+            showNotification('âŒ Failed to clear visitor data');
         }
     };
 
@@ -593,18 +593,18 @@ const AdminDashboard = () => {
             });
             if (res.ok) {
                 const result = await res.json();
-                showNotification(`✅ ${result.message}`);
+                showNotification(`âœ… ${result.message}`);
                 await fetchDevices();
                 await fetchVisitors();
                 // Update the views counter to the corrected count
                 setStats(prev => ({ ...prev, views: result.true_unique_devices ?? prev.views }));
             } else {
                 const err = await res.json().catch(() => ({}));
-                showNotification(`❌ ${err.detail || 'Cleanup failed'}`);
+                showNotification(`âŒ ${err.detail || 'Cleanup failed'}`);
             }
         } catch (err) {
             console.error(err);
-            showNotification('❌ Failed to run dedup cleanup');
+            showNotification('âŒ Failed to run dedup cleanup');
         }
     };
 
@@ -654,7 +654,7 @@ const AdminDashboard = () => {
             list.splice(index, 1);
             return { ...prev, [collection]: list };
         });
-        showNotification('🗑️ Successfully removed card');
+        showNotification('ðŸ—‘ï¸ Successfully removed card');
     };
 
     const addListItem = (collection: string, defaultItem: any) => {
@@ -662,7 +662,7 @@ const AdminDashboard = () => {
             ...prev,
             [collection]: [...(prev as any)[collection], defaultItem]
         }));
-        showNotification(`📝 Added new ${collection} item`);
+        showNotification(`ðŸ“ Added new ${collection} item`);
     };
 
     const handleSave = async () => {
@@ -670,13 +670,13 @@ const AdminDashboard = () => {
         try {
             const success = await updateData(editData);
             if (success) {
-                setSaveStatus('✅ Changes synced to Database successfully!');
+                setSaveStatus('âœ… Changes synced to Database successfully!');
                 setTimeout(() => setSaveStatus(''), 3000);
             } else {
-                setSaveStatus('⚠️ Saved locally, but failed to sync to Database.');
+                setSaveStatus('âš ï¸ Saved locally, but failed to sync to Database.');
             }
         } catch (err) {
-            setSaveStatus('❌ Error during save. Check backend.');
+            setSaveStatus('âŒ Error during save. Check backend.');
         }
     };
 
@@ -748,7 +748,7 @@ const AdminDashboard = () => {
             list[certIndex] = cert;
             return { ...prev, certifications: list };
         });
-        showNotification('⚡ Course status updated');
+        showNotification('âš¡ Course status updated');
     };
 
     const addSubCourse = (certIndex: number) => {
@@ -771,7 +771,7 @@ const AdminDashboard = () => {
             return { ...prev, certifications: list };
         });
         setExpandedCurriculums(prev => ({ ...prev, [certIndex]: true }));
-        showNotification('➕ Added sub-course to curriculum');
+        showNotification('âž• Added sub-course to curriculum');
     };
 
     const removeSubCourse = (certIndex: number, subIndex: number) => {
@@ -784,7 +784,7 @@ const AdminDashboard = () => {
             list[certIndex] = cert;
             return { ...prev, certifications: list };
         });
-        showNotification('🗑️ Removed course from curriculum');
+        showNotification('ðŸ—‘ï¸ Removed course from curriculum');
     };
 
 
@@ -794,7 +794,7 @@ const AdminDashboard = () => {
             work[workIndex] = { ...work[workIndex], details: [...work[workIndex].details, ''] };
             return { ...prev, work };
         });
-        showNotification('📝 Added work detail');
+        showNotification('ðŸ“ Added work detail');
     };
     const removeWorkDetail = (workIndex: number, detailIndex: number) => {
         setEditData(prev => {
@@ -803,7 +803,7 @@ const AdminDashboard = () => {
             work[workIndex] = { ...work[workIndex], details };
             return { ...prev, work };
         });
-        showNotification('🗑️ Removed work detail');
+        showNotification('ðŸ—‘ï¸ Removed work detail');
     };
 
     const updateSkillItem = (catIndex: number, itemIndex: number, value: string) => {
@@ -855,7 +855,7 @@ const AdminDashboard = () => {
             });
             return { ...prev, skills };
         });
-        showNotification('📝 Added skill');
+        showNotification('ðŸ“ Added skill');
     };
     const removeSkillItem = (catIndex: number, itemIndex: number) => {
         setEditData(prev => {
@@ -875,7 +875,7 @@ const AdminDashboard = () => {
             });
             return { ...prev, skills };
         });
-        showNotification('🗑️ Removed skill');
+        showNotification('ðŸ—‘ï¸ Removed skill');
     };
 
     const addManualProject = (catIndex: number, skillName: string, projectTitle: string) => {
@@ -891,7 +891,7 @@ const AdminDashboard = () => {
             });
             return { ...prev, skills };
         });
-        showNotification('🔗 Associated project with skill');
+        showNotification('ðŸ”— Associated project with skill');
     };
 
     const removeManualProject = (catIndex: number, skillName: string, projectTitle: string) => {
@@ -905,7 +905,7 @@ const AdminDashboard = () => {
             });
             return { ...prev, skills };
         });
-        showNotification('🗑️ Removed project association');
+        showNotification('ðŸ—‘ï¸ Removed project association');
     };
 
     const updateProjectTag = (projIndex: number, tagIndex: number, value: string) => {
@@ -926,7 +926,7 @@ const AdminDashboard = () => {
             );
             return { ...prev, projects };
         });
-        showNotification('🗑️ Removed project tag');
+        showNotification('ðŸ—‘ï¸ Removed project tag');
     };
 
     const addProjectTag = (projIndex: number) => {
@@ -936,7 +936,7 @@ const AdminDashboard = () => {
             );
             return { ...prev, projects };
         });
-        showNotification('🏷️ Added project tag');
+        showNotification('ðŸ·ï¸ Added project tag');
     };
 
     const FileUploadInput = ({ label, value, onUpload, id, placeholder = "Enter URL or upload file" }: { 
@@ -970,16 +970,16 @@ const AdminDashboard = () => {
                     const result = await res.json();
                     if (result.success) {
                         onUpload(result.url);
-                        showNotification('✨ File uploaded successfully!');
+                        showNotification('âœ¨ File uploaded successfully!');
                     } else {
-                        showNotification(`❌ Upload failed: ${result.message}`);
+                        showNotification(`âŒ Upload failed: ${result.message}`);
                     }
                 } else {
-                    showNotification('❌ Connection failed during file upload');
+                    showNotification('âŒ Connection failed during file upload');
                 }
             } catch (err) {
                 console.error('Upload failed:', err);
-                showNotification('❌ Connection failed during file upload');
+                showNotification('âŒ Connection failed during file upload');
             } finally {
                 setUploading(false);
             }
@@ -1072,12 +1072,12 @@ const AdminDashboard = () => {
         );
     };
 
-    // ── Badge Drag & Drop Uploader ──────────────────────────────────────────
+    // â”€â”€ Badge Drag & Drop Uploader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const BadgeUploader = ({ index, value, onUpload, publicUrl, onPublicUrl }: {
         index: number;
         value: string;
         onUpload: (url: string) => void;
-        /** Credly badge public page URL — optional, can be filled in later */
+        /** Credly badge public page URL â€” optional, can be filled in later */
         publicUrl?: string;
         onPublicUrl?: (url: string) => void;
     }) => {
@@ -1092,7 +1092,7 @@ const AdminDashboard = () => {
 
         const uploadFile = async (file: File) => {
             if (!file.type.startsWith('image/')) {
-                showNotification('❌ Please upload an image file (PNG, SVG, JPG)');
+                showNotification('âŒ Please upload an image file (PNG, SVG, JPG)');
                 return;
             }
             setUploading(true);
@@ -1109,15 +1109,15 @@ const AdminDashboard = () => {
                     const result = await res.json();
                     if (result.success) {
                         onUpload(result.url);
-                        showNotification('🏅 Badge uploaded successfully!');
+                        showNotification('ðŸ… Badge uploaded successfully!');
                     } else {
-                        showNotification(`❌ Upload failed: ${result.message}`);
+                        showNotification(`âŒ Upload failed: ${result.message}`);
                     }
                 } else {
-                    showNotification('❌ Upload connection failed');
+                    showNotification('âŒ Upload connection failed');
                 }
             } catch {
-                showNotification('❌ Upload connection failed');
+                showNotification('âŒ Upload connection failed');
             } finally {
                 setUploading(false);
             }
@@ -1135,7 +1135,7 @@ const AdminDashboard = () => {
         const fetchImageFromCredly = async (targetUrl?: string) => {
             const link = targetUrl || publicUrl;
             if (!link || !link.includes('credly.com')) {
-                showNotification('⚠️ Please enter a valid Credly badge public URL first');
+                showNotification('âš ï¸ Please enter a valid Credly badge public URL first');
                 return;
             }
             setFetchingCredly(true);
@@ -1145,12 +1145,12 @@ const AdminDashboard = () => {
                 if (data.success && data.imageUrl) {
                     onUpload(data.imageUrl);
                     setUrlInput(data.imageUrl);
-                    showNotification('✨ Badge image auto-fetched from Credly!');
+                    showNotification('âœ¨ Badge image auto-fetched from Credly!');
                 } else {
-                    showNotification(`⚠️ Could not auto-detect image: ${data.error || 'Check URL'}`);
+                    showNotification(`âš ï¸ Could not auto-detect image: ${data.error || 'Check URL'}`);
                 }
             } catch {
-                showNotification('❌ Failed to connect to Credly fetch service');
+                showNotification('âŒ Failed to connect to Credly fetch service');
             } finally {
                 setFetchingCredly(false);
             }
@@ -1160,7 +1160,7 @@ const AdminDashboard = () => {
             <div className="form-group" style={{ marginTop: '8px' }}>
                 <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        🏅 Credly Badge Image
+                        ðŸ… Credly Badge Image
                     </span>
                     <button
                         type="button"
@@ -1220,16 +1220,16 @@ const AdminDashboard = () => {
                                     }}
                                 >
                                     {uploading ? (
-                                        <span style={{ fontSize: '0.85rem', color: 'var(--primary)' }}>⏳ Uploading...</span>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--primary)' }}>â³ Uploading...</span>
                                     ) : dragOver ? (
                                         <span style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}>Drop badge here!</span>
                                     ) : value ? (
-                                        <span style={{ fontSize: '0.8rem', color: '#10b981' }}>✅ Badge uploaded — drop or click to replace</span>
+                                        <span style={{ fontSize: '0.8rem', color: '#10b981' }}>âœ… Badge uploaded â€” drop or click to replace</span>
                                     ) : (
                                         <>
-                                            <span style={{ fontSize: '1.5rem' }}>🏅</span>
+                                            <span style={{ fontSize: '1.5rem' }}>ðŸ…</span>
                                             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Drag & Drop badge here</span>
-                                            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', opacity: 0.7 }}>or click to browse — PNG, SVG, JPG</span>
+                                            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', opacity: 0.7 }}>or click to browse â€” PNG, SVG, JPG</span>
                                         </>
                                     )}
                                 </div>
@@ -1267,7 +1267,7 @@ const AdminDashboard = () => {
                     )}
                 </div>
 
-                {/* ── Credly Badge Public URL with Auto-Fetch ── */}
+                {/* â”€â”€ Credly Badge Public URL with Auto-Fetch â”€â”€ */}
                 <div style={{ marginTop: '10px', display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <div style={{ flex: 1, position: 'relative' }}>
                         <input
@@ -1309,7 +1309,7 @@ const AdminDashboard = () => {
                                 flexShrink: 0 
                             }}
                         >
-                            {fetchingCredly ? '⏳ Fetching...' : <><Sparkles size={12} /> Auto-Fetch Image</>}
+                            {fetchingCredly ? 'â³ Fetching...' : <><Sparkles size={12} /> Auto-Fetch Image</>}
                         </button>
                     )}
                     {publicUrl && (
@@ -1325,7 +1325,7 @@ const AdminDashboard = () => {
                     )}
                 </div>
                 <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', margin: '4px 0 0', opacity: 0.7 }}>
-                    🔗 Paste any Credly badge link — click Auto-Fetch or let our system detect the official badge image CDN URL!
+                    ðŸ”— Paste any Credly badge link â€” click Auto-Fetch or let our system detect the official badge image CDN URL!
                 </p>
             </div>
         );
@@ -1333,21 +1333,21 @@ const AdminDashboard = () => {
 
 
     const navItems = [
-        { id: 'overview', icon: '⚡', label: 'Dashboard' },
-        { id: 'profile', icon: '👤', label: editData.sections?.about?.adminLabel || 'About' },
-        { id: 'education', icon: '🎓', label: editData.sections?.education?.adminLabel || 'Education' },
-        { id: 'work', icon: '💼', label: editData.sections?.work?.adminLabel || 'Experience' },
-        { id: 'projects', icon: '🚀', label: editData.sections?.projects?.adminLabel || 'Projects' },
-        { id: 'skills', icon: '🧠', label: editData.sections?.skills?.adminLabel || 'Skills' },
-        { id: 'experience', icon: '📜', label: editData.sections?.experience?.adminLabel || 'Achievements' },
-        { id: 'activities', icon: '🏅', label: editData.sections?.activities?.adminLabel || 'Activities' },
-        { id: 'papers', icon: '📚', label: editData.sections?.papers?.adminLabel || 'Publications' },
-        { id: 'references', icon: '🤝', label: editData.sections?.references?.adminLabel || 'References' },
-        { id: 'blogs', icon: '✍️', label: editData.sections?.blogs?.adminLabel || 'Blog Posts' },
-        { id: 'certifications', icon: '📜', label: editData.sections?.certifications?.adminLabel || 'Certifications' },
-        { id: 'messages', icon: '📩', label: 'Messages' },
+        { id: 'overview', icon: 'âš¡', label: 'Dashboard' },
+        { id: 'profile', icon: 'ðŸ‘¤', label: editData.sections?.about?.adminLabel || 'About' },
+        { id: 'education', icon: 'ðŸŽ“', label: editData.sections?.education?.adminLabel || 'Education' },
+        { id: 'work', icon: 'ðŸ’¼', label: editData.sections?.work?.adminLabel || 'Experience' },
+        { id: 'projects', icon: 'ðŸš€', label: editData.sections?.projects?.adminLabel || 'Projects' },
+        { id: 'skills', icon: 'ðŸ§ ', label: editData.sections?.skills?.adminLabel || 'Skills' },
+        { id: 'experience', icon: 'ðŸ“œ', label: editData.sections?.experience?.adminLabel || 'Achievements' },
+        { id: 'activities', icon: 'ðŸ…', label: editData.sections?.activities?.adminLabel || 'Activities' },
+        { id: 'papers', icon: 'ðŸ“š', label: editData.sections?.papers?.adminLabel || 'Publications' },
+        { id: 'references', icon: 'ðŸ¤', label: editData.sections?.references?.adminLabel || 'References' },
+        { id: 'blogs', icon: 'âœï¸', label: editData.sections?.blogs?.adminLabel || 'Blog Posts' },
+        { id: 'certifications', icon: 'ðŸ“œ', label: editData.sections?.certifications?.adminLabel || 'Certifications' },
+        { id: 'messages', icon: 'ðŸ“©', label: 'Messages' },
         { id: 'visitors', icon: <Users size={18} />, label: 'Visitor Logs' },
-        { id: 'contact', icon: '📞', label: editData.sections?.contact?.adminLabel || 'Contact' },
+        { id: 'contact', icon: 'ðŸ“ž', label: editData.sections?.contact?.adminLabel || 'Contact' },
     ];
 
     const SectionConfigPanel = ({ sectionKey }: { sectionKey: keyof typeof editData.sections }) => {
@@ -1397,10 +1397,10 @@ const AdminDashboard = () => {
                 </h2>
                 <div className="flex gap-4 mt-2">
                     <span style={{ fontSize: '0.75rem', opacity: 0.7, color: health.database === 'Connected' ? '#10b981' : '#f43f5e' }}>
-                       ● MongoDB: {health.database}
+                       â— MongoDB: {health.database}
                     </span>
                     <span style={{ fontSize: '0.75rem', opacity: 0.7, color: health.cloudinary === 'Configured' ? '#0ea5e9' : '#f59e0b' }}>
-                       ● Cloudinary: {health.cloudinary}
+                       â— Cloudinary: {health.cloudinary}
                     </span>
                 </div>
                 <p className="pane-desc">Edit and save your content changes.</p>
@@ -1414,7 +1414,7 @@ const AdminDashboard = () => {
             <div className="admin-mobile-header">
                 <h2>Admin <span className="gradient-text">Panel</span></h2>
                 <button className="sidebar-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-                    {isSidebarOpen ? '✕' : '☰'}
+                    {isSidebarOpen ? 'âœ•' : 'â˜°'}
                 </button>
             </div>
 
@@ -1436,22 +1436,22 @@ const AdminDashboard = () => {
                 </nav>
 
                 <div className="sidebar-footer" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '15px' }}>
-                    <button onClick={() => navigate('/')} className="footer-btn action-btn"><span className="icon">🌐</span> View Portfolio</button>
-                    <button onClick={handleLogout} className="footer-btn danger-btn"><span className="icon">🚪</span> Sign Out</button>
+                    <button onClick={() => navigate('/')} className="footer-btn action-btn"><span className="icon">ðŸŒ</span> View Portfolio</button>
+                    <button onClick={handleLogout} className="footer-btn danger-btn"><span className="icon">ðŸšª</span> Sign Out</button>
                     
                     <div className="theme-toggle-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '20px 0', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
                         <span>Theme</span>
                         <div className="toggle-switch active">
                             <span className="toggle-track"></span>
-                            <span className="toggle-thumb" style={{ left: '16px' }}>🌙</span>
+                            <span className="toggle-thumb" style={{ left: '16px' }}>ðŸŒ™</span>
                         </div>
                     </div>
                 </div>
                 
                 <div className="weather-widget" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                    <span className="weather-icon" style={{ fontSize: '20px' }}>⛅</span>
+                    <span className="weather-icon" style={{ fontSize: '20px' }}>â›…</span>
                     <div className="weather-info" style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '13px', fontWeight: 'bold' }}>25°C</span>
+                        <span style={{ fontSize: '13px', fontWeight: 'bold' }}>25Â°C</span>
                         <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>Mostly cloudy</span>
                     </div>
                 </div>
@@ -1554,7 +1554,7 @@ const AdminDashboard = () => {
                     {activeTab === 'profile' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             
                             <div className="form-section enhanced-profile">
                                 <h3 className="text-xl font-semibold mb-6 flex items-center gap-2" style={{ color: '#60a5fa' }}>
@@ -1619,7 +1619,7 @@ const AdminDashboard = () => {
                                         className="enhanced-textarea" />
                                 </div>
 
-                                {/* ── BIOGRAPHY LINKS ─────────────────────────────── */}
+                                {/* â”€â”€ BIOGRAPHY LINKS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                                 <div className="form-group" style={{ marginTop: '20px' }}>
                                     <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <span>Biography Links <span style={{ fontWeight: 400, fontSize: '0.8rem', opacity: 0.6 }}>(shown below bio on Profile page)</span></span>
@@ -1727,7 +1727,7 @@ const AdminDashboard = () => {
                     {activeTab === 'education' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="education" />
                             {editData.education.map((item: EducationItem, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -1753,6 +1753,12 @@ const AdminDashboard = () => {
                                         <div className="form-group w-50">
                                             <label>Major / Subject</label>
                                             <input type="text" value={item.major} onChange={e => updateListItem('education', i, 'major', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Result / GPA</label>
+                                            <input type="text" value={item.result || ''''} placeholder="e.g. 3.85 / 4.00" onChange={e => updateListItem('education', i, 'result', e.target.value)} />
                                         </div>
                                     </div>
                                     <div className="flex-group">
@@ -1783,7 +1789,7 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                             ))}
-                            <button type="button" className="add-btn" onClick={() => addListItem('education', { degree: '', school: '', year: '', major: '', certificateUrl: '', attachmentUrl: '', logoUrl: '' })}>
+                            <button type="button" className="add-btn" onClick={() => addListItem('education', { degree: '', school: '', year: '', major: '', result: '', certificateUrl: '', attachmentUrl: '', logoUrl: '' })}>
                                 <Plus size={16} /> Add Education
                             </button>
                         </div>
@@ -1792,7 +1798,7 @@ const AdminDashboard = () => {
                     {activeTab === 'work' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="work" />
                             {editData.work.map((job: WorkItem, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -1872,7 +1878,7 @@ const AdminDashboard = () => {
                     {activeTab === 'experience' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="experience" />
                             {editData.experience.map((item: ExperienceItem, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -1898,6 +1904,12 @@ const AdminDashboard = () => {
                                         <div className="form-group w-50">
                                             <label>Description</label>
                                             <input type="text" value={item.desc} onChange={e => updateListItem('experience', i, 'desc', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Result / GPA</label>
+                                            <input type="text" value={item.result || ''''} placeholder="e.g. 3.85 / 4.00" onChange={e => updateListItem('education', i, 'result', e.target.value)} />
                                         </div>
                                     </div>
                                     <div className="flex-group">
@@ -1973,7 +1985,7 @@ const AdminDashboard = () => {
                                         title="Merge duplicate device entries and fix visitor count"
                                         style={{ background: '#7c3aed', color: '#ffffff', border: 'none' }}
                                     >
-                                        🔧 Fix Duplicates
+                                        ðŸ”§ Fix Duplicates
                                     </button>
                                     <button
                                         onClick={handleClearVisitors}
@@ -1986,7 +1998,7 @@ const AdminDashboard = () => {
                             </div>
 
 
-                            {/* ── Canonical Device Registry View ── */}
+                            {/* â”€â”€ Canonical Device Registry View â”€â”€ */}
                             {visitorViewMode === 'devices' && (
                                 <div className="visitor-table-container">
                                     <div className="visitor-table-toolbar">
@@ -2036,9 +2048,9 @@ const AdminDashboard = () => {
                                                     const isExpanded = expandedDeviceId === device.canonical_device_id;
                                                     const status = device.verification_status || 'unverified';
                                                     const statusColor = status === 'verified' ? '#10b981' : status === 'fingerprint' ? '#f59e0b' : '#64748b';
-                                                    const statusLabel = status === 'verified' ? '🔗 Verified' : status === 'fingerprint' ? '🖥 Fingerprint' : '❓ Unverified';
+                                                    const statusLabel = status === 'verified' ? 'ðŸ”— Verified' : status === 'fingerprint' ? 'ðŸ–¥ Fingerprint' : 'â“ Unverified';
                                                     const lastSeen = formatBDTDate(device.last_seen_at);
-                                                    const displayMac = device.primary_fingerprint || device.mac_address || (device.canonical_device_id || '').slice(0, 18) + '…';
+                                                    const displayMac = device.primary_fingerprint || device.mac_address || (device.canonical_device_id || '').slice(0, 18) + 'â€¦';
 
                                                     return (
                                                         <div key={device.canonical_device_id || idx} style={{
@@ -2084,7 +2096,7 @@ const AdminDashboard = () => {
                                                                         )}
                                                                     </div>
                                                                     <div style={{ marginTop: '3px', fontSize: '0.82rem', color: 'var(--text-secondary)', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                                                                        <span><Cpu size={12} style={{ verticalAlign: 'middle' }} /> UUID: {(device.canonical_device_id || '').slice(0, 10)}…</span>
+                                                                        <span><Cpu size={12} style={{ verticalAlign: 'middle' }} /> UUID: {(device.canonical_device_id || '').slice(0, 10)}â€¦</span>
                                                                         <span><Globe size={12} style={{ verticalAlign: 'middle' }} /> {device.ip || 'Unknown IP'}</span>
                                                                         <span><MapPin size={12} style={{ verticalAlign: 'middle' }} /> {device.location || 'Unknown'}</span>
                                                                         <span><Calendar size={12} style={{ verticalAlign: 'middle' }} /> Last: {lastSeen}</span>
@@ -2128,7 +2140,7 @@ const AdminDashboard = () => {
                                                                             {(device.linked_browsers || []).map((b: any, bi: number) => {
                                                                                 const bStatus = b.verification_status || 'unverified';
                                                                                 const bColor = bStatus === 'verified' ? '#10b981' : bStatus === 'fingerprint' ? '#f59e0b' : '#64748b';
-                                                                                const bLabel = bStatus === 'verified' ? '🔗 Verified' : bStatus === 'fingerprint' ? '🖥 Fingerprint' : '❓ Unverified';
+                                                                                const bLabel = bStatus === 'verified' ? 'ðŸ”— Verified' : bStatus === 'fingerprint' ? 'ðŸ–¥ Fingerprint' : 'â“ Unverified';
                                                                                 const bLastSeen = formatBDTDate(b.last_seen_at);
                                                                                 return (
                                                                                     <div key={bi} style={{
@@ -2144,7 +2156,7 @@ const AdminDashboard = () => {
                                                                                             background: `${bColor}18`, color: bColor, border: `1px solid ${bColor}30`
                                                                                         }}>{bLabel}</span>
                                                                                         <span style={{ color: 'var(--text-secondary)', marginLeft: 'auto' }}>
-                                                                                            <Globe size={11} style={{ verticalAlign: 'middle' }} /> {b.ip || '—'}
+                                                                                            <Globe size={11} style={{ verticalAlign: 'middle' }} /> {b.ip || 'â€”'}
                                                                                         </span>
                                                                                         <span style={{ color: 'var(--text-secondary)' }}>
                                                                                             <Calendar size={11} style={{ verticalAlign: 'middle' }} /> {bLastSeen}
@@ -2156,7 +2168,7 @@ const AdminDashboard = () => {
                                                                     )}
                                                                     <div style={{ marginTop: '10px', fontSize: '0.75rem', color: '#94a3b8', display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
                                                                         <ShieldCheck size={12} style={{ flexShrink: 0, marginTop: '2px' }} />
-                                                                        <span>Fingerprint: <code>{device.primary_fingerprint || 'N/A'}</code> — This is a probabilistic hardware hash, not a verified hardware ID.</span>
+                                                                        <span>Fingerprint: <code>{device.primary_fingerprint || 'N/A'}</code> â€” This is a probabilistic hardware hash, not a verified hardware ID.</span>
                                                                     </div>
                                                                 </div>
                                                             )}
@@ -2168,7 +2180,7 @@ const AdminDashboard = () => {
                                 </div>
                             )}
 
-                            {/* ── Flat Browser Log View (legacy + new) ── */}
+                            {/* â”€â”€ Flat Browser Log View (legacy + new) â”€â”€ */}
                             {visitorViewMode === 'flat' && (
                                 <div className="visitor-table-container">
                                     <div className="visitor-table-toolbar">
@@ -2245,12 +2257,12 @@ const AdminDashboard = () => {
                                                             ? v.device_id 
                                                             : (v.mac_address && v.mac_address !== 'N/A') 
                                                                 ? v.mac_address 
-                                                                : (v.ip ? `Device (${v.ip.slice(0, 8)}…)` : 'N/A');
+                                                                : (v.ip ? `Device (${v.ip.slice(0, 8)}â€¦)` : 'N/A');
                                                         const loc = v.location || (v.city && v.country ? `${v.city}, ${v.country}` : (v.city || v.country || 'Unknown'));
                                                         const dateFormatted = formatBDTDate(v.timestamp);
                                                         const vStatus = v.verification_status || 'legacy';
                                                         const vColor = vStatus === 'verified' ? '#10b981' : vStatus === 'fingerprint' ? '#f59e0b' : vStatus === 'legacy' ? '#64748b' : '#94a3b8';
-                                                        const vLabel = vStatus === 'verified' ? '🔗 Verified' : vStatus === 'fingerprint' ? '🖥 Fingerprint' : vStatus === 'legacy' ? '📁 Legacy' : '❓ Unverified';
+                                                        const vLabel = vStatus === 'verified' ? 'ðŸ”— Verified' : vStatus === 'fingerprint' ? 'ðŸ–¥ Fingerprint' : vStatus === 'legacy' ? 'ðŸ“ Legacy' : 'â“ Unverified';
 
                                                         return (
                                                             <tr key={v._id || v.id || idx}>
@@ -2260,7 +2272,7 @@ const AdminDashboard = () => {
                                                                 <td className="device-id-cell">
                                                                     <span className="mac-badge" title={`Device ID: ${devId}`}>
                                                                         <Cpu size={12} />
-                                                                        <code>{devId.length > 24 ? devId.slice(0, 24) + '…' : devId}</code>
+                                                                        <code>{devId.length > 24 ? devId.slice(0, 24) + 'â€¦' : devId}</code>
                                                                     </span>
                                                                 </td>
                                                                 <td className="location-cell">
@@ -2298,7 +2310,7 @@ const AdminDashboard = () => {
                     {activeTab === 'skills' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="skills" />
                             {editData.skills.map((cat: SkillCategory, ci: number) => (
                                 <div key={ci} className="form-section item-card">
@@ -2375,7 +2387,7 @@ const AdminDashboard = () => {
                                                                                     onClick={() => removeManualProject(ci, item, pTitle)} 
                                                                                     style={{ border: 'none', background: 'none', color: '#f87171', cursor: 'pointer', padding: '0 2px', fontSize: '0.85rem', display: 'flex', alignItems: 'center' }}
                                                                                 >
-                                                                                    ×
+                                                                                    Ã—
                                                                                 </button>
                                                                             </span>
                                                                         ))}
@@ -2416,7 +2428,7 @@ const AdminDashboard = () => {
                     {activeTab === 'projects' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="projects" />
                             {editData.projects.map((project: ProjectItem, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -2425,7 +2437,7 @@ const AdminDashboard = () => {
                                         <button type="button" className="remove-btn" onClick={() => removeListItem('projects', i)}><Minus size={14} /> Remove</button>
                                     </div>
                                     
-                                    <h5 style={{ margin: '15px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>📋 Basic Info</h5>
+                                    <h5 style={{ margin: '15px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>ðŸ“‹ Basic Info</h5>
                                     
                                     <div className="flex-group">
                                         <div className="form-group w-50">
@@ -2474,7 +2486,7 @@ const AdminDashboard = () => {
                                     <div className="ai-generation-box" style={{ background: 'rgba(139, 92, 246, 0.04)', border: '1px dashed rgba(139, 92, 246, 0.25)', padding: '15px', borderRadius: '8px', margin: '15px 0' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                                             <h5 style={{ margin: 0, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                ✨ AI Writer (Ngrok + Ollama / Groq)
+                                                âœ¨ AI Writer (Ngrok + Ollama / Groq)
                                             </h5>
                                             <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>GPU Accelerated Case Studies</span>
                                         </div>
@@ -2495,11 +2507,11 @@ const AdminDashboard = () => {
                                             disabled={generatingIndex === i}
                                             style={{ width: '100%', padding: '10px', justifyContent: 'center', background: 'rgba(139, 92, 246, 0.1)', borderColor: 'rgba(139, 92, 246, 0.3)', color: 'var(--primary)', cursor: 'pointer', fontWeight: 'bold' }}
                                         >
-                                            {generatingIndex === i ? '⏳ Generating case study details (usually 30-60s on GPU)...' : '✨ Generate Case Study Details with AI'}
+                                            {generatingIndex === i ? 'â³ Generating case study details (usually 30-60s on GPU)...' : 'âœ¨ Generate Case Study Details with AI'}
                                         </button>
                                     </div>
 
-                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>⭐ Recruiter Skim Case Study Details</h5>
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>â­ Recruiter Skim Case Study Details</h5>
 
                                     <div className="form-group">
                                         <label>Business Problem addressed</label>
@@ -2532,7 +2544,7 @@ const AdminDashboard = () => {
                                         <textarea rows={3} value={project.impact || ''} onChange={e => updateListItem('projects', i, 'impact', e.target.value)} placeholder="Metrics recruiters love:&#10;- Reduced response time from 10s to 2.5s&#10;- Handled 100 concurrent requests" />
                                     </div>
 
-                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>💻 Tech Stack & Categories</h5>
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>ðŸ’» Tech Stack & Categories</h5>
                                     
                                     <div className="flex-group" style={{ flexWrap: 'wrap' }}>
                                         <div className="form-group w-50">
@@ -2564,7 +2576,7 @@ const AdminDashboard = () => {
                                         <button className="add-inline-btn" onClick={() => addProjectTag(i)}><Plus size={14} /> Add Tag</button>
                                     </div>
 
-                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>📐 System Architecture</h5>
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>ðŸ“ System Architecture</h5>
                                     
                                     <div className="flex-group">
                                         <div className="form-group w-50">
@@ -2581,7 +2593,7 @@ const AdminDashboard = () => {
                                         </div>
                                     </div>
 
-                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>🔍 Deep-Dive details (Optional)</h5>
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>ðŸ” Deep-Dive details (Optional)</h5>
 
                                     <div className="form-group">
                                         <label>Key Features (One per line)</label>
@@ -2598,7 +2610,7 @@ const AdminDashboard = () => {
                                         <textarea rows={3} value={project.future || ''} onChange={e => updateListItem('projects', i, 'future', e.target.value)} placeholder="What is the future roadmap for this project? One per line..." />
                                     </div>
 
-                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>🔗 Project Assets & Links</h5>
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>ðŸ”— Project Assets & Links</h5>
                                     
                                     <div className="flex-group" style={{ flexWrap: 'wrap' }}>
                                         <div className="form-group" style={{ width: '33%' }}>
@@ -2640,7 +2652,7 @@ const AdminDashboard = () => {
                                         </div>
                                     </div>
 
-                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>💼 Academic / Legacy Fields (Optional)</h5>
+                                    <h5 style={{ margin: '20px 0 5px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px', color: 'var(--primary)' }}>ðŸ’¼ Academic / Legacy Fields (Optional)</h5>
                                     
                                     <div className="flex-group">
                                         <div className="form-group" style={{ width: '33%' }}>
@@ -2668,11 +2680,11 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {/* ── RESEARCH PAPERS ────────────────────────────────────── */}
+                    {/* â”€â”€ RESEARCH PAPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                     {activeTab === 'papers' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="papers" />
                             {editData.papers.map((paper: PaperItem, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -2682,7 +2694,7 @@ const AdminDashboard = () => {
                                     </div>
                                     
                                     <div className="form-group" style={{ background: 'rgba(59,130,246,0.05)', padding: '16px', borderRadius: '12px', border: '1px dashed rgba(59,130,246,0.3)' }}>
-                                        <label style={{ color: '#3b82f6' }}>✨ Option 1: Auto-Fill via BibTeX</label>
+                                        <label style={{ color: '#3b82f6' }}>âœ¨ Option 1: Auto-Fill via BibTeX</label>
                                         <textarea rows={5} style={{ fontFamily: 'monospace', fontSize: '0.85rem' }} placeholder="@INPROCEEDINGS{..."
                                             value={bibtexInputs[i] !== undefined ? bibtexInputs[i] : (paper.bibtex || '')} 
                                             onChange={e => setBibtexInputs({...bibtexInputs, [i]: e.target.value})} 
@@ -2738,9 +2750,9 @@ const AdminDashboard = () => {
                                         <div className="form-group w-50">
                                             <label>Publication Type</label>
                                             <select value={paper.type || 'journal'} onChange={e => updateListItem('papers', i, 'type', e.target.value)} style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--card-bg)', color: 'var(--text-color)', fontSize: '0.9rem' }}>
-                                                <option value="journal">📰 Journal Article</option>
-                                                <option value="conference">🎤 Conference Paper</option>
-                                                <option value="book-chapter">📖 Book Chapter</option>
+                                                <option value="journal">ðŸ“° Journal Article</option>
+                                                <option value="conference">ðŸŽ¤ Conference Paper</option>
+                                                <option value="book-chapter">ðŸ“– Book Chapter</option>
                                             </select>
                                         </div>
                                         <div className="form-group w-50">
@@ -2756,6 +2768,12 @@ const AdminDashboard = () => {
                                         <div className="form-group w-50">
                                             <label>Keywords (semi-colon separated)</label>
                                             <input type="text" value={paper.keywords} onChange={e => updateListItem('papers', i, 'keywords', e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-group">
+                                        <div className="form-group w-50">
+                                            <label>Result / GPA</label>
+                                            <input type="text" value={item.result || ''''} placeholder="e.g. 3.85 / 4.00" onChange={e => updateListItem('education', i, 'result', e.target.value)} />
                                         </div>
                                     </div>
                                     <div className="flex-group">
@@ -2784,11 +2802,11 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {/* ── ACTIVITIES ────────────────────────────────────────── */}
+                    {/* â”€â”€ ACTIVITIES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                     {activeTab === 'activities' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="activities" />
                             {editData.activities?.map((activity: any, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -2840,11 +2858,11 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {/* ── REFERENCES ────────────────────────────────────────── */}
+                    {/* â”€â”€ REFERENCES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                     {activeTab === 'references' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="references" />
                             {editData.references?.map((ref: any, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -2890,11 +2908,11 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {/* ── BLOG POSTS ────────────────────────────────────────── */}
+                    {/* â”€â”€ BLOG POSTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                     {activeTab === 'blogs' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="blogs" />
                             {editData.blogs?.map((blog: any, i: number) => (
                                 <div key={i} className="form-section item-card">
@@ -2928,11 +2946,11 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {/* ── LICENSES & CERTIFICATIONS ────────────────────────── */}
+                    {/* â”€â”€ LICENSES & CERTIFICATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                     {activeTab === 'certifications' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="certifications" />
                             {editData.certifications?.map((cert: any, i: number) => {
                                 const hasSubCourses = !!cert.subCourses && cert.subCourses.length > 0;
@@ -3042,7 +3060,7 @@ const AdminDashboard = () => {
                                         />
                                     </div>
 
-                                    {/* ── Badge Drag & Drop Uploader ── */}
+                                    {/* â”€â”€ Badge Drag & Drop Uploader â”€â”€ */}
                                     <BadgeUploader
                                         index={i}
                                         value={(cert as any).badgeUrl || ''}
@@ -3079,7 +3097,7 @@ const AdminDashboard = () => {
                                         </button>
                                     </div>
 
-                                    {/* ── Progressive Curriculum / Sub-Courses Tray ── */}
+                                    {/* â”€â”€ Progressive Curriculum / Sub-Courses Tray â”€â”€ */}
                                     <div className="form-section-nested" style={{ 
                                         background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.4))', 
                                         padding: '18px', 
@@ -3196,9 +3214,9 @@ const AdminDashboard = () => {
                                                                         }}
                                                                     >
                                                                         {isVerified ? (
-                                                                            <>✓ Verified on Credly</>
+                                                                            <>âœ“ Verified on Credly</>
                                                                         ) : (
-                                                                            <>○ Mark as Verified</>
+                                                                            <>â—‹ Mark as Verified</>
                                                                         )}
                                                                     </button>
                                                                     <button 
@@ -3244,23 +3262,23 @@ const AdminDashboard = () => {
                                                                             <button
                                                                                 type="button"
                                                                                 onClick={async () => {
-                                                                                    showNotification('⏳ Fetching image from Credly...');
+                                                                                    showNotification('â³ Fetching image from Credly...');
                                                                                     try {
                                                                                         const res = await fetch(`/api/portfolio/credly-image?url=${encodeURIComponent(sub.credlyUrl.trim())}`);
                                                                                         const data = await res.json();
                                                                                         if (data.success && data.imageUrl) {
                                                                                             updateSubCourse(i, sIdx, 'badgeImageUrl', data.imageUrl);
-                                                                                            showNotification('✨ Badge image URL fetched successfully!');
+                                                                                            showNotification('âœ¨ Badge image URL fetched successfully!');
                                                                                         } else {
-                                                                                            showNotification('⚠️ Could not auto-detect image URL.');
+                                                                                            showNotification('âš ï¸ Could not auto-detect image URL.');
                                                                                         }
                                                                                     } catch {
-                                                                                        showNotification('❌ Failed to fetch from Credly.');
+                                                                                        showNotification('âŒ Failed to fetch from Credly.');
                                                                                     }
                                                                                 }}
                                                                                 style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', fontSize: '0.68rem', fontWeight: 600, padding: 0 }}
                                                                             >
-                                                                                ⚡ Auto-Fetch Image
+                                                                                âš¡ Auto-Fetch Image
                                                                             </button>
                                                                         )}
                                                                     </div>
@@ -3277,7 +3295,7 @@ const AdminDashboard = () => {
                                                                                     .then(data => {
                                                                                         if (data.success && data.imageUrl) {
                                                                                             updateSubCourse(i, sIdx, 'badgeImageUrl', data.imageUrl);
-                                                                                            showNotification('✨ Badge image auto-detected from Credly!');
+                                                                                            showNotification('âœ¨ Badge image auto-detected from Credly!');
                                                                                         }
                                                                                     })
                                                                                     .catch(() => {});
@@ -3347,11 +3365,11 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {/* ── CONTACT DETAILS ─────────────────────────────────── */}
+                    {/* â”€â”€ CONTACT DETAILS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                     {activeTab === 'contact' && (
                         <div className="tab-pane cms-pane">
                             <SaveBar />
-                            {saveStatus && <div className="status-badge success">✓ {saveStatus}</div>}
+                            {saveStatus && <div className="status-badge success">âœ“ {saveStatus}</div>}
                             <SectionConfigPanel sectionKey="contact" />
 
                             <div className="form-section">
@@ -3394,7 +3412,7 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {/* ── MANAGE ADMINS ──────────────────────────────────────── */}
+                    {/* â”€â”€ MANAGE ADMINS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                     {activeTab === 'admins' && (
                         <div className="tab-pane">
                             <div className="pane-header">
@@ -3434,12 +3452,12 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {/* ── SETTINGS ─────────────────────────────────────────── */}
+                    {/* â”€â”€ SETTINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                     {activeTab === 'settings' && (
                         <div className="tab-pane">
                             <h2 className="pane-title">Settings</h2>
                             <div className="dashboard-card full-width" style={{ textAlign: 'center', padding: '80px 20px' }}>
-                                <span style={{ fontSize: '4rem', display: 'block', marginBottom: '16px' }}>⚙️</span>
+                                <span style={{ fontSize: '4rem', display: 'block', marginBottom: '16px' }}>âš™ï¸</span>
                                 <h3 style={{ color: '#e2e8f0', marginBottom: '8px' }}>Preferences Locked</h3>
                                 <p style={{ color: '#94a3b8', maxWidth: '400px', margin: '0 auto' }}>System configuration is currently read-only.</p>
                             </div>
@@ -3663,12 +3681,12 @@ const AdminDashboard = () => {
                                                         ? v.device_id 
                                                         : (v.mac_address && v.mac_address !== 'N/A') 
                                                             ? v.mac_address 
-                                                            : (v.ip ? `Device (${v.ip.slice(0, 8)}…)` : 'N/A');
+                                                            : (v.ip ? `Device (${v.ip.slice(0, 8)}â€¦)` : 'N/A');
                                                     const loc = v.location || (v.city && v.country ? `${v.city}, ${v.country}` : (v.city || v.country || 'Unknown'));
                                                     const dateFormatted = formatBDTDate(v.timestamp);
                                                     const vStatus = v.verification_status || 'legacy';
                                                     const vColor = vStatus === 'verified' ? '#10b981' : vStatus === 'fingerprint' ? '#f59e0b' : vStatus === 'legacy' ? '#64748b' : '#94a3b8';
-                                                    const vLabel = vStatus === 'verified' ? '🔗 Verified' : vStatus === 'fingerprint' ? '🖥 Fingerprint' : vStatus === 'legacy' ? '📁 Legacy' : '❓ Unverified';
+                                                    const vLabel = vStatus === 'verified' ? 'ðŸ”— Verified' : vStatus === 'fingerprint' ? 'ðŸ–¥ Fingerprint' : vStatus === 'legacy' ? 'ðŸ“ Legacy' : 'â“ Unverified';
 
                                                     return (
                                                         <tr key={v._id || v.id || idx}>
@@ -3678,7 +3696,7 @@ const AdminDashboard = () => {
                                                             <td className="device-id-cell">
                                                                 <span className="mac-badge" title={`Hardware Device ID: ${devId}`}>
                                                                     <Cpu size={12} />
-                                                                    <code>{devId.length > 24 ? devId.slice(0, 24) + '…' : devId}</code>
+                                                                    <code>{devId.length > 24 ? devId.slice(0, 24) + 'â€¦' : devId}</code>
                                                                 </span>
                                                             </td>
                                                             <td className="location-cell">

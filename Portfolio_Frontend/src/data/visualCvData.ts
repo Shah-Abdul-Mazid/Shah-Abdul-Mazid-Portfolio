@@ -1,4 +1,4 @@
-export interface VisualCvData {
+﻿﻿export interface VisualCvData {
     personal: {
         name: string;
         title: string;
@@ -68,19 +68,19 @@ export const visualCvData: VisualCvData = {
             degree: "B.Sc. in Computer Science & Engineering",
             institution: "East West University",
             period: "2021–2026",
-            details: "Major: Intelligent Systems & Data Science",
+            details: "Major: Intelligent Systems & Data Science | GPA: 2.56",
         },
         {
             degree: "Higher Secondary Certificate",
             institution: "Dhaka Ideal College",
             period: "2018–2020",
-            details: "Science",
+            details: "Science | GPA: 4.08",
         },
         {
             degree: "Secondary School Certificate",
             institution: "Badshah Faisal Institute",
             period: "2016–2018",
-            details: "Science",
+            details: "Science | GPA: 4.00",
         },
     ],
     languages: [

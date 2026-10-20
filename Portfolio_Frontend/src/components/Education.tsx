@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import type { MouseEvent } from 'react';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { FileText, ExternalLink, Link as LinkIcon } from 'lucide-react';
@@ -47,6 +47,7 @@ const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void 
                                 <div className="card-meta">
                                     <span className="card-period">{item.year}</span>
                                     <span className="card-duration">{item.major}</span>
+                                    {item.result && <span className="card-result">GPA: {item.result}</span>}
                                 </div>
                             </div>
                             <div className="card-body">
@@ -82,7 +83,7 @@ const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void 
             {selectedFile && (
                 <div className="image-modal-overlay" onClick={closeModal}>
                     <div className="image-modal-content">
-                        <button className="close-modal-btn" onClick={() => setSelectedFile(null)}>✖</button>
+                        <button className="close-modal-btn" onClick={() => setSelectedFile(null)}>âœ–</button>
                         {isPdfUrl(selectedFile) ? (
                             <iframe 
                                 src={getPdfViewerUrl(selectedFile)} 
@@ -116,6 +117,7 @@ const Education = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void 
                 .card-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; text-align: right; margin-left: 20px; }
                 .card-period { background: rgba(139,92,246,0.08); color: var(--primary); padding: 2px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(139,92,246,0.2); }
                 .card-duration { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; max-width: 200px; line-height: 1.2; }
+                .card-result { font-size: 0.7rem; color: var(--primary); font-weight: 700; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2); padding: 1px 8px; border-radius: 100px; }
 
                 .card-body { display: flex; gap: 24px; align-items: center; justify-content: space-between; }
                 .card-content { flex: 1; min-width: 250px; }

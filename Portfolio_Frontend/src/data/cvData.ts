@@ -1,4 +1,4 @@
-export interface CVSkillCategory {
+﻿﻿export interface CVSkillCategory {
     category: string;
     items: string[];
 }
@@ -115,19 +115,19 @@ export const cvData: CVData = {
             degree: "B.Sc. in Computer Science & Engineering",
             institution: "East West University",
             period: "2021–2026",
-            details: "Major: Intelligent Systems & Data Science",
+            details: "Major: Intelligent Systems & Data Science | GPA: 2.56",
         },
         {
             degree: "Higher Secondary Certificate",
             institution: "Dhaka Ideal College",
             period: "2018–2020",
-            details: "Science",
+            details: "Science | GPA: 4.08",
         },
         {
             degree: "Secondary School Certificate",
             institution: "Badshah Faisal Institute",
             period: "2016–2018",
-            details: "Science",
+            details: "Science | GPA: 4.00",
         },
     ],
     languages: [
@@ -177,7 +177,7 @@ export const cvData: CVData = {
             role: "AI Engineer",
             company: "Neuroxyte",
             location: "Narayanganj, Dhaka Division, Bangladesh",
-            period: "July 2026 – Current",
+            period: "July 2026 â€“ Current",
             points: [
                 "Develop and deploy AI solutions using Generative AI, LLMs, RAG, and intelligent automation.",
                 "Build AI applications and scalable backend services using Python and FastAPI.",
@@ -189,7 +189,7 @@ export const cvData: CVData = {
             role: "AI Engineer",
             company: "Softvence Agency",
             location: "Dhaka, Bangladesh",
-            period: "Feb 2026 – July 2026",
+            period: "Feb 2026 â€“ July 2026",
             points: [
                 "Developed RAG-based chatbots using Large Language Models for intelligent question answering.",
                 "Built FastAPI backend services and integrated AI models and external APIs.",
@@ -203,7 +203,7 @@ export const cvData: CVData = {
             title: "MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis",
             authors: "Raiyan Gani, Yusuf Salehin, Md. Shakil Bhuiyan, Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Shamim Ripon",
             year: "2025",
-            conference: "2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240.",
+            conference: "2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235â€“2240.",
             doi: "10.1109/ICCIT68739.2025.11490181",
             url: "https://doi.org/10.1109/ICCIT68739.2025.11490181",
         },
@@ -211,7 +211,7 @@ export const cvData: CVData = {
             title: "Uncertainty-Aware Chest Pathology Detection with Vision and Language Transformers",
             authors: "Shah Abdul Mazid, Monisha Bani Nibedita Shuci, Mahia Mehrun Safa, Md. Ashikur Rahman Anik, Md. Omor Faruk Sejan, Khandhakar Shatu Moni, Md. Sazzad Hossain, Md. Adnan Morshed, Ahmed Wasif Reza",
             year: "2026",
-            conference: "Innovations in Data Analytics, Springer Nature, 2026, pp. 397–417.",
+            conference: "Innovations in Data Analytics, Springer Nature, 2026, pp. 397â€“417.",
             doi: "10.1007/978-3-032-27845-6_34",
             url: "https://doi.org/10.1007/978-3-032-27845-6_34",
         },
@@ -263,7 +263,7 @@ export const cvData: CVData = {
         {
             title: "Brain Tumor Detection and Classification",
             subtitle: "MobDenseNet with CBAM Attention",
-            description: "Developed a hybrid MobileNetV2–DenseNet121 model with CBAM attention for MRI-based brain tumor classification.",
+            description: "Developed a hybrid MobileNetV2â€“DenseNet121 model with CBAM attention for MRI-based brain tumor classification.",
             points: [
                 "Applied preprocessing, augmentation, classification, and Grad-CAM for explainable predictions.",
             ],

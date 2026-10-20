@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { GITHUB_URL, SCHOLAR_URL, ORCID_URL, RESEARCHGATE_URL } from '../constants/researchLinks';
 import { CANONICAL_CREDENTIALS } from '../data/certificationData';
 
 export interface SkillCategory {
     name: string;
     items: string[];
-    proficiencies?: Record<string, number>; // skill name -> 0–100
+    proficiencies?: Record<string, number>; // skill name -> 0â€“100
     projectAssociations?: Record<string, string[]>; // skill name -> manual project titles
 }
 
@@ -14,6 +14,7 @@ export interface EducationItem {
     school: string;
     year: string;
     major: string;
+    result?: string;
     attachmentUrl?: string;
     attachmentLabel?: string;
     certificateUrl?: string;
@@ -500,7 +501,7 @@ const defaultPapers: PaperItem[] = [
     {
         title: "A comprehensive dataset and deep learning approach for misinformation detection on social media in Bangladesh",
         authors: "Rashid, M.R.A., Roy, R., Rahman, D.M.S., Saleh, M.A., Khan, A.A.H., Rayhan, M.A., Ahmed, K.F., Monsoor, N. and Hasan, M.",
-        venue: "International Journal of Computing and Digital Systems, 16(1), 1–10",
+        venue: "International Journal of Computing and Digital Systems, 16(1), 1â€“10",
         year: "2024",
         type: "journal"
     },
@@ -565,7 +566,7 @@ const defaultPapers: PaperItem[] = [
     {
         title: "Image based surface damage detection of renewable energy installations using a unified deep learning approach",
         authors: "ASM Shihavuddin, Mohammad Rifat Ahmmad Rashid, Md Hasan Maruf, Muhammad Abul Hasan, Mohammad Asif ul Haq, Ratil H. Ashique, Ahmed Al Mansur",
-        venue: "Energy Reports, 7, 4566–4576",
+        venue: "Energy Reports, 7, 4566â€“4576",
         publisher: "Elsevier",
         year: "2021",
         type: "journal"
@@ -580,7 +581,7 @@ const defaultPapers: PaperItem[] = [
     {
         title: "A quality assessment approach for evolving knowledge bases",
         authors: "Rashid, Mohammad, Marco Torchiano, Giuseppe Rizzo, Nandana Mihindukulasooriya, and Oscar Corcho",
-        venue: "Semantic Web, 10(2), 349–383",
+        venue: "Semantic Web, 10(2), 349â€“383",
         publisher: "IOS Press",
         year: "2019",
         type: "journal"
@@ -588,7 +589,7 @@ const defaultPapers: PaperItem[] = [
     {
         title: "Completeness and consistency analysis for evolving knowledge bases",
         authors: "Rashid, Mohammad Rifat Ahmmad, Giuseppe Rizzo, Marco Torchiano, Nandana Mihindukulasooriya, Oscar Corcho, and Raul Garcia-Castro",
-        venue: "Journal of Web Semantics, 54, 48–71",
+        venue: "Journal of Web Semantics, 54, 48â€“71",
         publisher: "Elsevier",
         year: "2019",
         type: "journal"
@@ -708,9 +709,9 @@ const defaultData: PortfolioData = {
         }
     ],
     education: [
-        { degree: 'B.Sc. in Computer Science & Engineering', school: 'East West University', year: '2021 – 2026', major: 'Major: Intelligent Systems & Data Science' },
-        { degree: 'Higher Secondary Certificate (HSC)', school: 'Dhaka Ideal College', year: '2018 – 2020', major: 'Science' },
-        { degree: 'Secondary School Certificate (SSC)', school: 'Badshah Faisal Institute', year: '2016 – 2018', major: 'Science' }
+        { degree: 'B.Sc. in Computer Science & Engineering', school: 'East West University', year: '2021 â€“ 2026', major: 'Major: Intelligent Systems & Data Science' },
+        { degree: 'Higher Secondary Certificate (HSC)', school: 'Dhaka Ideal College', year: '2018 â€“ 2020', major: 'Science' },
+        { degree: 'Secondary School Certificate (SSC)', school: 'Badshah Faisal Institute', year: '2016 â€“ 2018', major: 'Science' }
     ],
     experience: [
         { role: 'Network War', company: 'EWU Telecommunication Club', period: '2024', desc: 'Participated in the specialized networking competition.', certificateUrl: '/data/work-certificate.png' },
@@ -795,7 +796,7 @@ const defaultData: PortfolioData = {
         },
         {
             title: "Brain Tumor Detection and Classification",
-            desc: "Developed a hybrid MobileNetV2–DenseNet121 model with CBAM attention for MRI-based brain tumor classification.",
+            desc: "Developed a hybrid MobileNetV2â€“DenseNet121 model with CBAM attention for MRI-based brain tumor classification.",
             tags: ["PyTorch", "MobileNetV2", "DenseNet121", "CBAM", "Grad-CAM", "Streamlit"],
             showcase: 4,
             githubUrl: "https://github.com/Shah-Abdul-Mazid/CapstoneProjectFinal",
@@ -978,7 +979,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
         localStorage.setItem('portfolio_data', JSON.stringify(sanitized));
         
         try {
-            console.log('📡 Syncing portfolio to backend MongoDB...');
+            console.log('ðŸ“¡ Syncing portfolio to backend MongoDB...');
             const token = localStorage.getItem('admin_token');
             const headers: Record<string, string> = {
                 'Content-Type': 'application/json',
@@ -992,13 +993,13 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
                 body: JSON.stringify(sanitized)
             });
             if (res.ok) {
-                console.log('✅ Portfolio data saved to MongoDB');
+                console.log('âœ… Portfolio data saved to MongoDB');
                 return true;
             }
-            console.warn('⚠️ Failed to save portfolio data to backend status:', res.status);
+            console.warn('âš ï¸ Failed to save portfolio data to backend status:', res.status);
             return false;
         } catch (err) {
-            console.warn('⚠️ Could not reach backend to save portfolio data:', err);
+            console.warn('âš ï¸ Could not reach backend to save portfolio data:', err);
             return false;
         }
     };

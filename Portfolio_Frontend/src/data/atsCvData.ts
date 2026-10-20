@@ -1,4 +1,4 @@
-export interface ATSCvData {
+﻿export interface ATSCvData {
     personal: {
         name: string;
         title: string;
@@ -164,21 +164,21 @@ export const atsCvData: ATSCvData = {
             institution: "East West University",
             location: "Dhaka, Bangladesh",
             period: "2021 -- 2026",
-            major: "Major: Intelligent Systems and Data Science",
+            major: "Major: Intelligent Systems and Data Science | GPA: 2.56",
         },
         {
             degree: "Higher Secondary Certificate (HSC)",
             institution: "Dhaka Ideal College",
             location: "Dhaka, Bangladesh",
             period: "2018 -- 2020",
-            details: "Science",
+            details: "Science | GPA: 4.08",
         },
         {
             degree: "Secondary School Certificate (SSC)",
             institution: "Badshah Faisal Institute",
             location: "Dhaka, Bangladesh",
             period: "2016 -- 2018",
-            details: "Science",
+            details: "Science | GPA: 4.00",
         },
     ],
     projects: [
