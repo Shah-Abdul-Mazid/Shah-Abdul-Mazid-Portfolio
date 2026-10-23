@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     # Ollama (Local LLM - Free, zero cost)
     OLLAMA_URL: Optional[str] = "http://localhost:11434"
     OLLAMA_MODEL: Optional[str] = "openchat"
-    USE_OLLAMA: bool = True
+    USE_OLLAMA: bool = False
 
     # Groq (Free Cloud LLM - fastest option)
     GROQ_API_KEY: Optional[str] = None
@@ -49,17 +49,19 @@ class Settings(BaseSettings):
         for key in ('ATLAS_URL', 'atlas_URL', 'MONGODB_URI', 'MONGO_URI', 'MONGODB_URL', 'DATABASE_URL'):
             val = getattr(self, key, None) or os.getenv(key)
             if val and str(val).strip():
-                return str(val).strip()
+                # Strip leading/trailing whitespaces and optional quotes
+                return str(val).strip().strip('\'"')
         return 'mongodb://localhost:27017'
 
     @property
     def get_db_name(self) -> str:
-        return self.atlas_DB_NAME or self.DB_NAME or os.getenv("atlas_DB_NAME") or "portfolio_data"
+        raw = self.atlas_DB_NAME or self.DB_NAME or os.getenv("atlas_DB_NAME") or "portfolio_data"
+        return str(raw).strip().strip('\'"')
 
     @property
     def is_cloudinary_configured(self) -> bool:
         # We are good if we have individual keys OR the combined URL
-        return (self.CLOUDINARY_CLOUD_NAME and self.CLOUDINARY_API_KEY) or self.CLOUDINARY_URL
+        return (self.CLOUDINARY_CLOUD_NAME and self.CLOUDINARY_API_KEY) or bool(self.CLOUDINARY_URL)
 
 
 settings = Settings()

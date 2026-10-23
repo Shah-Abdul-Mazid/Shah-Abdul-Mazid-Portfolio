@@ -49,6 +49,10 @@ wheels/
 # Environment variables & secrets
 .env
 .env.*
+*.env
+Shah-Abdul-Mazid-Portfolio.env
+Portfolio_Backend/.env
+Portfolio_Frontend/.env
 !.env.example
 
 # Backups & local models
