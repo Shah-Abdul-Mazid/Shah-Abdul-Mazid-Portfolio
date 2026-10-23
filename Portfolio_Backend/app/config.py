@@ -1,4 +1,4 @@
-﻿import os
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
@@ -12,12 +12,15 @@ class Settings(BaseSettings):
     JWT_SECRET: str = "secret"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 # 24 hours
     
-    # Databases
+    # Databases — accept any common env-var name for the MongoDB URI
     ATLAS_URL: Optional[str] = None
-    atlas_URL: Optional[str] = None  
+    atlas_URL: Optional[str] = None
+    MONGODB_URI: Optional[str] = None
+    MONGO_URI: Optional[str] = None
+    MONGODB_URL: Optional[str] = None
+    DATABASE_URL: Optional[str] = None
     DB_NAME: str = "portfolio_data"
-    atlas_DB_NAME: Optional[str] = None 
-    
+    atlas_DB_NAME: Optional[str] = None
 
     # Cloudinary (Optional)
     CLOUDINARY_CLOUD_NAME: Optional[str] = None
@@ -36,15 +39,18 @@ class Settings(BaseSettings):
 
     # Load from .env in project root
     model_config = SettingsConfigDict(
-        env_file=".env", 
-        extra="ignore", 
-        env_ignore_case=True # CRITICAL for Render/Vercel environment variable case matching
+        env_file=".env",
+        extra="ignore",
+        env_ignore_case=True  # CRITICAL for Render/Vercel environment variable case matching
     )
 
     @property
     def get_atlas_url(self) -> str:
-        # Prioritize lowercase or uppercase from env
-        return self.atlas_URL or self.ATLAS_URL or os.getenv("atlas_URL") or "mongodb://localhost:27017"
+        for key in ('ATLAS_URL', 'atlas_URL', 'MONGODB_URI', 'MONGO_URI', 'MONGODB_URL', 'DATABASE_URL'):
+            val = getattr(self, key, None) or os.getenv(key)
+            if val and str(val).strip():
+                return str(val).strip()
+        return 'mongodb://localhost:27017'
 
     @property
     def get_db_name(self) -> str:
