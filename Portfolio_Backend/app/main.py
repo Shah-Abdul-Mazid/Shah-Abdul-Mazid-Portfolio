@@ -1,5 +1,7 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html, get_swagger_ui_oauth2_redirect_html, get_redoc_html
+from fastapi.responses import JSONResponse
 from app.db import connect_to_mongo, close_mongo_connection
 
 from app.api.v1.endpoints import portfolio, admin, analytics, messages, upload, agent
@@ -126,6 +128,33 @@ async def get_version():
 @app.get("/")
 async def root():
     return {"message": "Welcome to the Portfolio & AI Agent Backend API"}
+
+# --- 6. API DOCUMENTATION ENDPOINTS (/docs, /api/docs, /redoc, /api/redoc) ---
+@app.get("/api/docs", include_in_schema=False)
+async def api_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url="/api/openapi.json",
+        title=f"{settings.PROJECT_NAME} - Swagger UI",
+        oauth2_redirect_url="/api/docs/oauth2-redirect",
+        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
+        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css"
+    )
+
+@app.get("/api/docs/oauth2-redirect", include_in_schema=False)
+async def api_swagger_ui_redirect():
+    return get_swagger_ui_oauth2_redirect_html()
+
+@app.get("/api/redoc", include_in_schema=False)
+async def api_redoc_html():
+    return get_redoc_html(
+        openapi_url="/api/openapi.json",
+        title=f"{settings.PROJECT_NAME} - ReDoc",
+        redoc_js_url="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"
+    )
+
+@app.get("/api/openapi.json", include_in_schema=False)
+async def api_openapi_schema():
+    return JSONResponse(app.openapi())
 
 if __name__ == "__main__":
     import uvicorn
