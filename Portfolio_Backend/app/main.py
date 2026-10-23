@@ -1,7 +1,7 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html, get_swagger_ui_oauth2_redirect_html, get_redoc_html
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from app.db import connect_to_mongo, close_mongo_connection
 
 from app.api.v1.endpoints import portfolio, admin, analytics, messages, upload, agent
@@ -83,6 +83,7 @@ app.include_router(upload.router, prefix="/api/upload", tags=["Uploads"])
 app.include_router(agent.router, prefix="/api/agent", tags=["AI Agent"])
 
 # --- 5. CORE ENDPOINTS ---
+@app.get("/health")
 @app.get("/api/v1/health")
 @app.get("/api/health")
 async def health():
@@ -129,31 +130,72 @@ async def get_version():
 async def root():
     return {"message": "Welcome to the Portfolio & AI Agent Backend API"}
 
-# --- 6. API DOCUMENTATION ENDPOINTS (/docs, /api/docs, /redoc, /api/redoc) ---
-@app.get("/api/docs", include_in_schema=False)
-async def api_swagger_ui_html():
-    return get_swagger_ui_html(
-        openapi_url="/api/openapi.json",
-        title=f"{settings.PROJECT_NAME} - Swagger UI",
-        oauth2_redirect_url="/api/docs/oauth2-redirect",
-        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
-        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css"
-    )
+# --- 6. ROCK-SOLID API DOCUMENTATION ENDPOINTS ---
+def _generate_swagger_ui(openapi_path: str = "/openapi.json"):
+    return HTMLResponse(f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{settings.PROJECT_NAME} - Swagger UI</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.18.2/swagger-ui.min.css" />
+    <link rel="icon" type="image/png" href="https://fastapi.tiangolo.com/img/favicon.png" />
+    <style>
+        html {{ box-sizing: border-box; overflow-y: scroll; }}
+        *, *:before, *:after {{ box-sizing: inherit; }}
+        body {{ margin: 0; background: #0b1120; }}
+        .swagger-ui {{ color: #e2e8f0; }}
+        .swagger-ui .topbar {{ display: none; }}
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.18.2/swagger-ui-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.18.2/swagger-ui-standalone-preset.min.js"></script>
+    <script>
+    window.onload = function() {{
+        window.ui = SwaggerUIBundle({{
+            url: '{openapi_path}',
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+            ],
+            layout: "BaseLayout"
+        }});
+    }};
+    </script>
+</body>
+</html>""")
 
-@app.get("/api/docs/oauth2-redirect", include_in_schema=False)
-async def api_swagger_ui_redirect():
-    return get_swagger_ui_oauth2_redirect_html()
+@app.get("/docs", include_in_schema=False)
+async def swagger_docs():
+    return _generate_swagger_ui("/openapi.json")
+
+@app.get("/api/docs", include_in_schema=False)
+async def api_swagger_docs():
+    return _generate_swagger_ui("/api/openapi.json")
+
+@app.get("/redoc", include_in_schema=False)
+async def redoc_html():
+    return get_redoc_html(
+        openapi_url="/openapi.json",
+        title=f"{settings.PROJECT_NAME} - ReDoc",
+        redoc_js_url="https://cdnjs.cloudflare.com/ajax/libs/redoc/2.1.5/redoc.standalone.js"
+    )
 
 @app.get("/api/redoc", include_in_schema=False)
 async def api_redoc_html():
     return get_redoc_html(
         openapi_url="/api/openapi.json",
         title=f"{settings.PROJECT_NAME} - ReDoc",
-        redoc_js_url="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"
+        redoc_js_url="https://cdnjs.cloudflare.com/ajax/libs/redoc/2.1.5/redoc.standalone.js"
     )
 
+@app.get("/openapi.json", include_in_schema=False)
 @app.get("/api/openapi.json", include_in_schema=False)
-async def api_openapi_schema():
+async def openapi_schema():
     return JSONResponse(app.openapi())
 
 if __name__ == "__main__":
