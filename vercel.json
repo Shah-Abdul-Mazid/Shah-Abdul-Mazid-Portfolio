@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "framework": null,
   "buildCommand": "cd Portfolio_Frontend && npm install && npm run build",
   "outputDirectory": "Portfolio_Frontend/dist",
   "installCommand": "pip install -r requirements.txt",
