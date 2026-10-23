@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+﻿import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import HomePage from './pages/HomePage';
@@ -22,6 +22,25 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 import { PortfolioProvider } from './context/PortfolioContext';
 import { useVisitorTracker } from './hooks/useVisitorTracker';
 
+const BackendPassThrough = () => {
+    useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(regs => {
+                for (const reg of regs) {
+                    reg.unregister();
+                }
+                window.location.reload();
+            });
+        } else {
+            window.location.reload();
+        }
+    }, []);
+    return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#0b1120', color: '#60a5fa', fontFamily: 'sans-serif' }}>
+            <p>Opening API Documentation...</p>
+        </div>
+    );
+};
 const TrackerWrapper = ({ children }: { children: React.ReactNode }) => {
     useVisitorTracker();
     return <>{children}</>;
@@ -54,6 +73,11 @@ function App() {
 
                             <Route path="/login/admin" element={<AdminLogin />} />
                             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                                                        <Route path="/docs" element={<BackendPassThrough />} />
+                            <Route path="/docs/*" element={<BackendPassThrough />} />
+                            <Route path="/redoc" element={<BackendPassThrough />} />
+                            <Route path="/redoc/*" element={<BackendPassThrough />} />
+                            <Route path="/openapi.json" element={<BackendPassThrough />} />
                             <Route path="*" element={<Navigate to="/home" replace />} />
                         </Routes>
                     </Suspense>
