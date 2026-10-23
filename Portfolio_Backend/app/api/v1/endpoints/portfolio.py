@@ -31,13 +31,21 @@ import asyncio
 
 @router.get("")
 async def get_portfolio(db=Depends(get_database)):
-
-    # 2. Fallback to MongoDB
     if db is not None:
-        doc = await db["portfolio_content"].find_one({"key": "main"})
-        if doc:
-            return doc.get("data", {})
-    return None
+        try:
+            doc = await asyncio.wait_for(
+                db["portfolio_content"].find_one({"key": "main"}),
+                timeout=3.5
+            )
+            if doc:
+                data = doc.get("data", {})
+                if isinstance(data, dict):
+                    if "_id" in data:
+                        data["_id"] = str(data["_id"])
+                    return data
+        except Exception as e:
+            logger.warning(f"Error fetching portfolio from DB: {e}")
+    return {}
 
 @router.post("")
 async def save_portfolio(
