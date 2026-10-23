@@ -2,14 +2,11 @@
   "version": 2,
   "functions": {
     "api/index.py": {
-      "runtime": "python3.12",
+      "runtime": "@vercel/python",
       "maxDuration": 30
     }
   },
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/api/index.py"
-    }
+    { "source": "/(.*)", "destination": "/api/index.py" }
   ]
 }

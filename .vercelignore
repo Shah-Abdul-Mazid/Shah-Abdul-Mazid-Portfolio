@@ -1,8 +1,13 @@
-# Vercel – skip these from the deployment upload (saves time & space)
+# Vercel – skip heavy folders from upload (keeps function under 50 MB)
 Portfolio_Backend/.venv
 Portfolio_Backend/__pycache__
+Portfolio_Backend/app/__pycache__
+Portfolio_Backend/app/api/__pycache__
+Portfolio_Backend/app/api/v1/__pycache__
+Portfolio_Backend/app/api/v1/endpoints/__pycache__
 Portfolio_Frontend/node_modules
 Portfolio_Frontend/dist
 .git
 *.pyc
 *.pyo
+*.pyd
