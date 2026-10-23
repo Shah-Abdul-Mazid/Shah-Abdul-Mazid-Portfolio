@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db import connect_to_mongo, close_mongo_connection
 
@@ -25,6 +25,8 @@ allowed_origins = [
     "https://shahabdulmazid.com",
     "https://www.shahabdulmazid.com",
     "https://shah-abdul-mazid.vercel.app",
+    "https://shahabdulmazidezan.me",
+    "https://www.shahabdulmazidezan.me",
     "https://shah-abdul-mazid-portfolio.onrender.com",
 ]
 for origin in env_origins:

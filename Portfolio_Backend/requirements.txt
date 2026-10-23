@@ -1,14 +1,14 @@
-# 🚀 Portfolio & AI Agent FastAPI Requirements (Production Optimized)
-fastapi
-uvicorn[standard]
-gunicorn
-motor
-cloudinary
-python-dotenv
-pydantic-settings
-python-multipart
-python-jose[cryptography]
-bcrypt
-httpx
-pydantic
-
+# Vercel Serverless — pinned production requirements
+# gunicorn is NOT needed on Vercel (serverless); uvicorn[standard] provides the ASGI runner
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+motor==3.6.0
+cloudinary==1.42.1
+python-dotenv==1.0.1
+pydantic-settings==2.7.0
+python-multipart==0.0.20
+python-jose[cryptography]==3.3.0
+bcrypt==4.2.1
+httpx==0.28.1
+pydantic==2.10.4
+mangum==0.19.0

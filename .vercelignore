@@ -1,0 +1,8 @@
+# Vercel – skip these from the deployment upload (saves time & space)
+Portfolio_Backend/.venv
+Portfolio_Backend/__pycache__
+Portfolio_Frontend/node_modules
+Portfolio_Frontend/dist
+.git
+*.pyc
+*.pyo
