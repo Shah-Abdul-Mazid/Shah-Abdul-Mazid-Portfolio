@@ -1,4 +1,4 @@
-﻿﻿export interface ATSCvData {
+﻿export interface ATSCvData {
     personal: {
         name: string;
         title: string;
@@ -64,7 +64,7 @@ export const atsCvData: ATSCvData = {
         name: "SHAH ABDUL MAZID",
         title: "AI/ML Engineer | Generative AI | LLMs | RAG | Computer Vision",
         location: "Dhaka, Bangladesh",
-        email: "shahabdulmazid.esan@yahoo.com",
+        email: "shahabdulmazid.ezan@yahoo.com",
         phone: "+880 1531329222",
         linkedin: "https://www.linkedin.com/in/shahabdulmazid",
         github: "https://github.com/Shah-Abdul-Mazid",

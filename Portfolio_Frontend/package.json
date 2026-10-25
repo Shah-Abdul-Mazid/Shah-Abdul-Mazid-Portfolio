@@ -7,13 +7,13 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "scrape:cv": "python src/utils/scrape_tex.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",
     "@types/three": "^0.183.1",
     "@vercel/analytics": "^1.5.0",
-
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.14.0",
     "jspdf": "^4.2.1",

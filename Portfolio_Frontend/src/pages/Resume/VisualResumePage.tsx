@@ -92,8 +92,6 @@ async function generateVisualPdfBlob(container: HTMLElement): Promise<Blob> {
     return pdf.output('blob');
 }
 
-/** Path to the static, pre-compiled Overleaf-generated PDF */
-const PDF_FILE_PATH = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
 
 export const VisualResumePage: React.FC = () => {
     const { data: portfolioData } = usePortfolio();
@@ -110,19 +108,7 @@ export const VisualResumePage: React.FC = () => {
         setGenerating(true);
         setShowNameModal(false);
         try {
-            const res = await fetch(PDF_FILE_PATH);
-            const contentType = res.headers.get('content-type') || '';
-            if (res.ok && !contentType.includes('text/html')) {
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = selectedFileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-            } else if (cvRef.current) {
+            if (cvRef.current) {
                 const blob = await generateVisualPdfBlob(cvRef.current);
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');

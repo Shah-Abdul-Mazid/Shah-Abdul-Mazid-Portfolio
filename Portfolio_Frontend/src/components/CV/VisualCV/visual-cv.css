@@ -547,3 +547,32 @@
     height: 25mm;
   }
 }
+
+#cv-page-2 .v2-project-link {
+  color: var(--v2-navy, #243B5A);
+  text-decoration: underline;
+  font-weight: 600;
+  font-size: 7.8pt;
+  margin-left: 3px;
+}
+
+#cv-page-2 .v2-project-link:hover {
+  color: var(--v2-blue, #2F527F);
+}
+
+/* References */
+#cv-page-2 .v2-ref-item {
+  font-size: 8.3pt;
+  margin-bottom: 2mm;
+  line-height: 1.32;
+  color: var(--v2-text);
+}
+
+#cv-page-2 .v2-ref-item:last-child {
+  margin-bottom: 0;
+}
+
+#cv-page-2 .v2-ref-item b {
+  font-weight: 700;
+  color: var(--v2-dark);
+}

@@ -1,11 +1,12 @@
-﻿﻿﻿import { useRef, useState, useMemo } from 'react';
+﻿import { useRef, useState, useMemo } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Download, Loader, CheckCircle2, AlertCircle, Info, X, Zap, Mail, MapPin, Globe, Briefcase, Eye, FileDown, Phone, Linkedin, Github } from 'lucide-react';
+import { Download, Loader, CheckCircle2, AlertCircle, Info, X, Zap, Mail, MapPin, Globe, Briefcase, Eye, FileDown } from 'lucide-react';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
 import { downloadUpdatedVisualCvTex } from '../utils/latexSync';
 import DownloadFileNameModal from './CV/DownloadFileNameModal';
+import VisualCV from './CV/VisualCV/VisualCV';
 
 const fmtDate = (s: string) => {
     if (!s) return 'Present';
@@ -13,6 +14,31 @@ const fmtDate = (s: string) => {
     if (isNaN(d.getTime())) return s;
     return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 };
+
+
+const OrcidIcon: React.FC<{ size?: number }> = ({ size = 10 }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
+    >
+        <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947s-.422.947-.947.947a.95.95 0 0 1-.947-.947c0-.525.422-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.025-5.325 5.025h-3.919V7.416zm1.444 1.303v7.444h2.297c3.272 0 4.022-2.484 4.022-3.722 0-2.016-1.284-3.722-4.097-3.722h-2.222z" />
+    </svg>
+);
+
+const ResearchGateIcon: React.FC<{ size?: number }> = ({ size = 10 }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
+    >
+        <path d="M19.586 0c-.818 0-1.508.19-2.073.565-.563.377-.97.936-1.213 1.68a3.193 3.193 0 0 0-.112.437 8.365 8.365 0 0 0-.078.53 9 9 0 0 0-.05.727c-.01.282-.013.621-.013 1.016a31.121 31.123 0 0 0 .014 1.017 9 9 0 0 0 .05.727 7.946 7.946 0 0 0 .077.53h-.005a3.334 3.334 0 0 0 .113.438c.245.743.65 1.303 1.214 1.68.565.376 1.256.564 2.075.564.8 0 1.536-.213 2.105-.603.57-.39.94-.916 1.175-1.65.076-.235.135-.558.177-.93a10.9 10.9 0 0 0 .043-1.207v-.82c0-.095-.047-.142-.14-.142h-3.064c-.094 0-.14.047-.14.141v.956c0 .094.046.14.14.14h1.666c.056 0 .084.03.084.086 0 .36 0 .62-.036.865-.038.244-.1.447-.147.606-.108.385-.348.664-.638.876-.29.212-.738.35-1.227.35-.545 0-.901-.15-1.21-.353-.306-.203-.517-.454-.67-.915a3.136 3.136 0 0 1-.147-.762 17.366 17.367 0 0 1-.034-.656c-.01-.26-.014-.572-.014-.939a26.401 26.403 0 0 1 .014-.938 15.821 15.822 0 0 1 .035-.656 3.19 3.19 0 0 1 .148-.76 1.89 1.89 0 0 1 .742-1.01c.344-.244.593-.352 1.137-.352.508 0 .815.096 1.144.303.33.207.528.492.764.925.047.094.111.118.198.07l1.044-.43c.075-.048.09-.115.042-.199a3.549 3.549 0 0 0-.466-.742 3 3 0 0 0-.679-.607 3.313 3.313 0 0 0-.903-.41A4.068 4.068 0 0 0 19.586 0zM8.217 5.836c-1.69 0-3.036.086-4.297.086-1.146 0-2.291 0-3.007-.029v.831l1.088.2c.744.144 1.174.488 1.174 2.264v11.288c0 1.777-.43 2.12-1.174 2.263l-1.088.2v.832c.773-.029 2.12-.086 3.465-.086 1.29 0 2.951.057 3.667.086v-.831l-1.49-.2c-.773-.115-1.174-.487-1.174-2.264v-4.784c.688.057 1.29.057 2.206.057 1.748 3.123 3.41 5.472 4.355 6.56.86 1.032 2.177 1.691 3.839 1.691.487 0 1.003-.086 1.318-.23v-.744c-1.031 0-2.063-.716-2.808-1.518-1.26-1.376-2.95-3.582-4.355-6.074 2.32-.545 4.04-2.722 4.04-4.9 0-3.208-2.492-4.698-5.758-4.698zm-.515 1.29c2.406 0 3.839 1.26 3.839 3.552 0 2.263-1.547 3.782-4.097 3.782-.974 0-1.404-.03-2.063-.086v-7.19c.66-.059 1.547-.059 2.32-.059z" />
+    </svg>
+);
 
 const Resume = () => {
     const { data } = usePortfolio();
@@ -28,9 +54,6 @@ const Resume = () => {
     // Static compiled TeX paths
     const TEX_V1 = '/resume/Shah_Abdul_Mazid_ATS_CV_Version_1.tex';
     const TEX_V2 = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.tex';
-
-    // Static compiled PDF path (Overleaf-generated)
-    const VISUAL_PDF_PATH = '/resume/Shah_Abdul_Mazid_Visual_CV_Version_2.pdf';
 
     const activeTex = cvType === 'v1_ats' ? TEX_V1 : TEX_V2;
 
@@ -71,34 +94,16 @@ const Resume = () => {
 
     const handleExecuteDownload = async (selectedFileName: string) => {
         setShowNameModal(false);
-        if (cvType === 'v2_visual') {
-            try {
-                const res = await fetch(VISUAL_PDF_PATH);
-                const contentType = res.headers.get('content-type') || '';
-                if (res.ok && !contentType.includes('text/html')) {
-                    const blob = await res.blob();
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = selectedFileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    setTimeout(() => URL.revokeObjectURL(url), 5000);
-                    return;
-                }
-            } catch (e) {
-                console.error("Direct Visual CV download error:", e);
-            }
-        }
 
         if (!sheetRef.current) return;
         setBusy(true);
         
         try {
             sheetRef.current.classList.add('pdf-export');
+            // Visual CV uses own internal padding; 0 margin keeps pages clean A4
+            const isVisual = cvType === 'v2_visual';
             const opt = {
-                margin: [13.2, 0, 13.2, 0],
+                margin: isVisual ? 0 : [13.2, 0, 13.2, 0],
                 filename: selectedFileName,
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { 
@@ -145,12 +150,6 @@ const Resume = () => {
     };
 
     const handleViewPdf = async () => {
-        if (cvType === 'v2_visual') {
-            setShowPdfViewer(true);
-            setPdfBlobUrl(VISUAL_PDF_PATH);
-            setViewerLoading(false);
-            return;
-        }
 
         setShowPdfViewer(true);
         setViewerLoading(true);
@@ -451,262 +450,7 @@ const Resume = () => {
                 {/* VERSION 2: VISUAL CV (2-COLUMN MODERN LAYOUT)                             */}
                 {/* ========================================================================= */}
                 {cvType === 'v2_visual' && (
-                    <div className="rv-content v2-visual-content">
-                        {/* Header Navy Block */}
-                        <div className="v2-header-band">
-                            <div className="v2-header-left">
-                                <h1 className="v2-name">SHAH ABDUL MAZID</h1>
-                                <h2 className="v2-subtitle">AI/ML ENGINEER</h2>
-                                <div className="v2-tags">
-                                    Generative AI &nbsp;|&nbsp; LLMs &nbsp;|&nbsp; RAG &nbsp;|&nbsp; Computer Vision &nbsp;|&nbsp; NLP
-                                </div>
-                                <div className="v2-contact-grid">
-                                    <span className="v2-citem"><MapPin size={11} /> Dhaka, Bangladesh</span>
-                                    <span className="v2-citem"><Mail size={11} /> <a href={`mailto:${em}`}>{em}</a></span>
-                                    <span className="v2-citem"><Phone size={11} /> {ph}</span>
-                                    <span className="v2-citem"><Linkedin size={11} /> <a href="https://www.linkedin.com/in/shahabdulmazid" target="_blank" rel="noreferrer">LinkedIn</a></span>
-                                    <span className="v2-citem"><Github size={11} /> <a href="https://github.com/Shah-Abdul-Mazid" target="_blank" rel="noreferrer">GitHub</a></span>
-                                </div>
-                            </div>
-                            <div className="v2-header-right">
-                                <img src="/resume/FD=109767.jpg" alt="Shah Abdul Mazid" className="v2-avatar" />
-                            </div>
-                        </div>
-
-                        {/* Professional Summary */}
-                        <div className="v2-summary-box">
-                            <h3 className="v2-sec-heading">Professional Summary</h3>
-                            <p className="v2-summary-p">
-                                AI/ML Engineer with a B.Sc. in Computer Science and Engineering from East West University, majoring in Intelligent Systems and Data Science. Experienced in Generative AI, LLMs, RAG, Machine Learning, Deep Learning, Computer Vision, and NLP. Skilled in building AI applications using Python, PyTorch, TensorFlow, FastAPI, Pinecone, OpenAI APIs, and AWS. Passionate about AI research and developing intelligent solutions for real-world problems.
-                            </p>
-                        </div>
-
-                        {/* PAGE 1 CONTENT (2-COLUMN GRID) */}
-                        <div className="v2-page1">
-                            <div className="v2-grid">
-                                {/* Page 1 Left Column */}
-                                <div className="v2-col">
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Technical Skills</h3>
-                                        <div className="v2-skill-entry"><b>Languages:</b> Python, Java, C/C++, JavaScript, TypeScript, SQL</div>
-                                        <div className="v2-skill-entry"><b>AI / ML:</b> Machine Learning, Deep Learning, Transfer Learning, Model Evaluation, Data Preprocessing</div>
-                                        <div className="v2-skill-entry"><b>Generative AI:</b> Generative AI, LLMs, RAG, Prompt Engineering, AI Agents, Agentic AI, Multi-Agent Systems</div>
-                                        <div className="v2-skill-entry"><b>NLP:</b> Natural Language Processing, Semantic Search, Vector Search, Embeddings, Sentence Transformers, Document Q&A, AI Chatbots</div>
-                                        <div className="v2-skill-entry"><b>Computer Vision:</b> Object Detection, Image Classification, Medical Imaging, YOLO, OpenCV, Grad-CAM, CBAM Attention</div>
-                                        <div className="v2-skill-entry"><b>Frameworks:</b> PyTorch, TensorFlow, Keras, Scikit-learn, NumPy, Pandas, Matplotlib, Plotly</div>
-                                        <div className="v2-skill-entry"><b>Backend:</b> FastAPI, REST APIs, JWT Authentication, API Integration, PDF Processing</div>
-                                        <div className="v2-skill-entry"><b>Frontend:</b> React, Next.js, Streamlit, Gradio</div>
-                                        <div className="v2-skill-entry"><b>Databases:</b> Pinecone, Vector Databases, MongoDB, MySQL, SQLite</div>
-                                        <div className="v2-skill-entry"><b>Cloud / DevOps:</b> AWS, EC2, Docker, PM2, Git, GitHub</div>
-                                        <div className="v2-skill-entry"><b>Automation:</b> n8n, Workflow Automation, API Integration</div>
-                                    </div>
-
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Education</h3>
-                                        <div className="v2-item">
-                                            <div className="v2-bold">B.Sc. in Computer Science & Engineering</div>
-                                            <div className="v2-sub">East West University <span className="v2-right-date">2021–2026</span></div>
-                                            <div className="v2-small">Major: Intelligent Systems & Data Science</div>
-                                            <div className="v2-small">Result: 2.56</div>
-                                        </div>
-                                        <div className="v2-item">
-                                            <div className="v2-bold">Higher Secondary Certificate</div>
-                                            <div className="v2-sub">Dhaka Ideal College <span className="v2-right-date">2018–2020</span></div>
-                                            <div className="v2-small">Group: Science</div>
-                                            <div className="v2-small">Result: 4.08</div>
-                                        </div>
-                                        <div className="v2-item">
-                                            <div className="v2-bold">Secondary School Certificate</div>
-                                            <div className="v2-sub">Badshah Faisal Institute <span className="v2-right-date">2016–2018</span></div>
-                                            <div className="v2-small">Group: Science</div>
-                                            <div className="v2-small">Result: 4.00</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Languages</h3>
-                                        <div><b>Bengali</b> — Native</div>
-                                        <div><b>English</b> — Professional Working Proficiency</div>
-                                    </div>
-                                </div>
-
-                                {/* Page 1 Right Column */}
-                                <div className="v2-col">
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Tools & Platforms</h3>
-                                        <div className="v2-skill-entry"><b>Models & APIs:</b> OpenAI API, Llama 2, Mistral, Claude API, HuggingFace Models</div>
-                                        <div className="v2-skill-entry"><b>Vector DBs & Search:</b> Pinecone, Weaviate, Milvus, Chroma, FAISS</div>
-                                        <div className="v2-skill-entry"><b>Deployment:</b> Hugging Face Hub, AWS SageMaker, Docker Hub, Streamlit Cloud</div>
-                                        <div className="v2-skill-entry"><b>Dev Tools:</b> VS Code, Git, GitHub, Jupyter, Google Colab, Linux/Ubuntu</div>
-                                        <div className="v2-skill-entry"><b>APIs & Integrations:</b> OpenAI API, Google Maps, Stripe, Google Sheets, Anthropic API</div>
-                                    </div>
-
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Key Achievements</h3>
-                                        <ul className="v2-ul">
-                                            <li>Published 2 research papers in agricultural AI and medical imaging (IEEE ICCIT 2025, Springer ICIDA 2026)</li>
-                                            <li>Built enterprise RAG platform processing 10,000+ documents with 95%+ retrieval accuracy</li>
-                                            <li>Developed traffic detection system for real-world Bangladesh traffic conditions</li>
-                                            <li>Designed multi-agent AI systems for complex enterprise workflows and automation</li>
-                                            <li>Earned 17+ IBM and AWS certifications across AI, ML, Generative AI, and data science</li>
-                                        </ul>
-                                    </div>
-                                                                        
-
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Professional Highlights</h3>
-                                        <div className="v2-item"><b>Published Research:</b> Two publications in medical imaging and agricultural AI, including  IEEE ICCIT 2025 and Springer ICIDA 2025.</div>
-                                        <div className="v2-item"><b>Generative AI &amp; RAG:</b> Built enterprise document Q&amp;A, retrieval-augmented, and multi-agent AI systems.</div>
-                                        <div className="v2-item"><b>End-to-End AI:</b> Developed ML systems spanning model development, backend integration, and production deployment.</div>
-                                        <div className="v2-item"><b>AI Automation:</b> Built n8n-based workflows integrating AI models, APIs, and external services.</div>
-                                    </div>
-
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Research Interests</h3>
-                                        <ul className="v2-ul">
-                                            <li>Generative AI, LLMs & RAG Architecture</li>
-                                            <li>Multi-Agent AI Systems & Autonomous Workflows</li>
-                                            <li>Healthcare AI & Medical Image Diagnosis</li>
-                                            <li>Computer Vision, Grad-CAM & Model Interpretability</li>
-                                        </ul>
-                                    </div>
-
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Career Focus</h3>
-                                        <div>AI/ML Engineering &nbsp;|&nbsp; Generative AI &nbsp;|&nbsp; RAG Systems</div>
-                                        <div>Computer Vision &nbsp;|&nbsp; AI Research &nbsp;|&nbsp; Data Science</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* PAGE 2 CONTENT (2-COLUMN GRID) */}
-                        <div className="v2-page2 html2pdf__page-break" style={{ pageBreakBefore: 'always' }}>
-                            <div className="v2-grid">
-                                {/* Page 2 Left Column */}
-                                <div className="v2-col">
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Professional Experience</h3>
-                                        <div className="v2-item">
-                                            <div className="v2-bold">AI Engineer <span className="v2-right-date">July 2026 — Current</span></div>
-                                            <div className="v2-sub">Neuroxyte — Narayanganj, Dhaka Division, Bangladesh</div>
-                                            <ul className="v2-ul">
-                                                <li>Develop and deploy AI solutions using Generative AI, LLMs, RAG, and intelligent automation.</li>
-                                                <li>Build AI applications and scalable backend services using Python and FastAPI.</li>
-                                                <li>Design LLM-based workflows, conversational AI systems, and retrieval-augmented applications.</li>
-                                                <li>Integrate AI models, external APIs, and third-party services to deliver reliable end-to-end solutions.</li>
-                                            </ul>
-                                        </div>
-
-                                        <div className="v2-item">
-                                            <div className="v2-bold">AI Engineer <span className="v2-right-date">Feb 2026 — July 2026</span></div>
-                                            <div className="v2-sub">Softvence Agency — Dhaka, Bangladesh</div>
-                                            <ul className="v2-ul">
-                                                <li>Developed RAG-based chatbots using Large Language Models for intelligent question answering.</li>
-                                                <li>Built FastAPI backend services and integrated AI models and external APIs.</li>
-                                                <li>Developed Text-to-Speech and voice generation systems for interactive AI applications.</li>
-                                                <li>Automated business workflows using n8n and implemented Generative AI and RAG solutions.</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Publication</h3>
-                                        <div className="v2-item" style={{ marginBottom: '8px' }}>
-                                            <div className="v2-bold">MangoStack: A Lightweight, Interpretable Ensemble for Real-Time Mango Leaf Disease Diagnosis</div>
-                                            <div className="v2-small"><b>2025</b> — 2025 28th International Conference on Computer and Information Technology (ICCIT), IEEE, pp. 2235–2240.</div>
-                                        </div>
-                                        <div className="v2-item">
-                                            <div className="v2-bold">Uncertainty-Aware Chest Pathology Detection with Vision and Language Transformers</div>
-                                            <div className="v2-small"><b>2026</b> — Innovations in Data Analytics, Springer Nature, 2026, pp. 397–417.</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Certifications</h3>
-                                        <ul className="v2-ul">
-                                            <li>IBM Deep Learning with PyTorch, Keras and TensorFlow</li>
-                                            <li>DeepLearning.AI TensorFlow Developer</li>
-                                            <li>IBM Machine Learning</li>
-                                            <li>IBM RAG and Agentic AI</li>
-                                            <li>Building AI Agents and Agentic Workflows</li>
-                                            <li>IBM AI Developer</li>
-                                            <li>AWS Generative AI and AI Agents with Amazon Bedrock</li>
-                                            <li>IBM AI Engineering</li>
-                                            <li>IBM Data Science</li>
-                                        </ul>
-                                    </div>
-
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Competitions & Awards</h3>
-                                        <div className="v2-item"><b>Network War</b> — EWU Telecommunication Club, 2024</div>
-                                        <div className="v2-item"><b>IT Olympiad</b> — CSE FEST, East West University, 2024</div>
-                                        <div className="v2-item"><b>In House Programming Battle</b> — EWUCoPC, 2022</div>
-                                    </div>
-
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Online Profiles</h3>
-                                        <div><b>Portfolio:</b> <a href="http://shah-abdul-mazid-portfolio.vercel.app/" target="_blank" rel="noreferrer">shah-abdul-mazid-portfolio.vercel.app</a></div>
-                                        <div><b>GitHub:</b> <a href="https://github.com/Shah-Abdul-Mazid" target="_blank" rel="noreferrer">github.com/Shah-Abdul-Mazid</a></div>
-                                        <div><b>LinkedIn:</b> <a href="https://www.linkedin.com/in/shahabdulmazid" target="_blank" rel="noreferrer">linkedin.com/in/shahabdulmazid</a></div>
-                                        <div><b>Nexus Intelligence:</b> <a href="https://ai-rag-project-llm-based.vercel.app/auth/login" target="_blank" rel="noreferrer">Live Demo</a></div>
-                                    </div>
-                                </div>
-
-                                {/* Page 2 Right Column */}
-                                <div className="v2-col">
-                                    <div className="v2-sec">
-                                        <h3 className="v2-sec-heading">Selected Projects</h3>
-
-                                        <div className="v2-item">
-                                            <div className="v2-bold">Nexus Intelligence — Enterprise Multi-Agent AI Platform</div>
-                                            <p className="v2-small">Built a full-stack enterprise AI platform for secure Q&A across private documents, spreadsheets, and web data.</p>
-                                            <ul className="v2-ul">
-                                                <li>Implemented RAG, multi-agent routing, Pinecone retrieval, feedback memory, JWT authentication, and PII detection.</li>
-                                                <li><b>Tech:</b> FastAPI, Next.js, React, TypeScript, OpenAI, Pinecone, AWS.</li>
-                                            </ul>
-                                        </div>
-
-                                        <div className="v2-item">
-                                            <div className="v2-bold">HR Policies RAG Chatbot — AI-Powered Document Q&A</div>
-                                            <p className="v2-small">Built a citation-aware chatbot that answers HR policy questions from organizational PDF documents using RAG.</p>
-                                            <ul className="v2-ul">
-                                                <li>Implemented PDF processing, semantic search, vector retrieval, and LLM-based response generation.</li>
-                                                <li><b>Tech:</b> Python, FastAPI, Streamlit, Pinecone, Llama 2, Sentence Transformers.</li>
-                                            </ul>
-                                        </div>
-
-                                        <div className="v2-item">
-                                            <div className="v2-bold">Bangladesh Traffic Flow Dataset — Deep Learning Vehicle Detection</div>
-                                            <p className="v2-small">Developed a computer vision system for vehicle detection and classification under Bangladesh traffic conditions.</p>
-                                            <ul className="v2-ul">
-                                                <li>Implemented YOLO detection with Grad-CAM/EigenCAM-based model interpretation and interactive inference.</li>
-                                                <li><b>Tech:</b> PyTorch, YOLO, OpenCV, NumPy, Pandas, Streamlit, Gradio.</li>
-                                            </ul>
-                                        </div>
-
-                                        <div className="v2-item">
-                                            <div className="v2-bold">Brain Tumor Detection and Classification — MobDenseNet with CBAM</div>
-                                            <p className="v2-small">Developed a hybrid MobileNetV2–DenseNet121 model with CBAM attention for MRI-based brain tumor classification.</p>
-                                            <ul className="v2-ul">
-                                                <li>Applied preprocessing, augmentation, classification, and Grad-CAM for explainable predictions.</li>
-                                                <li><b>Tech:</b> PyTorch, MobileNetV2, DenseNet121, CBAM, Grad-CAM, Streamlit.</li>
-                                            </ul>
-                                        </div>
-
-                                        <div className="v2-item">
-                                            <div className="v2-bold">WhatsUpIn — AI-Powered Travel Recommendation Engine</div>
-                                            <p className="v2-small">Built an AI travel platform that generates personalized itineraries and automates travel-related workflows.</p>
-                                            <ul className="v2-ul">
-                                                <li>Integrated OpenAI, n8n, Google Maps, Google Sheets, and Stripe for end-to-end automation.</li>
-                                                <li><b>Tech:</b> OpenAI, n8n, APIs, Google Maps, Google Sheets, Stripe.</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <VisualCV />
                 )}
 
                 {/* ========================================================================= */}

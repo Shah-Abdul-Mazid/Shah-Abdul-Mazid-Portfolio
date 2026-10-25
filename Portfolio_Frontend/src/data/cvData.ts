@@ -66,6 +66,9 @@ export interface CVData {
         linkedin: string;
         github: string;
         scholar?: string;
+        portfolio?: string;
+        orcid?: string;
+        researchgate?: string;
         avatarUrl: string;
     };
     summary: string;
@@ -88,14 +91,17 @@ export interface CVData {
 export const cvData: CVData = {
     personal: {
         name: "SHAH ABDUL MAZID",
-        title: "AI/ML ENGINEER",
-        tags: ["Generative AI", "LLMs", "RAG", "Computer Vision", "NLP"],
+        title: "AI/ML Engineer & Researcher",
+        tags: ["Generative AI", "LLMs & RAG", "Computer Vision", "NLP", "Deep Learning"],
         location: "Dhaka, Bangladesh",
-        email: "shahabdulmazid.esan@yahoo.com",
+        email: "shahabdulmazid.ezan@yahoo.com",
         phone: "+880 1531329222",
         linkedin: "https://www.linkedin.com/in/shahabdulmazid",
         github: "https://github.com/Shah-Abdul-Mazid",
         scholar: "https://scholar.google.com/citations?user=TYkiwUgAAAAJ",
+        portfolio: "https://shahabdulmazidezan.me",
+        orcid: "https://orcid.org/0009-0009-6864-5343",
+        researchgate: "https://www.researchgate.net/profile/Shah-Abdul-Mazid",
         avatarUrl: "/resume/FD-109767.jpg",
     },
     summary:
