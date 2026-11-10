@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 
 interface InlineAudioWaveformProps {
     src?: string;
@@ -22,14 +22,31 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
         48, 72, 88, 65, 48, 38, 28, 20
     ];
 
+    const playAudio = useCallback(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.muted = false;
+        audio.volume = 1.0;
+        const promise = audio.play();
+        if (promise !== undefined) {
+            promise
+                .then(() => {
+                    setIsPlaying(true);
+                    setHasEnded(false);
+                })
+                .catch(() => {
+                    // Handled safely without uncaught exceptions
+                });
+        }
+    }, []);
+
     useEffect(() => {
         const audio = audioRef.current;
         if (!audio || !autoPlay) return;
 
-        // Ensure 100% unmuted and full volume
         audio.muted = false;
         audio.volume = 1.0;
-        audio.loop = false; // Never loop — play once through and stop
+        audio.loop = false; // Never repeat
 
         const onPlay = () => {
             setIsPlaying(true);
@@ -40,7 +57,6 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
             setIsPlaying(false);
         };
 
-        // When audio completes: terminate playback cleanly (do not loop)
         const onEnded = () => {
             setIsPlaying(false);
             setHasEnded(true);
@@ -51,59 +67,47 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
         audio.addEventListener('ended', onEnded);
 
         // Attempt direct unmuted playback immediately on visit
-        const tryPlayUnmuted = () => {
-            if (!audio) return;
-            audio.muted = false;
-            audio.volume = 1.0;
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise
-                    .then(() => {
+        playAudio();
+
+        // If browser autoplay policy requires user gesture,
+        // attach to valid user activation events (click, pointerdown, touchstart, keydown).
+        // (Do NOT use mousemove or wheel — browsers reject them as user gestures).
+        const onFirstInteraction = () => {
+            if (audioRef.current && audioRef.current.paused) {
+                audioRef.current.muted = false;
+                audioRef.current.volume = 1.0;
+                const p = audioRef.current.play();
+                if (p !== undefined) {
+                    p.then(() => {
                         setIsPlaying(true);
-                    })
-                    .catch(() => {
-                        // If browser blocks unmuted audio before user interaction,
-                        // trigger unmuted audio on the first user movement / touch / click
-                        const startOnGesture = () => {
-                            if (audioRef.current && audioRef.current.paused) {
-                                audioRef.current.muted = false;
-                                audioRef.current.volume = 1.0;
-                                audioRef.current.play()
-                                    .then(() => setIsPlaying(true))
-                                    .catch(() => {});
-                            }
-                            cleanupGestures();
-                        };
-
-                        const cleanupGestures = () => {
-                            window.removeEventListener('pointerdown', startOnGesture, true);
-                            window.removeEventListener('click', startOnGesture, true);
-                            window.removeEventListener('touchstart', startOnGesture, true);
-                            window.removeEventListener('keydown', startOnGesture, true);
-                            window.removeEventListener('wheel', startOnGesture, true);
-                            document.removeEventListener('mousemove', startOnGesture, true);
-                        };
-
-                        window.addEventListener('pointerdown', startOnGesture, { capture: true, once: true });
-                        window.addEventListener('click', startOnGesture, { capture: true, once: true });
-                        window.addEventListener('touchstart', startOnGesture, { capture: true, once: true });
-                        window.addEventListener('keydown', startOnGesture, { capture: true, once: true });
-                        window.addEventListener('wheel', startOnGesture, { capture: true, once: true, passive: true });
-                        document.addEventListener('mousemove', startOnGesture, { capture: true, once: true, passive: true });
-                    });
+                        setHasEnded(false);
+                        removeListeners();
+                    }).catch(() => {});
+                }
+            } else {
+                removeListeners();
             }
         };
 
-        tryPlayUnmuted();
-        const retryTimer = setTimeout(tryPlayUnmuted, 250);
+        const removeListeners = () => {
+            window.removeEventListener('pointerdown', onFirstInteraction, true);
+            window.removeEventListener('click', onFirstInteraction, true);
+            window.removeEventListener('touchstart', onFirstInteraction, true);
+            window.removeEventListener('keydown', onFirstInteraction, true);
+        };
+
+        window.addEventListener('pointerdown', onFirstInteraction, { capture: true, once: false });
+        window.addEventListener('click', onFirstInteraction, { capture: true, once: false });
+        window.addEventListener('touchstart', onFirstInteraction, { capture: true, once: false });
+        window.addEventListener('keydown', onFirstInteraction, { capture: true, once: false });
 
         return () => {
-            clearTimeout(retryTimer);
+            removeListeners();
             audio.removeEventListener('play', onPlay);
             audio.removeEventListener('pause', onPause);
             audio.removeEventListener('ended', onEnded);
         };
-    }, [autoPlay]);
+    }, [autoPlay, playAudio]);
 
     const togglePlayback = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -119,7 +123,13 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
             }
             audio.muted = false;
             audio.volume = 1.0;
-            audio.play().then(() => setIsPlaying(true)).catch(() => {});
+            const p = audio.play();
+            if (p !== undefined) {
+                p.then(() => {
+                    setIsPlaying(true);
+                    setHasEnded(false);
+                }).catch(() => {});
+            }
         }
     };
 
@@ -159,16 +169,16 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
                 {FREQ_BARS.map((height, i) => (
                     <div key={i} className="dsp-bar-channel">
                         <span
-                            className={`dsp-bar-top ${isPlaying ? 'active' : hasEnded ? 'static' : ''}`}
+                            className={`dsp-bar-top ${isPlaying ? 'active' : hasEnded ? 'static' : 'idle'}`}
                             style={{
-                                height: hasEnded ? '3px' : `${Math.max(12, (height / 100) * 14)}px`,
+                                height: hasEnded ? '3px' : `${Math.max(10, (height / 100) * 14)}px`,
                                 animationDelay: `${(i % 8) * 0.08}s`,
                             }}
                         />
                         <span
-                            className={`dsp-bar-bottom ${isPlaying ? 'active' : hasEnded ? 'static' : ''}`}
+                            className={`dsp-bar-bottom ${isPlaying ? 'active' : hasEnded ? 'static' : 'idle'}`}
                             style={{
-                                height: hasEnded ? '3px' : `${Math.max(12, (height / 100) * 14)}px`,
+                                height: hasEnded ? '3px' : `${Math.max(10, (height / 100) * 14)}px`,
                                 animationDelay: `${(i % 8) * 0.08}s`,
                             }}
                         />
@@ -182,7 +192,7 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
             {/* Right Technical Spec Anchor */}
             <div className="eng-freq-tag right">
                 <span className="freq-text">
-                    {hasEnded ? 'COMPLETED' : isPlaying ? 'STREAMING' : 'READY'}
+                    {hasEnded ? 'COMPLETED' : isPlaying ? 'STREAMING' : 'AUDIO AI'}
                 </span>
                 <span className="freq-rate">{hasEnded ? 'STANDBY' : '128 kbps'}</span>
             </div>
@@ -308,6 +318,10 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
                     transform-origin: top;
                     background: linear-gradient(180deg, #0284c7 0%, rgba(56, 189, 248, 0.3) 100%);
                     opacity: 0.65;
+                }
+
+                .dsp-bar-top.idle, .dsp-bar-bottom.idle {
+                    opacity: 0.5;
                 }
 
                 .dsp-bar-top.static, .dsp-bar-bottom.static {
