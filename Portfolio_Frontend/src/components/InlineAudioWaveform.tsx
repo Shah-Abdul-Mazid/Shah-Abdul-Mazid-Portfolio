@@ -34,7 +34,6 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
                 audio.currentTime = 0;
                 setHasEnded(false);
             }
-            // Always unmuted with full volume
             audio.muted = false;
             audio.volume = 1.0;
             const p = audio.play();
@@ -74,7 +73,8 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
         audio.addEventListener('pause', onPause);
         audio.addEventListener('ended', onEnded);
 
-        const tryUnmutedPlay = () => {
+        // Immediate unmuted play attempt without requiring any user action
+        const startUnmutedPlay = () => {
             if (!audio || hasEnded) return;
             audio.muted = false;
             audio.volume = 1.0;
@@ -86,55 +86,46 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
                         setHasEnded(false);
                     })
                     .catch(() => {
-                        // Handled safely without muting
+                        // Suppress browser rejection silently until trigger
                     });
             }
         };
 
-        // Immediate unmuted playback attempt on landing
-        tryUnmutedPlay();
-        const t1 = setTimeout(tryUnmutedPlay, 200);
-        const t2 = setTimeout(tryUnmutedPlay, 500);
-        const t3 = setTimeout(tryUnmutedPlay, 1000);
+        // Fire unmuted autoplay immediately on mount and at small staggered intervals
+        startUnmutedPlay();
+        const t1 = setTimeout(startUnmutedPlay, 50);
+        const t2 = setTimeout(startUnmutedPlay, 200);
+        const t3 = setTimeout(startUnmutedPlay, 600);
+        const t4 = setTimeout(startUnmutedPlay, 1200);
 
-        // Fallback: the moment any user interaction occurs on the page,
-        // trigger unmuted playback with full volume from 0:00!
-        const onFirstInteraction = () => {
-            if (audioRef.current && audioRef.current.paused && !hasEnded) {
-                audioRef.current.muted = false;
-                audioRef.current.volume = 1.0;
-                const p = audioRef.current.play();
-                if (p !== undefined) {
-                    p.then(() => {
-                        setIsPlaying(true);
-                        setHasEnded(false);
-                        removeInteractionListeners();
-                    }).catch(() => {});
-                }
-            } else {
-                removeInteractionListeners();
-            }
+        // Also trigger on automatic browser lifecycle events (no clicks/keys needed)
+        const onPageFocus = () => startUnmutedPlay();
+        window.addEventListener('focus', onPageFocus);
+        window.addEventListener('pageshow', onPageFocus);
+        document.addEventListener('visibilitychange', onPageFocus);
+
+        // Ambient fallback triggers (scroll, touch, pointer) if browser held audio
+        const onAmbientInteraction = () => {
+            startUnmutedPlay();
         };
 
-        const removeInteractionListeners = () => {
-            window.removeEventListener('pointerdown', onFirstInteraction, true);
-            window.removeEventListener('click', onFirstInteraction, true);
-            window.removeEventListener('touchstart', onFirstInteraction, true);
-            window.removeEventListener('keydown', onFirstInteraction, true);
-            window.removeEventListener('scroll', onFirstInteraction, true);
-        };
-
-        window.addEventListener('pointerdown', onFirstInteraction, { capture: true, once: false });
-        window.addEventListener('click', onFirstInteraction, { capture: true, once: false });
-        window.addEventListener('touchstart', onFirstInteraction, { capture: true, once: false });
-        window.addEventListener('keydown', onFirstInteraction, { capture: true, once: false });
-        window.addEventListener('scroll', onFirstInteraction, { capture: true, once: false, passive: true });
+        window.addEventListener('pointerdown', onAmbientInteraction, { capture: true, passive: true });
+        window.addEventListener('scroll', onAmbientInteraction, { capture: true, passive: true });
+        window.addEventListener('touchstart', onAmbientInteraction, { capture: true, passive: true });
+        window.addEventListener('click', onAmbientInteraction, { capture: true, passive: true });
 
         return () => {
             clearTimeout(t1);
             clearTimeout(t2);
             clearTimeout(t3);
-            removeInteractionListeners();
+            clearTimeout(t4);
+            window.removeEventListener('focus', onPageFocus);
+            window.removeEventListener('pageshow', onPageFocus);
+            document.removeEventListener('visibilitychange', onPageFocus);
+            window.removeEventListener('pointerdown', onAmbientInteraction, true);
+            window.removeEventListener('scroll', onAmbientInteraction, true);
+            window.removeEventListener('touchstart', onAmbientInteraction, true);
+            window.removeEventListener('click', onAmbientInteraction, true);
             audio.removeEventListener('play', onPlay);
             audio.removeEventListener('pause', onPause);
             audio.removeEventListener('ended', onEnded);
@@ -151,13 +142,14 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
             <audio
                 ref={audioRef}
                 src={src}
+                autoPlay={autoPlay}
                 preload="auto"
                 playsInline
             />
 
             {/* Left Technical Frequency Anchor */}
             <div className="eng-freq-tag left">
-                <span className={`signal-dot ${isPlaying ? 'live' : hasEnded ? 'off' : 'ready'}`} />
+                <span className={`signal-dot ${isPlaying ? 'live' : hasEnded ? 'off' : 'live'}`} />
                 <span className="freq-text">24.0 kHz</span>
             </div>
 
@@ -169,14 +161,14 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
                 {FREQ_BARS.map((height, i) => (
                     <div key={i} className="dsp-bar-channel">
                         <span
-                            className={`dsp-bar-top ${isPlaying ? 'active' : hasEnded ? 'static' : 'ready'}`}
+                            className={`dsp-bar-top ${isPlaying || !hasEnded ? 'active' : 'static'}`}
                             style={{
                                 height: hasEnded ? '3px' : `${Math.max(10, (height / 100) * 14)}px`,
                                 animationDelay: `${(i % 8) * 0.08}s`,
                             }}
                         />
                         <span
-                            className={`dsp-bar-bottom ${isPlaying ? 'active' : hasEnded ? 'static' : 'ready'}`}
+                            className={`dsp-bar-bottom ${isPlaying || !hasEnded ? 'active' : 'static'}`}
                             style={{
                                 height: hasEnded ? '3px' : `${Math.max(10, (height / 100) * 14)}px`,
                                 animationDelay: `${(i % 8) * 0.08}s`,
@@ -192,7 +184,7 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
             {/* Right Technical Spec Anchor */}
             <div className="eng-freq-tag right">
                 <span className="freq-text">
-                    {hasEnded ? 'COMPLETED' : isPlaying ? 'STREAMING' : 'AUDIO AI'}
+                    {hasEnded ? 'COMPLETED' : 'STREAMING'}
                 </span>
                 <span className="freq-rate">{hasEnded ? 'STANDBY' : '128 kbps'}</span>
             </div>
@@ -274,10 +266,6 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
                     box-shadow: 0 0 8px #38bdf8;
                     animation: signalPulse 1.4s infinite ease-in-out;
                 }
-                .signal-dot.ready {
-                    background: #38bdf8;
-                    opacity: 0.7;
-                }
                 .signal-dot.off {
                     background: #475569;
                     box-shadow: none;
@@ -330,10 +318,6 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
                     transform-origin: top;
                     background: linear-gradient(180deg, #0284c7 0%, rgba(56, 189, 248, 0.3) 100%);
                     opacity: 0.65;
-                }
-
-                .dsp-bar-top.ready, .dsp-bar-bottom.ready {
-                    opacity: 0.45;
                 }
 
                 .dsp-bar-top.static, .dsp-bar-bottom.static {
