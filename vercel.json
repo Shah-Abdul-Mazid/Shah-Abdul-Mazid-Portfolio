@@ -55,47 +55,9 @@
       }
     },
     {
-      "source": "/assets/(.*)",
-      "destination": {
-        "service": "frontend"
-      }
-    },
-    {
-      "source": "/audio/(.*)",
-      "destination": {
-        "service": "frontend"
-      }
-    },
-    {
-      "source": "/resume/(.*)",
-      "destination": {
-        "service": "frontend"
-      }
-    },
-    {
-      "source": "/data/(.*)",
-      "destination": {
-        "service": "frontend"
-      }
-    },
-    {
-      "source": "/(favicon\\.svg|icons\\.svg|manifest\\.webmanifest|sw\\.js|registerSW\\.js|workbox-.*\\.js|admin-pwa-.*\\.png|_redirects)",
-      "destination": {
-        "service": "frontend"
-      }
-    },
-    {
-      "source": "/(home|profile|skills|publications|projects|contacts|resume|login|admin)(.*)",
-      "destination": {
-        "service": "frontend",
-        "path": "/index.html"
-      }
-    },
-    {
       "source": "/(.*)",
       "destination": {
-        "service": "frontend",
-        "path": "/index.html"
+        "service": "frontend"
       }
     }
   ]
