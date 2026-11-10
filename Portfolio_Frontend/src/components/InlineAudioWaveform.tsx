@@ -50,7 +50,7 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
         const audio = audioRef.current;
         if (!audio || !autoPlay) return;
 
-        // Strictly UNMUTED — never muted
+        // Strictly UNMUTED — full audio volume
         audio.muted = false;
         audio.volume = 1.0;
         audio.loop = false; // Never repeat — play once through and stop
@@ -73,7 +73,7 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
         audio.addEventListener('pause', onPause);
         audio.addEventListener('ended', onEnded);
 
-        // Immediate unmuted play attempt without requiring any user action
+        // Core unmuted playback trigger
         const startUnmutedPlay = () => {
             if (!audio || hasEnded) return;
             audio.muted = false;
@@ -84,6 +84,7 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
                     .then(() => {
                         setIsPlaying(true);
                         setHasEnded(false);
+                        cleanupPassiveTriggers();
                     })
                     .catch(() => {
                         // Suppress browser rejection silently until trigger
@@ -91,41 +92,55 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
             }
         };
 
-        // Fire unmuted autoplay immediately on mount and at small staggered intervals
+        // Attempt 1: Immediate unmuted autoplay upon landing
         startUnmutedPlay();
         const t1 = setTimeout(startUnmutedPlay, 50);
-        const t2 = setTimeout(startUnmutedPlay, 200);
-        const t3 = setTimeout(startUnmutedPlay, 600);
-        const t4 = setTimeout(startUnmutedPlay, 1200);
+        const t2 = setTimeout(startUnmutedPlay, 150);
+        const t3 = setTimeout(startUnmutedPlay, 400);
+        const t4 = setTimeout(startUnmutedPlay, 900);
+        const t5 = setTimeout(startUnmutedPlay, 1800);
 
-        // Also trigger on automatic browser lifecycle events (no clicks/keys needed)
-        const onPageFocus = () => startUnmutedPlay();
-        window.addEventListener('focus', onPageFocus);
-        window.addEventListener('pageshow', onPageFocus);
-        document.addEventListener('visibilitychange', onPageFocus);
+        // Attempt 2: Lifecycle events (page visibility, focus, pageshow)
+        const onPageActivation = () => startUnmutedPlay();
+        window.addEventListener('focus', onPageActivation, { passive: true });
+        window.addEventListener('pageshow', onPageActivation, { passive: true });
+        document.addEventListener('visibilitychange', onPageActivation, { passive: true });
 
-        // Ambient fallback triggers (scroll, touch, pointer) if browser held audio
-        const onAmbientInteraction = () => {
+        // Attempt 3: Zero-click ambient viewport triggers (any mousemove, scroll, wheel, touch)
+        // If the browser held audio on cold direct URL entry, the split second the user
+        // moves their cursor, scrolls the page, or touches the screen, sound starts instantly!
+        const onAmbientMovement = () => {
             startUnmutedPlay();
         };
 
-        window.addEventListener('pointerdown', onAmbientInteraction, { capture: true, passive: true });
-        window.addEventListener('scroll', onAmbientInteraction, { capture: true, passive: true });
-        window.addEventListener('touchstart', onAmbientInteraction, { capture: true, passive: true });
-        window.addEventListener('click', onAmbientInteraction, { capture: true, passive: true });
+        const cleanupPassiveTriggers = () => {
+            window.removeEventListener('pointermove', onAmbientMovement);
+            window.removeEventListener('mousemove', onAmbientMovement);
+            window.removeEventListener('wheel', onAmbientMovement);
+            window.removeEventListener('scroll', onAmbientMovement);
+            window.removeEventListener('touchstart', onAmbientMovement);
+            window.removeEventListener('pointerdown', onAmbientMovement);
+            window.removeEventListener('keydown', onAmbientMovement);
+        };
+
+        window.addEventListener('pointermove', onAmbientMovement, { capture: true, passive: true });
+        window.addEventListener('mousemove', onAmbientMovement, { capture: true, passive: true });
+        window.addEventListener('wheel', onAmbientMovement, { capture: true, passive: true });
+        window.addEventListener('scroll', onAmbientMovement, { capture: true, passive: true });
+        window.addEventListener('touchstart', onAmbientMovement, { capture: true, passive: true });
+        window.addEventListener('pointerdown', onAmbientMovement, { capture: true, passive: true });
+        window.addEventListener('keydown', onAmbientMovement, { capture: true, passive: true });
 
         return () => {
             clearTimeout(t1);
             clearTimeout(t2);
             clearTimeout(t3);
             clearTimeout(t4);
-            window.removeEventListener('focus', onPageFocus);
-            window.removeEventListener('pageshow', onPageFocus);
-            document.removeEventListener('visibilitychange', onPageFocus);
-            window.removeEventListener('pointerdown', onAmbientInteraction, true);
-            window.removeEventListener('scroll', onAmbientInteraction, true);
-            window.removeEventListener('touchstart', onAmbientInteraction, true);
-            window.removeEventListener('click', onAmbientInteraction, true);
+            clearTimeout(t5);
+            window.removeEventListener('focus', onPageActivation);
+            window.removeEventListener('pageshow', onPageActivation);
+            document.removeEventListener('visibilitychange', onPageActivation);
+            cleanupPassiveTriggers();
             audio.removeEventListener('play', onPlay);
             audio.removeEventListener('pause', onPause);
             audio.removeEventListener('ended', onEnded);
