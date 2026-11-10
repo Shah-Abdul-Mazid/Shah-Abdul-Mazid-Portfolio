@@ -3,6 +3,7 @@ import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { Link } from 'react-router-dom';
 import { Moon, Sun } from 'lucide-react';
 import avtarImg from '../assets/avtar.webp';
+import InlineAudioWaveform from './InlineAudioWaveform';
 
 
 const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) => {
@@ -125,6 +126,7 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     <h1 className="fade-in" ref={addToRefs} style={{ fontSize: 'clamp(2.2rem, 8vw, 5rem)', fontWeight: 900, margin: '10px 0' }}>
                         Hi, I'm <span className="gradient-text">{data.hero.name}</span>
                     </h1>
+                    <InlineAudioWaveform />
                     <p className="fade-in" ref={addToRefs} style={{ fontSize: '1.3rem', color: 'var(--text-secondary)', maxWidth: '800px', margin: '0 auto 6px', lineHeight: 1.5, minHeight: '34px', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center' }}>
                             {(() => {

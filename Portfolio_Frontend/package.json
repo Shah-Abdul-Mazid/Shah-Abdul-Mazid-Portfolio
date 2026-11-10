@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "scrape:cv": "python src/utils/scrape_tex.py"
+    "scrape:cv": "python src/utils/scrape_tex.py",
+    "update-agent": "node scripts/update-elevenlabs-kb.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",
