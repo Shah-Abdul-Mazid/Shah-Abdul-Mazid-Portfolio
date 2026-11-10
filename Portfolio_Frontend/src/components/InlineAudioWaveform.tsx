@@ -13,7 +13,7 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
     const [isPlaying, setIsPlaying] = useState(false);
     const [hasEnded, setHasEnded] = useState(false);
 
-    // Engineered acoustic frequency distribution (42 symmetrical frequency bins)
+    // Engineered acoustic frequency distribution (40 symmetrical frequency bins)
     const FREQ_BARS = [
         18, 26, 38, 54, 72, 88, 64, 46,
         78, 92, 100, 84, 68, 90, 76, 58,
@@ -23,7 +23,7 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
     ];
 
     useEffect(() => {
-        // Check session flag: play only ONCE per visitor session
+        // Play only ONCE per visitor session
         const alreadyPlayed = sessionStorage.getItem('portfolio_voice_intro_played');
         if (alreadyPlayed === 'true') {
             setHasEnded(true);
@@ -33,13 +33,11 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
         const audio = audioRef.current;
         if (!audio || !autoPlay) return;
 
+        audio.loop = false;
         audio.volume = 1.0;
-        audio.loop = false; // Never repeat
 
         const onPlay = () => setIsPlaying(true);
         const onPause = () => setIsPlaying(false);
-
-        // When audio ends: mark terminated, clean up and persist session flag
         const onEnded = () => {
             setIsPlaying(false);
             setHasEnded(true);
@@ -55,79 +53,92 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
         audio.addEventListener('pause', onPause);
         audio.addEventListener('ended', onEnded);
 
-        const startPlayback = () => {
-            if (!audio.paused || hasEnded) return;
-            const p = audio.play();
-            if (p !== undefined) {
-                p.then(() => setIsPlaying(true)).catch(() => {});
+        // ─── STEP 1: Start MUTED (browsers always allow muted autoplay) ───
+        audio.muted = true;
+
+        const attemptMutedPlay = () => {
+            const promise = audio.play();
+            if (promise !== undefined) {
+                promise
+                    .then(() => {
+                        // Muted playback started — now wire up gesture listeners to unmute
+                        setIsPlaying(true);
+                        attachUnmuteListeners();
+                    })
+                    .catch(() => {
+                        // Even muted autoplay blocked (very rare) — wait for explicit gesture
+                        attachClickToPlayListeners();
+                    });
             }
         };
 
-        startPlayback();
-        const t1 = setTimeout(startPlayback, 200);
-        const t2 = setTimeout(startPlayback, 600);
-
-        const onFirstGesture = () => {
-            if (audio.paused && !hasEnded) {
-                audio.volume = 1.0;
-                audio.play().then(() => setIsPlaying(true)).catch(() => {});
+        // ─── STEP 2: Unmute on first micro-gesture (mousemove counts!) ───
+        const unmute = () => {
+            if (audioRef.current) {
+                audioRef.current.muted = false;
             }
-            cleanup();
+            removeUnmuteListeners();
         };
 
-        const cleanup = () => {
-            window.removeEventListener('pointerdown', onFirstGesture, true);
-            window.removeEventListener('mousedown', onFirstGesture, true);
-            window.removeEventListener('click', onFirstGesture, true);
-            window.removeEventListener('touchstart', onFirstGesture, true);
-            window.removeEventListener('keydown', onFirstGesture, true);
-            window.removeEventListener('wheel', onFirstGesture, true);
-            document.removeEventListener('mousemove', onFirstGesture, true);
+        const removeUnmuteListeners = () => {
+            window.removeEventListener('mousemove', unmute, true);
+            window.removeEventListener('pointerdown', unmute, true);
+            window.removeEventListener('touchstart', unmute, true);
+            window.removeEventListener('wheel', unmute, true);
+            window.removeEventListener('keydown', unmute, true);
+            window.removeEventListener('click', unmute, true);
         };
 
-        window.addEventListener('pointerdown', onFirstGesture, { capture: true, once: true });
-        window.addEventListener('mousedown', onFirstGesture, { capture: true, once: true });
-        window.addEventListener('click', onFirstGesture, { capture: true, once: true });
-        window.addEventListener('touchstart', onFirstGesture, { capture: true, once: true });
-        window.addEventListener('keydown', onFirstGesture, { capture: true, once: true });
-        window.addEventListener('wheel', onFirstGesture, { capture: true, once: true });
-        document.addEventListener('mousemove', onFirstGesture, { capture: true, once: true });
+        const attachUnmuteListeners = () => {
+            // Passive mousemove fires as soon as cursor enters the browser window
+            window.addEventListener('mousemove', unmute, { capture: true, once: true, passive: true });
+            window.addEventListener('pointerdown', unmute, { capture: true, once: true });
+            window.addEventListener('touchstart', unmute, { capture: true, once: true, passive: true });
+            window.addEventListener('wheel', unmute, { capture: true, once: true, passive: true });
+            window.addEventListener('keydown', unmute, { capture: true, once: true });
+            window.addEventListener('click', unmute, { capture: true, once: true });
+        };
+
+        // ─── Fallback: If muted play is also blocked, play on first explicit click ───
+        const onGesture = () => {
+            if (audioRef.current && audioRef.current.paused) {
+                audioRef.current.muted = false;
+                audioRef.current.play()
+                    .then(() => setIsPlaying(true))
+                    .catch(() => {});
+            }
+            removeClickListeners();
+        };
+
+        const removeClickListeners = () => {
+            window.removeEventListener('pointerdown', onGesture, true);
+            window.removeEventListener('click', onGesture, true);
+            window.removeEventListener('touchstart', onGesture, true);
+        };
+
+        const attachClickToPlayListeners = () => {
+            window.addEventListener('pointerdown', onGesture, { capture: true, once: true });
+            window.addEventListener('click', onGesture, { capture: true, once: true });
+            window.addEventListener('touchstart', onGesture, { capture: true, once: true });
+        };
+
+        // Kick off muted autoplay immediately
+        attemptMutedPlay();
 
         return () => {
-            clearTimeout(t1);
-            clearTimeout(t2);
-            cleanup();
+            removeUnmuteListeners();
+            removeClickListeners();
             audio.removeEventListener('play', onPlay);
             audio.removeEventListener('pause', onPause);
             audio.removeEventListener('ended', onEnded);
         };
-    }, [autoPlay, hasEnded]);
-
-    const togglePlayback = () => {
-        if (hasEnded) return;
-        const audio = audioRef.current;
-        if (!audio) return;
-        if (audio.paused) {
-            audio.play().catch(() => {});
-        } else {
-            audio.pause();
-        }
-    };
+    }, [autoPlay]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
-        <div 
+        <div
             className={`eng-waveform-wrapper ${hasEnded ? 'terminated' : ''}`}
-            onClick={togglePlayback}
-            title={
-                hasEnded 
-                    ? "Voice Intro Complete" 
-                    : isPlaying 
-                        ? "Audio Stream Active • Click to Pause" 
-                        : "Click to Resume"
-            }
-            role="button"
-            tabIndex={0}
             aria-label="DSP Voice Signal Waveform"
+            role="presentation"
         >
             {!hasEnded && (
                 <audio
@@ -186,7 +197,6 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
                     align-items: center;
                     justify-content: center;
                     gap: 12px;
-                    cursor: pointer;
                     margin: 8px auto 16px auto;
                     padding: 4px 16px;
                     border-radius: 999px;
@@ -195,18 +205,12 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
                     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
                     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
                     user-select: none;
-                }
-                .eng-waveform-wrapper:hover:not(.terminated) {
-                    border-color: rgba(56, 189, 248, 0.45);
-                    background: rgba(10, 17, 34, 0.65);
-                    box-shadow: 0 6px 26px rgba(0, 0, 0, 0.4), 0 0 18px rgba(56, 189, 248, 0.18);
-                    transform: translateY(-1px);
+                    cursor: default;
                 }
                 .eng-waveform-wrapper.terminated {
                     opacity: 0.65;
                     border-color: rgba(148, 163, 184, 0.15);
                     background: rgba(10, 17, 34, 0.25);
-                    cursor: default;
                 }
                 html.light-mode .eng-waveform-wrapper {
                     background: rgba(255, 255, 255, 0.7);
