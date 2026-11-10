@@ -1,17 +1,25 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 interface InlineAudioWaveformProps {
     src?: string;
     autoPlay?: boolean;
 }
 
+// Global singleton across React Router SPA page navigation
+let globalAudio: HTMLAudioElement | null = null;
+let globalHasStarted = false;
+let globalHasEnded = false;
+
 export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
     src = '/audio/ai_intro.mp3',
     autoPlay = true,
 }) => {
-    const audioRef = useRef<HTMLAudioElement | null>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [hasEnded, setHasEnded] = useState(false);
+    const [isPlaying, setIsPlaying] = useState<boolean>(() => {
+        return !!(globalAudio && !globalAudio.paused && !globalAudio.ended);
+    });
+    const [hasEnded, setHasEnded] = useState<boolean>(() => {
+        return globalHasEnded || !!(globalAudio && globalAudio.ended);
+    });
 
     // Engineered acoustic frequency distribution (40 symmetrical frequency bins)
     const FREQ_BARS = [
@@ -24,40 +32,54 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
 
     const togglePlayback = useCallback((e?: React.MouseEvent) => {
         if (e) e.stopPropagation();
-        const audio = audioRef.current;
-        if (!audio) return;
+        if (!globalAudio) return;
 
         if (isPlaying) {
-            audio.pause();
+            globalAudio.pause();
         } else {
-            if (hasEnded || audio.ended) {
-                audio.currentTime = 0;
+            if (hasEnded || globalAudio.ended) {
+                globalAudio.currentTime = 0;
                 setHasEnded(false);
+                globalHasEnded = false;
             }
-            audio.muted = false;
-            audio.volume = 1.0;
-            const p = audio.play();
+            globalAudio.muted = false;
+            globalAudio.volume = 1.0;
+            const p = globalAudio.play();
             if (p !== undefined) {
                 p.then(() => {
                     setIsPlaying(true);
                     setHasEnded(false);
+                    globalHasStarted = true;
                 }).catch(() => {});
             }
         }
     }, [isPlaying, hasEnded]);
 
     useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio || !autoPlay) return;
+        // Initialize global singleton audio instance once
+        if (!globalAudio) {
+            globalAudio = new Audio(src);
+            globalAudio.preload = 'auto';
+            globalAudio.muted = false;
+            globalAudio.volume = 1.0;
+            globalAudio.loop = false;
+        }
 
-        // Strictly UNMUTED — full audio volume
-        audio.muted = false;
-        audio.volume = 1.0;
-        audio.loop = false; // Never repeat — play once through and stop
+        const audio = globalAudio;
+
+        // Sync local component state with current global audio state
+        if (!audio.paused && !audio.ended) {
+            setIsPlaying(true);
+            setHasEnded(false);
+        } else if (audio.ended || globalHasEnded) {
+            setIsPlaying(false);
+            setHasEnded(true);
+        }
 
         const onPlay = () => {
             setIsPlaying(true);
             setHasEnded(false);
+            globalHasStarted = true;
         };
 
         const onPause = () => {
@@ -67,48 +89,59 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
         const onEnded = () => {
             setIsPlaying(false);
             setHasEnded(true);
+            globalHasEnded = true;
         };
 
         audio.addEventListener('play', onPlay);
         audio.addEventListener('pause', onPause);
         audio.addEventListener('ended', onEnded);
 
-        // Core unmuted playback trigger
+        // Core rule: If audio has ALREADY started or is running, REJECT 2nd play on returning to /home!
+        if (globalHasStarted || globalHasEnded || !autoPlay) {
+            return () => {
+                audio.removeEventListener('play', onPlay);
+                audio.removeEventListener('pause', onPause);
+                audio.removeEventListener('ended', onEnded);
+            };
+        }
+
+        // First-time visit unmuted playback
         const startUnmutedPlay = () => {
-            if (!audio || hasEnded) return;
-            audio.muted = false;
-            audio.volume = 1.0;
-            const promise = audio.play();
+            if (!globalAudio || globalHasEnded) return;
+            // If already started, do not start again
+            if (globalHasStarted && !globalAudio.paused) return;
+
+            globalAudio.muted = false;
+            globalAudio.volume = 1.0;
+            const promise = globalAudio.play();
             if (promise !== undefined) {
                 promise
                     .then(() => {
                         setIsPlaying(true);
                         setHasEnded(false);
+                        globalHasStarted = true;
                         cleanupPassiveTriggers();
                     })
                     .catch(() => {
-                        // Suppress browser rejection silently until trigger
+                        // Suppress browser rejection silently
                     });
             }
         };
 
-        // Attempt 1: Immediate unmuted autoplay upon landing
+        // Fire initial unmuted autoplay sequence
         startUnmutedPlay();
         const t1 = setTimeout(startUnmutedPlay, 50);
         const t2 = setTimeout(startUnmutedPlay, 150);
         const t3 = setTimeout(startUnmutedPlay, 400);
         const t4 = setTimeout(startUnmutedPlay, 900);
-        const t5 = setTimeout(startUnmutedPlay, 1800);
 
-        // Attempt 2: Lifecycle events (page visibility, focus, pageshow)
+        // Browser lifecycle triggers
         const onPageActivation = () => startUnmutedPlay();
         window.addEventListener('focus', onPageActivation, { passive: true });
         window.addEventListener('pageshow', onPageActivation, { passive: true });
         document.addEventListener('visibilitychange', onPageActivation, { passive: true });
 
-        // Attempt 3: Zero-click ambient viewport triggers (any mousemove, scroll, wheel, touch)
-        // If the browser held audio on cold direct URL entry, the split second the user
-        // moves their cursor, scrolls the page, or touches the screen, sound starts instantly!
+        // Zero-click ambient viewport triggers
         const onAmbientMovement = () => {
             startUnmutedPlay();
         };
@@ -136,7 +169,6 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
             clearTimeout(t2);
             clearTimeout(t3);
             clearTimeout(t4);
-            clearTimeout(t5);
             window.removeEventListener('focus', onPageActivation);
             window.removeEventListener('pageshow', onPageActivation);
             document.removeEventListener('visibilitychange', onPageActivation);
@@ -145,7 +177,7 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
             audio.removeEventListener('pause', onPause);
             audio.removeEventListener('ended', onEnded);
         };
-    }, [autoPlay, hasEnded]);
+    }, [src, autoPlay]);
 
     return (
         <div
@@ -154,14 +186,6 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
             aria-label="DSP Voice Signal Waveform"
             role="presentation"
         >
-            <audio
-                ref={audioRef}
-                src={src}
-                autoPlay={autoPlay}
-                preload="auto"
-                playsInline
-            />
-
             {/* Left Technical Frequency Anchor */}
             <div className="eng-freq-tag left">
                 <span className={`signal-dot ${isPlaying ? 'live' : hasEnded ? 'off' : 'live'}`} />
@@ -199,7 +223,7 @@ export const InlineAudioWaveform: React.FC<InlineAudioWaveformProps> = ({
             {/* Right Technical Spec Anchor */}
             <div className="eng-freq-tag right">
                 <span className="freq-text">
-                    {hasEnded ? 'COMPLETED' : 'STREAMING'}
+                    {hasEnded ? 'COMPLETED' : isPlaying ? 'STREAMING' : 'AUDIO AI'}
                 </span>
                 <span className="freq-rate">{hasEnded ? 'STANDBY' : '128 kbps'}</span>
             </div>
