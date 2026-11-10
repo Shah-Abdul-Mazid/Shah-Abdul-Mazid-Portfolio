@@ -1,4 +1,4 @@
-﻿import { defineConfig } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -10,14 +10,29 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       workbox: {
+        // Serve index.html for all SPA navigation requests (fixes 404 on hard refresh for visitors)
+        navigateFallback: '/index.html',
         navigateFallbackDenylist: [
           /^\/api/,
           /^\/docs/,
           /^\/redoc/,
           /^\/openapi\.json/,
           /^\/health/,
-          /^\/version/
-        ]
+          /^\/version/,
+          /^\/_vercel/,
+          /\.([a-z]{2,4})$/i   // deny fallback for real file extensions (js, css, png, etc.)
+        ],
+        // Network-first for HTML navigations so users always get fresh content
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }: { request: Request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst' as const,
+            options: {
+              cacheName: 'pages-cache-v2',
+              networkTimeoutSeconds: 5,
+            },
+          },
+        ],
       },
       manifest: {
         name: 'Portfolio Admin',
