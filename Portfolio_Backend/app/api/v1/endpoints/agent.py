@@ -204,13 +204,17 @@ def strip_greeting(query: str) -> str:
 async def call_groq(query: str, context: str) -> str | None:
     if not settings.GROQ_API_KEY:
         return None
+    # Map decommissioned models to active ones
+    model = settings.GROQ_MODEL or "qwen/qwen3.8-27b"
+    if "llama3-8b" in model or "llama3-70b" in model:
+        model = "qwen/qwen3.8-27b"
     try:
         async with httpx.AsyncClient(timeout=20.0) as client:
             resp = await client.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}", "Content-Type": "application/json"},
                 json={
-                    "model": settings.GROQ_MODEL or "llama3-8b-8192",
+                    "model": model,
                     "messages": [
                         {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE.format(context=context)},
                         {"role": "user",   "content": query}
@@ -228,36 +232,83 @@ async def call_groq(query: str, context: str) -> str | None:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ENGINE 2: Ollama — local free LLM (local dev)
+# ENGINE 2: Ollama — local free LLM (Always Active + Auto Failover)
 # ─────────────────────────────────────────────────────────────────────────────
+def get_ollama_urls() -> list[str]:
+    urls = []
+    # 1. Localhost direct (fastest when running on local machine with RTX 4060 GPU)
+    local_url = getattr(settings, "OLLAMA_LOCAL_URL", "http://127.0.0.1:11434")
+    if local_url:
+        urls.append(local_url)
+    urls.extend(["http://127.0.0.1:11434", "http://localhost:11434"])
+    # 2. Configured public / Ngrok URL (for Render and Vercel cloud)
+    if settings.OLLAMA_URL:
+        urls.append(settings.OLLAMA_URL)
+    
+    seen = set()
+    ordered = []
+    for u in urls:
+        clean = u.rstrip("/")
+        if clean and clean not in seen:
+            seen.add(clean)
+            ordered.append(clean)
+    return ordered
+
+def get_candidate_models(preferred_model: Optional[str] = None) -> list[str]:
+    models = []
+    if preferred_model and preferred_model != "auto":
+        models.append(preferred_model)
+    if settings.OLLAMA_MODEL:
+        models.append(settings.OLLAMA_MODEL)
+    models.extend(["llama3.1:latest", "llama3.1", "qwen3-v1-8b-64k-agent:latest", "openchat:latest", "openchat"])
+    seen = set()
+    ordered = []
+    for m in models:
+        if m and m not in seen:
+            seen.add(m)
+            ordered.append(m)
+    return ordered
+
 async def call_ollama(query: str, context: str) -> str | None:
-    url   = settings.OLLAMA_URL or "http://localhost:11434"
-    model = settings.OLLAMA_MODEL or "llama3"
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(
-                f"{url}/api/chat",
-                headers={
-                    "ngrok-skip-browser-warning": "true",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": model,
-                    "messages": [
-                        {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE.format(context=context)},
-                        {"role": "user",   "content": query}
-                    ],
-                    "stream": False
-                }
-            )
-            if resp.status_code == 200:
-                answer = resp.json().get("message", {}).get("content", "").strip()
-                # Reject if Ollama echoes back a greeting/menu (common Ollama bug)
-                bad_phrases = ["what would you like to know", "ask me anything", "i am shah"]
-                if answer and not any(p in answer.lower() for p in bad_phrases) and len(answer) > 15:
-                    return answer
-    except Exception as e:
-        logger.warning(f"Ollama unavailable: {e}")
+    urls = get_ollama_urls()
+    models = get_candidate_models()
+    headers = {
+        "ngrok-skip-browser-warning": "true",
+        "Content-Type": "application/json",
+    }
+    if getattr(settings, "OLLAMA_API_SECRET", None):
+        headers["Authorization"] = f"Bearer {settings.OLLAMA_API_SECRET}"
+
+    for url in urls:
+        for model in models:
+            try:
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    resp = await client.post(
+                        f"{url}/api/chat",
+                        headers=headers,
+                        json={
+                            "model": model,
+                            "messages": [
+                                {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE.format(context=context)},
+                                {"role": "user",   "content": query}
+                            ],
+                            "stream": False,
+                            "options": {
+                                "temperature": 0.3,
+                                "num_predict": 512,
+                                "num_ctx": 4096,
+                            }
+                        }
+                    )
+                    if resp.status_code == 200:
+                        text = resp.json().get("message", {}).get("content", "").strip()
+                        # Reject if Ollama echoes back a greeting/menu (common Ollama bug)
+                        if not text.startswith("Hello") and len(text) > 15:
+                            return text
+                    elif resp.status_code == 404:
+                        continue
+            except Exception:
+                continue
     return None
 
 
@@ -561,17 +612,22 @@ async def ai_chat_agent(
 
     # Build context once
     context = build_context(portfolio_data)
-    # ── CHAT: Always use Groq (fast, always online) ──────────────────────
+    # ── CHAT ENGINE 1: Try Ollama FIRST (Local RTX 4060 GPU / Ngrok Tunnel) ──
+    if settings.USE_OLLAMA:
+        response = await call_ollama(query, context)
+        if response:
+            return {"success": True, "response": response, "engine": "ollama"}
+
+    # ── CHAT ENGINE 2: Failover to Groq cloud if Ollama unavailable ──────────
     if settings.GROQ_API_KEY:
         response = await call_groq(query, context)
         if response:
             return {"success": True, "response": response, "engine": "groq"}
 
-    # ── CHAT FALLBACK: Try Ollama if Groq fails ─────────────────────────
-    if settings.USE_OLLAMA:
-        response = await call_ollama(query, context)
-        if response:
-            return {"success": True, "response": response, "engine": "ollama"}
+    # ── CHAT ENGINE 3: Safety Fallback to Ollama ─────────────────────────────
+    response = await call_ollama(query, context)
+    if response:
+        return {"success": True, "response": response, "engine": "ollama"}
 
     # ── FALLBACK: Keyword matching ────────────────────────────────────────────
     result = keyword_match(query.lower(), portfolio_data)
@@ -590,72 +646,106 @@ async def ai_chat_agent(
 
 import json
 
-async def call_llm_json(prompt: str) -> str | None:
-    use_ollama = str(settings.USE_OLLAMA).lower() in ("true", "1", "yes")
-    
-    # If USE_OLLAMA is enabled, try Ollama FIRST (via Ngrok or localhost)
-    if use_ollama:
-        url = settings.OLLAMA_URL or "http://localhost:11434"
-        model = settings.OLLAMA_MODEL or "llama3"
-        logger.info(f"[AI] Calling Ollama at {url} with model {model}")
-        try:
-            # 300s timeout — Ollama on CPU needs time, especially through Ngrok tunnel
-            async with httpx.AsyncClient(timeout=300.0) as client:
-                resp = await client.post(
-                    f"{url}/api/chat",
-                    headers={
-                        "ngrok-skip-browser-warning": "true",
-                        "Content-Type": "application/json",
-                    },
-                    json={
-                        "model": model,
-                        "messages": [
-                            {"role": "system", "content": "You are an expert technical resume writer. Respond ONLY with raw JSON. No markdown, no code blocks, no explanation."},
-                            {"role": "user",   "content": prompt}
-                        ],
-                        "stream": False,
-                        "options": {
-                            "temperature": 0.2,
-                            "num_predict": 1500  # Cap tokens to prevent slow runaway generation
-                        }
-                    }
-                )
-                if resp.status_code == 200:
-                    content = resp.json().get("message", {}).get("content", "").strip()
-                    logger.info(f"[AI] Ollama responded successfully ({len(content)} chars)")
-                    return content
-                else:
-                    logger.warning(f"[AI] Ollama returned {resp.status_code}: {resp.text[:200]}")
-        except Exception as e:
-            logger.warning(f"[AI] Ollama call failed: {e}")
-    
-    # Fallback: Try Groq (cloud LLM)
-    if settings.GROQ_API_KEY:
-        logger.info("[AI] Trying Groq fallback...")
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                resp = await client.post(
-                    "https://api.groq.com/openai/v1/chat/completions",
-                    headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}", "Content-Type": "application/json"},
-                    json={
-                        "model": "llama3-70b-8192",
-                        "messages": [
-                            {"role": "system", "content": "You are an expert technical resume writer. Respond ONLY with raw JSON. No markdown, no code blocks, no explanation."},
-                            {"role": "user",   "content": prompt}
-                        ],
-                        "temperature": 0.2,
-                        "max_tokens": 1500,
-                    }
-                )
-                if resp.status_code == 200:
-                    content = resp.json()["choices"][0]["message"]["content"].strip()
-                    logger.info(f"[AI] Groq responded successfully ({len(content)} chars)")
-                    return content
-                logger.warning(f"[AI] Groq returned {resp.status_code}: {resp.text[:200]}")
-        except Exception as e:
-            logger.warning(f"[AI] Groq call failed: {e}")
-        
+async def _call_groq_json(prompt: str, groq_model: str) -> str | None:
+    if not settings.GROQ_API_KEY:
+        return None
+    # Map any decommissioned models to active Groq models
+    if "llama3-8b" in groq_model or "llama3-70b" in groq_model:
+        groq_model = "qwen/qwen3.8-27b"
+    logger.info(f"[AI] Calling Groq with model: {groq_model}")
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}", "Content-Type": "application/json"},
+                json={
+                    "model": groq_model,
+                    "messages": [
+                        {"role": "system", "content": "You are an expert technical resume writer. Respond ONLY with raw JSON. No markdown, no code blocks, no explanation."},
+                        {"role": "user",   "content": prompt}
+                    ],
+                    "temperature": 0.2,
+                    "max_tokens": 1500,
+                }
+            )
+            if resp.status_code == 200:
+                content = resp.json()["choices"][0]["message"]["content"].strip()
+                logger.info(f"[AI] Groq responded successfully ({len(content)} chars)")
+                return content
+            logger.warning(f"[AI] Groq returned {resp.status_code}: {resp.text[:200]}")
+    except Exception as e:
+        logger.warning(f"[AI] Groq call failed: {e}")
     return None
+
+async def _try_ollama_json(prompt: str, requested_model: Optional[str]) -> str | None:
+    urls = get_ollama_urls()
+    models = get_candidate_models(requested_model)
+    headers = {
+        "ngrok-skip-browser-warning": "true",
+        "Content-Type": "application/json",
+    }
+    if getattr(settings, "OLLAMA_API_SECRET", None):
+        headers["Authorization"] = f"Bearer {settings.OLLAMA_API_SECRET}"
+
+    for url in urls:
+        for model in models:
+            try:
+                logger.info(f"[AI] Trying Ollama at {url} with model {model}")
+                async with httpx.AsyncClient(timeout=120.0) as client:
+                    resp = await client.post(
+                        f"{url}/api/chat",
+                        headers=headers,
+                        json={
+                            "model": model,
+                            "messages": [
+                                {"role": "system", "content": "You are an expert technical resume writer. Respond ONLY with raw JSON. No markdown, no code blocks, no explanation."},
+                                {"role": "user",   "content": prompt}
+                            ],
+                            "stream": False,
+                            "options": {
+                                "temperature": 0.2,
+                                "num_predict": 1500,
+                                "num_ctx": 4096  # Optimized context prevents KV allocation stall
+                            }
+                        }
+                    )
+                    if resp.status_code == 200:
+                        content = resp.json().get("message", {}).get("content", "").strip()
+                        if content:
+                            logger.info(f"[AI] Ollama ({url} / {model}) succeeded ({len(content)} chars)")
+                            return content
+                    elif resp.status_code == 404:
+                        continue
+                    else:
+                        logger.warning(f"[AI] Ollama returned {resp.status_code}: {resp.text[:150]}")
+            except Exception as e:
+                logger.debug(f"[AI] Ollama ({url} / {model}) failed: {e}")
+                continue
+    return None
+
+async def call_llm_json(prompt: str, requested_model: Optional[str] = "llama3.1:latest") -> str | None:
+    # 1. If explicit Cloud Groq model requested: try Groq first, but FALLBACK TO OLLAMA if it fails!
+    if requested_model and requested_model.startswith("groq:"):
+        model_name = requested_model.replace("groq:", "").strip() or "qwen/qwen3.8-27b"
+        groq_res = await _call_groq_json(prompt, model_name)
+        if groq_res:
+            return groq_res
+        logger.warning("[AI] Groq failed, seamlessly falling back to Ollama!")
+        return await _try_ollama_json(prompt, "llama3.1:latest")
+
+    # 2. Ollama ALWAYS ACTIVE / PRIMARY: Try local GPU or Ngrok tunnel across all URLs & models
+    ollama_res = await _try_ollama_json(prompt, requested_model)
+    if ollama_res:
+        return ollama_res
+
+    # 3. Fallback to Groq cloud if Ollama is unreachable
+    logger.info("[AI] Ollama unreachable, failing over to Groq cloud...")
+    groq_res = await _call_groq_json(prompt, settings.GROQ_MODEL or "qwen/qwen3.8-27b")
+    if groq_res:
+        return groq_res
+
+    # 4. Final safety retry with any responsive Ollama model
+    return await _try_ollama_json(prompt, "openchat:latest")
 
 def clean_json_string(s: str) -> str:
     s = re.sub(r"^```(?:json)?", "", s, flags=re.IGNORECASE)
@@ -669,6 +759,80 @@ class ProjectGenerateRequest(BaseModel):
     desc: Optional[str] = ""
     role: Optional[str] = "Software Engineer"
     instructions: Optional[str] = ""
+    model: Optional[str] = "llama3.1"
+
+@router.get("/models")
+async def get_available_models():
+    """Retrieve available AI models: dynamically discovers local Ollama models (llama3.1, qwen3, openchat, etc.) and cloud Groq models."""
+    local_models = []
+    
+    ollama_urls = []
+    if settings.OLLAMA_URL:
+        ollama_urls.append(settings.OLLAMA_URL)
+    ollama_urls.append("http://localhost:11434")
+    ollama_urls.append("http://127.0.0.1:11434")
+    
+    seen_urls = set()
+    for url in ollama_urls:
+        if not url or url in seen_urls:
+            continue
+        seen_urls.add(url)
+        try:
+            async with httpx.AsyncClient(timeout=2.5) as client:
+                resp = await client.get(
+                    f"{url}/api/tags",
+                    headers={"ngrok-skip-browser-warning": "true"}
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    for m in data.get("models", []):
+                        m_name = m.get("name")
+                        m_size = m.get("size", 0)
+                        size_gb = f"{m_size / (1024**3):.1f} GB" if m_size else ""
+                        
+                        desc = "Ollama Local GPU Model"
+                        if "llama3.1" in m_name.lower():
+                            desc = "Llama 3.1 8B — Default, High Performance"
+                        elif "qwen" in m_name.lower():
+                            desc = "Qwen3 8B Agent — Deep Reasoning & Tech Architecture"
+                        elif "openchat" in m_name.lower():
+                            desc = "OpenChat 7B — Fast, Conversational"
+                            
+                        local_models.append({
+                            "id": m_name,
+                            "name": m_name,
+                            "size": size_gb,
+                            "category": "local",
+                            "description": desc
+                        })
+                    if local_models:
+                        break
+        except Exception:
+            continue
+
+    # Safe defaults if Ollama query fails
+    if not local_models:
+        local_models = [
+            {"id": "llama3.1:latest", "name": "llama3.1:latest", "size": "4.9 GB", "category": "local", "description": "Llama 3.1 8B — Default, High Performance"},
+            {"id": "qwen3-v1-8b-64k-agent:latest", "name": "qwen3-v1-8b-64k-agent:latest", "size": "6.1 GB", "category": "local", "description": "Qwen3 8B Agent — Deep Reasoning"},
+            {"id": "openchat:latest", "name": "openchat:latest", "size": "4.1 GB", "category": "local", "description": "OpenChat 7B — Fast Conversational"}
+        ]
+
+    cloud_models = [
+        {
+            "id": "groq:qwen/qwen3.8-27b",
+            "name": "Groq Cloud (Qwen 3.8 27B)",
+            "size": "Cloud Fast",
+            "category": "cloud",
+            "description": "Hosted Cloud LLM (Instant, zero GPU load)"
+        }
+    ]
+    
+    return {
+        "success": True,
+        "models": local_models + cloud_models,
+        "default": "llama3.1:latest"
+    }
 
 @router.post("/generate-project")
 async def generate_project_case_study(
@@ -679,6 +843,7 @@ async def generate_project_case_study(
     raw_desc = payload.desc.strip()
     role = payload.role.strip() or "Software Engineer"
     instructions = payload.instructions.strip() if payload.instructions else ""
+    requested_model = payload.model.strip() if payload.model else "llama3.1"
     
     if not title:
         return {"success": False, "error": "Project title is required"}
@@ -694,6 +859,7 @@ async def generate_project_case_study(
         
     prompt += (
         f"\nYou must return a valid JSON object ONLY, with no extra text or markdown code blocks. The JSON keys MUST be exactly:\n"
+        f"- desc (Punchy, recruiter-friendly 1-2 sentence executive summary of the project)\n"
         f"- problem (Business problem addressed. Keep it concise, max 2 sentences)\n"
         f"- goal (Goal/Objective. What were you trying to achieve? 1-2 sentences)\n"
         f"- solution (High-level solution. Explain the architecture/pipeline at a high level. Keep it concise, max 2 sentences)\n"
@@ -711,7 +877,7 @@ async def generate_project_case_study(
         f"Ensure all values are strings (use newline character \\n for multiline strings like contributions, impact, features, future)."
     )
     
-    raw_response = await call_llm_json(prompt)
+    raw_response = await call_llm_json(prompt, requested_model=requested_model)
     if not raw_response:
         return {"success": False, "error": "AI model did not respond or is unreachable."}
         

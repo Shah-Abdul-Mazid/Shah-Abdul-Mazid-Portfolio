@@ -30,16 +30,44 @@ const AdminDashboard = () => {
     const [customInstructions, setCustomInstructions] = useState<Record<number, string>>({});
     const [expandedCurriculums, setExpandedCurriculums] = useState<Record<number, boolean>>({ 0: true, 1: true });
 
+    interface AiModelOption {
+        id: string;
+        name: string;
+        size?: string;
+        category: string;
+        description?: string;
+    }
+    const [availableAiModels, setAvailableAiModels] = useState<AiModelOption[]>([
+        { id: 'llama3.1:latest', name: 'llama3.1:latest', size: '4.6 GB', category: 'local', description: 'Llama 3.1 8B — Default, High Performance' },
+        { id: 'qwen3-v1-8b-64k-agent:latest', name: 'qwen3-v1-8b-64k-agent:latest', size: '5.7 GB', category: 'local', description: 'Qwen3 8B Agent — Deep Reasoning & Tech Architecture' },
+        { id: 'openchat:latest', name: 'openchat:latest', size: '3.8 GB', category: 'local', description: 'OpenChat 7B — Fast, Conversational' },
+        { id: 'groq:qwen/qwen3.8-27b', name: 'Groq Cloud (Qwen 3.8 27B)', size: 'Cloud Fast', category: 'cloud', description: 'Hosted Cloud LLM (Instant, zero GPU load)' }
+    ]);
+    const [selectedAiModels, setSelectedAiModels] = useState<Record<number, string>>({});
+
+    useEffect(() => {
+        fetch('/api/agent/models')
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success && Array.isArray(data.models) && data.models.length > 0) {
+                    setAvailableAiModels(data.models);
+                }
+            })
+            .catch(() => {});
+    }, []);
+
     const toggleCurriculum = (idx: number) => {
         setExpandedCurriculums(prev => ({ ...prev, [idx]: !prev[idx] }));
     };
 
-    const handleGenerateProjectAI = async (index: number, customPrompt?: string) => {
+    const handleGenerateProjectAI = async (index: number, customPrompt?: string, chosenModel?: string) => {
         const project = editData.projects[index];
         if (!project.title) {
             alert('Please enter a Project Title first before generating details.');
             return;
         }
+
+        const modelToUse = chosenModel || selectedAiModels[index] || 'llama3.1:latest';
 
         setGeneratingIndex(index);
         try {
@@ -58,7 +86,8 @@ const AdminDashboard = () => {
                     title: project.title,
                     desc: project.desc,
                     role: project.role || 'AI/ML Engineer',
-                    instructions: customPrompt || ''
+                    instructions: customPrompt || '',
+                    model: modelToUse
                 })
             });
 
@@ -71,6 +100,7 @@ const AdminDashboard = () => {
                     if (idx === index) {
                         return {
                             ...p,
+                            desc: aiData.desc || aiData.description || p.desc,
                             problem: aiData.problem || p.problem,
                             goal: aiData.goal || p.goal,
                             solution: aiData.solution || p.solution,
@@ -2449,8 +2479,18 @@ const AdminDashboard = () => {
                                     </div>
                                     
                                     <div className="form-group">
-                                        <label>One-line Summary (visible when card is collapsed)</label>
-                                        <textarea rows={2} value={project.desc} onChange={e => updateListItem('projects', i, 'desc', e.target.value)} />
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                            <label style={{ margin: 0 }}>One-line Summary / Project Description (visible when card is collapsed)</label>
+                                            <button 
+                                                type="button"
+                                                onClick={() => handleGenerateProjectAI(i, "Focus on crafting a compelling 1-2 sentence executive description and summary for this project.")}
+                                                disabled={generatingIndex === i}
+                                                style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '11px', fontWeight: '600', padding: 0 }}
+                                            >
+                                                ✨ {generatingIndex === i ? 'Generating...' : 'Auto-Generate with AI'}
+                                            </button>
+                                        </div>
+                                        <textarea rows={2} value={project.desc} onChange={e => updateListItem('projects', i, 'desc', e.target.value)} placeholder="A punchy 1-2 sentence executive summary of this project..." />
                                     </div>
                                     
                                     <div className="flex-group">
@@ -2478,13 +2518,46 @@ const AdminDashboard = () => {
                                     </div>
 
                                     <div className="ai-generation-box" style={{ background: 'rgba(139, 92, 246, 0.04)', border: '1px dashed rgba(139, 92, 246, 0.25)', padding: '15px', borderRadius: '8px', margin: '15px 0' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                                            <h5 style={{ margin: 0, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                âœ¨ AI Writer (Ngrok + Ollama / Groq)
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                            <h5 style={{ margin: 0, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' }}>
+                                                ✨ AI Writer (Ollama Local GPU / Groq Cloud)
                                             </h5>
-                                            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>GPU Accelerated Case Studies</span>
+                                            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>RTX 4060 GPU Accelerated</span>
                                         </div>
-                                        <div className="form-group" style={{ marginBottom: '10px' }}>
+
+                                        {/* Model Selection Dropdown */}
+                                        <div className="form-group" style={{ marginBottom: '12px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                                                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-color)', margin: 0 }}>
+                                                    Select AI Model (Ollama / Cloud)
+                                                </label>
+                                                <span style={{ color: 'var(--primary)', fontSize: '11px', fontWeight: '500' }}>
+                                                    {availableAiModels.find(m => m.id === (selectedAiModels[i] || 'llama3.1:latest'))?.description || 'Llama 3.1 8B High Performance'}
+                                                </span>
+                                            </div>
+                                            <select
+                                                value={selectedAiModels[i] || 'llama3.1:latest'}
+                                                onChange={e => setSelectedAiModels(prev => ({ ...prev, [i]: e.target.value }))}
+                                                style={{ width: '100%', padding: '9px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--card-bg)', color: 'var(--text-color)', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}
+                                            >
+                                                <optgroup label="⚡ Local Ollama Models (Running on your RTX 4060 GPU)">
+                                                    {availableAiModels.filter(m => m.category === 'local').map(m => (
+                                                        <option key={m.id} value={m.id}>
+                                                            {m.id.includes('llama3.1') ? '🌟' : m.id.includes('qwen') ? '🧠' : '💬'} {m.name} {m.size ? `(${m.size})` : ''} — {m.id.includes('llama3.1') ? 'Primary Recommended' : m.id.includes('qwen') ? 'Deep Reasoning' : 'Fast Chat'}
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                                <optgroup label="☁️ Cloud AI (Groq Hosted Failover)">
+                                                    {availableAiModels.filter(m => m.category === 'cloud').map(m => (
+                                                        <option key={m.id} value={m.id}>
+                                                            ☁️ {m.name} — Ultra Fast (0% GPU Load)
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                            </select>
+                                        </div>
+
+                                        <div className="form-group" style={{ marginBottom: '12px' }}>
                                             <label style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-color)' }}>Custom AI Instructions / Guidance (Optional)</label>
                                             <textarea 
                                                 rows={2}
@@ -2497,11 +2570,11 @@ const AdminDashboard = () => {
                                         <button
                                             type="button"
                                             className="add-inline-btn"
-                                            onClick={() => handleGenerateProjectAI(i, customInstructions[i])}
+                                            onClick={() => handleGenerateProjectAI(i, customInstructions[i], selectedAiModels[i])}
                                             disabled={generatingIndex === i}
                                             style={{ width: '100%', padding: '10px', justifyContent: 'center', background: 'rgba(139, 92, 246, 0.1)', borderColor: 'rgba(139, 92, 246, 0.3)', color: 'var(--primary)', cursor: 'pointer', fontWeight: 'bold' }}
                                         >
-                                            {generatingIndex === i ? 'â³ Generating case study details (usually 30-60s on GPU)...' : 'âœ¨ Generate Case Study Details with AI'}
+                                            {generatingIndex === i ? '⏳ Generating case study details with selected model (usually 15-30s on GPU)...' : '✨ Generate Case Study Details with AI'}
                                         </button>
                                     </div>
 

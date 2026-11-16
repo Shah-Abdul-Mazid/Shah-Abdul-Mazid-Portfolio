@@ -29,17 +29,20 @@ class Settings(BaseSettings):
     CLOUDINARY_URL: Optional[str] = None
 
     # Ollama (Local LLM - Free, zero cost)
-    OLLAMA_URL: Optional[str] = "http://localhost:11434"
-    OLLAMA_MODEL: Optional[str] = "openchat"
-    USE_OLLAMA: bool = False
+    OLLAMA_URL: Optional[str] = "https://keith-unstarting-microtonally.ngrok-free.dev"
+    OLLAMA_LOCAL_URL: Optional[str] = "http://127.0.0.1:11434"
+    OLLAMA_MODEL: Optional[str] = "llama3.1:latest"
+    USE_OLLAMA: bool = True
+    OLLAMA_API_SECRET: Optional[str] = None
+    NGROK_AUTH: Optional[str] = None
 
     # Groq (Free Cloud LLM - fastest option)
     GROQ_API_KEY: Optional[str] = None
-    GROQ_MODEL: Optional[str] = "llama3-8b-8192"  # or mixtral-8x7b-32768, gemma2-9b-it
+    GROQ_MODEL: Optional[str] = "qwen/qwen3.8-27b"  # or mixtral-8x7b-32768, gemma2-9b-it
 
-    # Load from .env in project root
+    # Load from .env in project root or subfolder
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", "../.env", "Portfolio_Backend/.env"),
         extra="ignore",
         env_ignore_case=True  # CRITICAL for Render/Vercel environment variable case matching
     )

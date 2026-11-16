@@ -4,6 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  envDir: '../', // Read unified master .env from root
   plugins: [
     react(),
     VitePWA({
