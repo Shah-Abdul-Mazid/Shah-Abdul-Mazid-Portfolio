@@ -66,9 +66,41 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
 
     const safeSplit = (val?: string | string[]): string[] => {
         if (!val) return [];
-        if (Array.isArray(val)) return val.map(s => s.trim()).filter(Boolean);
+        if (Array.isArray(val)) return val.map(s => String(s).trim()).filter(Boolean);
         if (typeof val !== 'string') return [];
         return val.split(',').map(s => s.trim()).filter(Boolean);
+    };
+
+    const getProjectTechTags = (proj: any): string[] => {
+        const collected: string[] = [];
+
+        // 1. Explicit tags from proj.tags (ignoring empty strings)
+        if (Array.isArray(proj.tags)) {
+            proj.tags.forEach((t: any) => {
+                if (t && typeof t === 'string' && t.trim()) {
+                    const clean = t.trim();
+                    if (!collected.includes(clean)) collected.push(clean);
+                }
+            });
+        }
+
+        // 2. Also extract from category stacks if tags is empty or has few items
+        const addFromStack = (stack?: string | string[]) => {
+            if (!stack) return;
+            safeSplit(stack).forEach(t => {
+                const clean = t.trim();
+                if (clean && !collected.includes(clean)) {
+                    collected.push(clean);
+                }
+            });
+        };
+
+        addFromStack(proj.backendStack);
+        addFromStack(proj.aiStack);
+        addFromStack(proj.databaseStack);
+        addFromStack(proj.cloudStack);
+
+        return collected;
     };
 
     const renderBulletList = (text?: string | string[], maxItems?: number) => {
@@ -154,18 +186,22 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                         <h3 className="proj-title">{project.title}</h3>
                                         <p className="proj-collapsed-desc">{project.desc}</p>
                                         
-                                        {!isExpanded && Array.isArray(project.tags) && project.tags.length > 0 && (
-                                            <div className="proj-collapsed-tags">
-                                                {project.tags.slice(0, 5).map((tag, tIdx) => (
-                                                    <span key={tIdx} className="collapsed-tag-pill" style={{ borderColor: getDotColor(tag) }}>
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                                {project.tags.length > 5 && (
-                                                    <span className="collapsed-tag-more">+{project.tags.length - 5} more</span>
-                                                )}
-                                            </div>
-                                        )}
+                                        {!isExpanded && (() => {
+                                            const techTags = getProjectTechTags(project);
+                                            if (techTags.length === 0) return null;
+                                            return (
+                                                <div className="proj-collapsed-tags">
+                                                    {techTags.slice(0, 5).map((tag, tIdx) => (
+                                                        <span key={tIdx} className="collapsed-tag-pill" style={{ borderColor: getDotColor(tag) }}>
+                                                            {tag}
+                                                        </span>
+                                                    ))}
+                                                    {techTags.length > 5 && (
+                                                        <span className="collapsed-tag-more">+{techTags.length - 5} more</span>
+                                                    )}
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
                                     <div className="proj-header-right">
                                         <span className={`status-badge ${statusClass}`}>
@@ -236,60 +272,67 @@ const Projects = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }
                                         )}
 
                                         {/* Tech Stack organized by category */}
-                                        {(project.backendStack || project.aiStack || project.databaseStack || project.cloudStack) ? (
-                                            <div className="recruiter-section tech-stack-section">
-                                                <h4>💻 Tech Stack</h4>
-                                                <div className="tech-stack-compact">
-                                                    {project.aiStack && (
-                                                        <div className="tech-compact-row">
-                                                            <span className="tech-compact-label ai">AI / ML</span>
-                                                            <div className="tech-compact-tags">
-                                                                {safeSplit(project.aiStack).map((s, idx) => <span key={idx} className="cat-tag-pill ai">{s}</span>)}
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                    {project.backendStack && (
-                                                        <div className="tech-compact-row">
-                                                            <span className="tech-compact-label backend">Backend</span>
-                                                            <div className="tech-compact-tags">
-                                                                {safeSplit(project.backendStack).map((s, idx) => <span key={idx} className="cat-tag-pill backend">{s}</span>)}
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                    {project.databaseStack && (
-                                                        <div className="tech-compact-row">
-                                                            <span className="tech-compact-label db">Database</span>
-                                                            <div className="tech-compact-tags">
-                                                                {safeSplit(project.databaseStack).map((s, idx) => <span key={idx} className="cat-tag-pill db">{s}</span>)}
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                    {project.cloudStack && (
-                                                        <div className="tech-compact-row">
-                                                            <span className="tech-compact-label cloud">Cloud / DevOps</span>
-                                                            <div className="tech-compact-tags">
-                                                                {safeSplit(project.cloudStack).map((s, idx) => <span key={idx} className="cat-tag-pill cloud">{s}</span>)}
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            /* Fallback tags */
-                                            Array.isArray(project.tags) && project.tags.length > 0 && (
+                                        {(() => {
+                                            const hasCategoryStack = Boolean(
+                                                (project.aiStack && safeSplit(project.aiStack).length > 0) ||
+                                                (project.backendStack && safeSplit(project.backendStack).length > 0) ||
+                                                (project.databaseStack && safeSplit(project.databaseStack).length > 0) ||
+                                                (project.cloudStack && safeSplit(project.cloudStack).length > 0)
+                                            );
+                                            const techTags = getProjectTechTags(project);
+                                            if (!hasCategoryStack && techTags.length === 0) return null;
+
+                                            return (
                                                 <div className="recruiter-section tech-stack-section">
                                                     <h4>💻 Tech Stack</h4>
-                                                    <div className="project-expanded-tags">
-                                                        {project.tags.map((tag, tIdx) => (
-                                                            <span key={tIdx} className="dot-tag">
-                                                                <span className="tag-dot" style={{ backgroundColor: getDotColor(tag) }} />
-                                                                {tag}
-                                                            </span>
-                                                        ))}
-                                                    </div>
+                                                    {hasCategoryStack ? (
+                                                        <div className="tech-stack-compact">
+                                                            {project.aiStack && safeSplit(project.aiStack).length > 0 && (
+                                                                <div className="tech-compact-row">
+                                                                    <span className="tech-compact-label ai">AI / ML</span>
+                                                                    <div className="tech-compact-tags">
+                                                                        {safeSplit(project.aiStack).map((s, idx) => <span key={idx} className="cat-tag-pill ai">{s}</span>)}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            {project.backendStack && safeSplit(project.backendStack).length > 0 && (
+                                                                <div className="tech-compact-row">
+                                                                    <span className="tech-compact-label backend">Backend</span>
+                                                                    <div className="tech-compact-tags">
+                                                                        {safeSplit(project.backendStack).map((s, idx) => <span key={idx} className="cat-tag-pill backend">{s}</span>)}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            {project.databaseStack && safeSplit(project.databaseStack).length > 0 && (
+                                                                <div className="tech-compact-row">
+                                                                    <span className="tech-compact-label db">Database</span>
+                                                                    <div className="tech-compact-tags">
+                                                                        {safeSplit(project.databaseStack).map((s, idx) => <span key={idx} className="cat-tag-pill db">{s}</span>)}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            {project.cloudStack && safeSplit(project.cloudStack).length > 0 && (
+                                                                <div className="tech-compact-row">
+                                                                    <span className="tech-compact-label cloud">Cloud / DevOps</span>
+                                                                    <div className="tech-compact-tags">
+                                                                        {safeSplit(project.cloudStack).map((s, idx) => <span key={idx} className="cat-tag-pill cloud">{s}</span>)}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="project-expanded-tags">
+                                                            {techTags.map((tag, tIdx) => (
+                                                                <span key={tIdx} className="dot-tag">
+                                                                    <span className="tag-dot" style={{ backgroundColor: getDotColor(tag) }} />
+                                                                    {tag}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            )
-                                        )}
+                                            );
+                                        })()}
 
                                         {/* Technical Deep Dive accordion sections */}
                                         <div className="deep-dive-section">

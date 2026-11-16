@@ -98,9 +98,20 @@ const AdminDashboard = () => {
                 // Update projects list
                 const updatedProjects = editData.projects.map((p, idx) => {
                     if (idx === index) {
+                        const generatedTags = [
+                            ...(aiData.aiStack ? String(aiData.aiStack).split(',') : []),
+                            ...(aiData.backendStack ? String(aiData.backendStack).split(',') : []),
+                            ...(aiData.databaseStack ? String(aiData.databaseStack).split(',') : []),
+                            ...(aiData.cloudStack ? String(aiData.cloudStack).split(',') : [])
+                        ].map(s => s.trim()).filter(Boolean);
+
+                        const existingValidTags = Array.isArray(p.tags) ? p.tags.filter(t => t && typeof t === 'string' && t.trim()) : [];
+                        const mergedTags = existingValidTags.length > 0 ? existingValidTags : generatedTags.slice(0, 8);
+
                         return {
                             ...p,
                             desc: aiData.desc || aiData.description || p.desc,
+                            tags: mergedTags,
                             problem: aiData.problem || p.problem,
                             goal: aiData.goal || p.goal,
                             solution: aiData.solution || p.solution,
