@@ -714,9 +714,10 @@ const defaultData: PortfolioData = {
         { degree: 'Secondary School Certificate (SSC)', school: 'Badshah Faisal Institute', year: '2016 – 2018', major: 'Science', result: '4.00' }
     ],
     experience: [
-        { role: 'Network War', company: 'EWU Telecommunication Club', period: '2024', desc: 'Participated in the specialized networking competition.', certificateUrl: '/data/work-certificate.png' },
-        { role: 'IT Olympiad', company: 'CSE FEST 2024', period: '2024', desc: 'Department of Computer Science & Engineering, East West University.' },
-        { role: 'In House Programming Battle', company: 'EWUCoPC', period: '2022', desc: 'Certified participant in the campus-wide coding battle.' }
+        { role: 'micro1 AI Interview – Outstanding Performance', company: 'micro1', period: 'November 2026', desc: 'Awarded for outstanding performance during micro1\'s AI-powered technical interview, certified by Ali Ansari (Founder/CEO). micro1 uses AI to objectively evaluate and match engineering talent globally.', certificateUrl: '/certificates/micro1-ai-interview.jpg', logoUrl: '' },
+        { role: 'Network War', company: 'EWU Telecommunication Club', period: '2024', desc: 'Certificate of Appreciation for outstanding participation in Network War at The Royal Hat Presents National Telco Warfare 2024, Powered by Flight Expert. Organized by East West University Telecommunications Club.', certificateUrl: '/certificates/national-telco-warfare-2024.jpg' },
+        { role: 'IT Olympiad', company: 'CSE FEST 2024', period: '2024', desc: 'Certificate of Participation for actively participating in the IT Olympiad of CSE FEST 2024, hosted by the Department of Computer Science and Engineering (CSE), East West University on April 24-25, 2024.', certificateUrl: '/certificates/cse-fest-2024-it-olympiad.jpg' },
+        { role: 'In House Programming Battle', company: 'EWUCoPC', period: '2022', desc: 'Certificate of Participation for successfully taking part in In House Programming Battle 2022. Recognized for logical and creative problem-solving skills.', certificateUrl: '/certificates/ewucopc-programming-battle-2022.jpg' }
     ],
     work: [
         { 

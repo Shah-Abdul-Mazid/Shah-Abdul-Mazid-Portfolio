@@ -841,7 +841,7 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
     category: "badge",
     credentialType: "Course",
     date: "November 17, 2026",
-    verificationUrl: "https://micro1.ai/apply-as-talent",
+    verificationUrl: "https://micro1-portal-data.s3.amazonaws.com/engineer-certificates/m1-1794945518-2d8f7e7a-0a8f-4087-a140-9fae2f4cc3eb.jpg",
     badgeUrl: "/certificates/micro1-ai-interview.jpg",
     sourcePlatform: "micro1",
     status: "verified",
