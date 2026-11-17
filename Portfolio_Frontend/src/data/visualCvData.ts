@@ -206,13 +206,13 @@ export const visualCvData: VisualCvData = {
             liveUrl: "https://nexus-enterprise-intelligence-platform.vercel.app/auth",
         },
         {
-            title: "HR Policies RAG Chatbot",
+            title: "HR-Policies-RAG-Chatbot-AI-Powered-Document-Q&A",
             subtitle: "AI-Powered Document Q&A",
             description: "Built a citation-aware RAG chatbot for answering HR policy questions from organizational PDF documents.",
             points: ["Implemented PDF ingestion, semantic search, vector retrieval, and LLM-based response generation with source-aware answers."],
             tech: ["Python", "FastAPI", "Streamlit", "Pinecone", "Llama 2", "Sentence Transformers"],
-            githubUrl: "https://github.com/Shah-Abdul-Mazid/DevelopRag.git",
-            liveUrl: "",
+            githubUrl: "https://github.com/Shah-Abdul-Mazid/HR-Policies-RAG-Chatbot-AI-Powered-Document-Q-A.git",
+            liveUrl: "https://hr-policies-rag-chatbot-ai-powered.vercel.app/",
         },
         {
             title: "Bangladesh Traffic Flow Dataset",
