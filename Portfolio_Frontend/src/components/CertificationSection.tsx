@@ -946,22 +946,26 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
 
         .award-cert-img-wrap {
           width: 100%;
-          aspect-ratio: 16 / 10;
-          overflow: hidden;
-          background: rgba(0,0,0,0.3);
-          cursor: zoom-in;
+          background: rgba(8, 15, 30, 0.6);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 10px;
+          box-sizing: border-box;
         }
 
         .award-cert-img {
           width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center;
+          height: auto;
+          display: block;
+          object-fit: contain;
+          border-radius: 6px;
           transition: transform 0.4s ease;
         }
 
         .award-cert-card:hover .award-cert-img {
-          transform: scale(1.04);
+          transform: scale(1.02);
         }
 
         .award-cert-body {
