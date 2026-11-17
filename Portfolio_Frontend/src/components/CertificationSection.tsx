@@ -98,8 +98,13 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
     return filteredCredentials.filter(c => c.category === 'course');
   }, [filteredCredentials]);
 
+  const badgeCertificates = useMemo(() => {
+    return filteredCredentials.filter(c => c.category === 'badge');
+  }, [filteredCredentials]);
+
   const professionalCount = useMemo(() => credentials.filter(c => c.category === 'professional').length, [credentials]);
   const courseCount = useMemo(() => credentials.filter(c => c.category === 'course').length, [credentials]);
+  const badgeCount = useMemo(() => credentials.filter(c => c.category === 'badge').length, [credentials]);
   const credlyCount = OFFICIAL_CREDLY_BADGES.length;
 
   return (
@@ -144,6 +149,13 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
             onClick={() => setSelectedCategory('badges')}
           >
             <BadgeCheck size={14} /> Credly Badges ({credlyCount})
+          </button>
+          <button
+            type="button"
+            className={`cert-tab-btn ${(selectedCategory as string) === 'award' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('badge' as any)}
+          >
+            <Award size={14} /> Awards & Participation ({badgeCount})
           </button>
         </div>
 
@@ -230,6 +242,67 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
                 isExpanded={!!expandedPrograms[cert.id]} 
                 onToggleExpand={() => toggleExpand(cert.id)} 
               />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION D: AWARDS & PARTICIPATION CERTIFICATES
+         ───────────────────────────────────────────────────────────── */}
+      {(selectedCategory === 'all' || (selectedCategory as string) === 'badge') && badgeCertificates.length > 0 && (
+        <div className="cert-group-container">
+          <div className="cert-group-header">
+            <div className="cert-group-header-left">
+              <span className="cert-group-badge-pill award-pill">🏆 Awards</span>
+              <h3 className="cert-group-title">Performance Certificates & Participation Awards</h3>
+            </div>
+            <span className="cert-group-count">{badgeCertificates.length} Achievements</span>
+          </div>
+
+          <div className="award-cert-grid">
+            {badgeCertificates.map((cert) => (
+              <div key={cert.id} className="award-cert-card">
+                {cert.badgeUrl && (
+                  <div className="award-cert-img-wrap">
+                    <img
+                      src={cert.badgeUrl}
+                      alt={cert.title}
+                      className="award-cert-img"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                <div className="award-cert-body">
+                  <span className="award-cert-issuer">{cert.issuer}</span>
+                  <h4 className="award-cert-title">{cert.title}</h4>
+                  {cert.date && (
+                    <span className="award-cert-date">
+                      <Calendar size={12} /> {cert.date}
+                    </span>
+                  )}
+                  {cert.programNote && (
+                    <p className="award-cert-note">{cert.programNote}</p>
+                  )}
+                  {cert.skills && cert.skills.length > 0 && (
+                    <div className="award-cert-skills">
+                      {cert.skills.map(s => (
+                        <span key={s} className="award-cert-skill-tag">{s}</span>
+                      ))}
+                    </div>
+                  )}
+                  {cert.verificationUrl && (
+                    <a
+                      href={cert.verificationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="award-cert-link"
+                    >
+                      Verify Certificate <ExternalLink size={11} />
+                    </a>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -840,6 +913,128 @@ export const CertificationSection: React.FC<CertificationSectionProps> = ({
         .cert-secondary-credly-btn:hover {
           background: rgba(251, 146, 60, 0.22);
           border-color: #fb923c;
+        }
+
+        /* ── Awards & Participation Certificates ── */
+        .award-pill {
+          background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.3));
+          border-color: rgba(251, 191, 36, 0.5);
+          color: #fbbf24;
+        }
+
+        .award-cert-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          gap: 24px;
+        }
+
+        .award-cert-card {
+          background: rgba(15, 23, 42, 0.7);
+          border: 1px solid rgba(251, 191, 36, 0.15);
+          border-radius: 16px;
+          overflow: hidden;
+          transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .award-cert-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 36px rgba(251, 191, 36, 0.12);
+          border-color: rgba(251, 191, 36, 0.4);
+        }
+
+        .award-cert-img-wrap {
+          width: 100%;
+          aspect-ratio: 16 / 10;
+          overflow: hidden;
+          background: rgba(0,0,0,0.3);
+          cursor: zoom-in;
+        }
+
+        .award-cert-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+          transition: transform 0.4s ease;
+        }
+
+        .award-cert-card:hover .award-cert-img {
+          transform: scale(1.04);
+        }
+
+        .award-cert-body {
+          padding: 16px 18px 18px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          flex: 1;
+        }
+
+        .award-cert-issuer {
+          font-size: 0.72rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: #fbbf24;
+        }
+
+        .award-cert-title {
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #f1f5f9;
+          margin: 0;
+          line-height: 1.35;
+        }
+
+        .award-cert-date {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 0.75rem;
+          color: #64748b;
+          margin-top: 2px;
+        }
+
+        .award-cert-note {
+          font-size: 0.78rem;
+          color: #94a3b8;
+          line-height: 1.55;
+          margin: 4px 0 0;
+        }
+
+        .award-cert-skills {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 6px;
+        }
+
+        .award-cert-skill-tag {
+          padding: 3px 9px;
+          border-radius: 20px;
+          font-size: 0.7rem;
+          font-weight: 500;
+          background: rgba(251, 191, 36, 0.1);
+          border: 1px solid rgba(251, 191, 36, 0.2);
+          color: #fcd34d;
+        }
+
+        .award-cert-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          margin-top: 10px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #38bdf8;
+          text-decoration: none;
+          transition: color 0.2s;
+        }
+
+        .award-cert-link:hover {
+          color: #7dd3fc;
         }
 
         /* ── Official Credly Badges Showcase ── */

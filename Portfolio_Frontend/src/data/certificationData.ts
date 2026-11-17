@@ -32,7 +32,7 @@ export interface CredentialRecord {
   badgeUrl?: string;
   credlyUrl?: string;
   credlyBadgeId?: string;
-  sourcePlatform: 'Coursera' | 'Credly' | 'AWS' | 'Microsoft' | 'CertNexus' | 'Google' | 'IBM';
+  sourcePlatform: 'Coursera' | 'Credly' | 'AWS' | 'Microsoft' | 'CertNexus' | 'Google' | 'IBM' | 'micro1' | 'EWU' | 'EWUCoPC';
   status: VerificationStatus;
   skills?: string[];
   subCourses?: SubCourseItem[];
@@ -831,6 +831,61 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
       { id: "ibm-aiaw-c2", order: 2, title: "Agentic AI with LangChain and LangGraph", status: "completed", completionDate: "May 2026" },
       { id: "ibm-aiaw-c3", order: 3, title: "Agentic AI with LangGraph, CrewAI, AutoGen and BeeAI", status: "completed", completionDate: "May 2026" }
     ]
+  },
+
+  // ── 5. PERFORMANCE CERTIFICATES & PARTICIPATION AWARDS ──
+  {
+    id: "micro1-ai-interview",
+    title: "micro1 AI Interview – Outstanding Performance",
+    issuer: "micro1",
+    category: "badge",
+    credentialType: "Course",
+    date: "November 17, 2026",
+    verificationUrl: "https://micro1.ai/apply-as-talent",
+    badgeUrl: "/certificates/micro1-ai-interview.jpg",
+    sourcePlatform: "micro1",
+    status: "verified",
+    programNote: "Awarded for outstanding performance during micro1's AI-powered technical interview, certified by Ali Ansari (Founder/CEO). micro1 uses AI to objectively evaluate and match engineering talent globally.",
+    skills: ["AI Technical Interview", "Software Engineering", "Problem Solving", "Algorithm Design"]
+  },
+  {
+    id: "national-telco-warfare-2024",
+    title: "National Telco Warfare 2024 – Network War",
+    issuer: "East West University Telecommunications Club",
+    category: "badge",
+    credentialType: "Course",
+    date: "2024",
+    badgeUrl: "/certificates/national-telco-warfare-2024.jpg",
+    sourcePlatform: "EWU",
+    status: "verified",
+    programNote: "Certificate of Appreciation for outstanding participation in Network War at The Royal Hat Presents National Telco Warfare 2024, Powered by Flight Expert. Organized by East West University Telecommunications Club.",
+    skills: ["Networking", "Telecommunications", "Network Architecture", "Problem Solving"]
+  },
+  {
+    id: "ewucopc-programming-battle-2022",
+    title: "EWUCoPC In House Programming Battle 2022",
+    issuer: "East West University Computer Programming Club",
+    category: "badge",
+    credentialType: "Course",
+    date: "2022",
+    badgeUrl: "/certificates/ewucopc-programming-battle-2022.jpg",
+    sourcePlatform: "EWUCoPC",
+    status: "verified",
+    programNote: "Certificate of Participation for successfully taking part in 'In House Programming Battle 2022' organized by EWUCoPC. Recognized for logical and creative problem-solving skills.",
+    skills: ["Competitive Programming", "Algorithm Design", "Problem Solving", "C/C++"]
+  },
+  {
+    id: "cse-fest-2024-it-olympiad",
+    title: "CSE FEST 2024 – IT Olympiad",
+    issuer: "Dept. of Computer Science & Engineering, East West University",
+    category: "badge",
+    credentialType: "Course",
+    date: "April 24–25, 2024",
+    badgeUrl: "/certificates/cse-fest-2024-it-olympiad.jpg",
+    sourcePlatform: "EWU",
+    status: "verified",
+    programNote: "Certificate of Participation for actively participating in the IT Olympiad of CSE FEST 2024, hosted by the Department of Computer Science and Engineering, East West University.",
+    skills: ["IT Olympiad", "Computer Science", "Programming", "Problem Solving"]
   }
 ];
 
@@ -928,7 +983,7 @@ export function getNormalizedCertifications(apiCerts?: Array<{
         verificationUrl: ac.credentialUrl,
         badgeUrl: cleanBadge,
         credlyUrl: ac.badgePublicUrl,
-        sourcePlatform: (ac.issuer?.includes('IBM') ? 'IBM' : ac.issuer?.includes('Google') ? 'Google' : 'Coursera') as any,
+        sourcePlatform: (ac.issuer?.includes('IBM') ? 'IBM' : ac.issuer?.includes('Google') ? 'Google' : ac.issuer?.includes('micro1') ? 'micro1' : ac.issuer?.includes('East West') ? 'EWU' : 'Coursera') as any,
         status: 'verified',
         skills: ac.skills,
         programNote: ac.programNote,
