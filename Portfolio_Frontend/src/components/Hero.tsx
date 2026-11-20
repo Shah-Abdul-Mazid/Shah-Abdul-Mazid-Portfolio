@@ -131,9 +131,8 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     <div 
                         className="ieb-hero-badge fade-in" 
                         ref={addToRefs}
-                        title="Accredited Professional Engineering Body in Bangladesh"
                         tabIndex={0}
-                        aria-label="Associate Member, Institution of Engineers, Bangladesh (IEB) | ID: A-31537 • Valid through 2028. Accredited Professional Engineering Body in Bangladesh"
+                        aria-label="Associate Member, Institution of Engineers, Bangladesh (IEB) | Membership No: A-31537 • Valid through 2028"
                     >
                         <img src="/documents/ieb-logo.png" alt="IEB Logo" className="ieb-hero-logo" />
                         <span className="ieb-status-dot" aria-hidden="true"></span>
@@ -156,12 +155,7 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                                 <span className="ieb-validity">Valid through 2028</span>
                             </span>
                         </div>
-                        {/* Recruiter Tooltip */}
-                        <div className="ieb-tooltip" role="tooltip">
-                            <span className="ieb-tooltip-badge">Accredited Body</span>
-                            <span>Accredited Professional Engineering Body in Bangladesh</span>
-                            <span className="ieb-tooltip-arrow"></span>
-                        </div>
+
                     </div>
                     <InlineAudioWaveform />
                     <p className="fade-in hero-roles-anim" ref={addToRefs}>
@@ -392,19 +386,18 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                 }
                 /* 
                  * .ieb-hero-text is the flex container for all badge content.
-                 * Key strategy: flex-wrap is ON so segments can wrap onto 2 clean lines.
-                 * But each individual segment (.ieb-org-title, .ieb-meta-group) has
-                 * white-space: nowrap so they never break MID-phrase.
+                 * Desktop: flex-wrap: nowrap forces single line.
+                 * Mobile breakpoints re-enable wrap for clean 2-line stacking.
                  */
                 .ieb-hero-text {
                     display: inline-flex;
                     align-items: center;
-                    gap: 6px 10px;
-                    font-size: 0.875rem;
-                    line-height: 1.5;
-                    letter-spacing: 0.012em;
-                    flex-wrap: wrap;
-                    justify-content: center;
+                    gap: 8px;
+                    font-size: 0.82rem;
+                    line-height: 1.4;
+                    letter-spacing: 0.01em;
+                    flex-wrap: nowrap;
+                    white-space: nowrap;
                 }
                 .ieb-org-title {
                     color: #FFFFFF;
@@ -475,55 +468,6 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     white-space: nowrap;
                 }
 
-                /* Recruiter Tooltip */
-                .ieb-tooltip {
-                    position: absolute;
-                    bottom: calc(100% + 10px);
-                    left: 50%;
-                    transform: translateX(-50%) translateY(4px);
-                    background: rgba(10, 17, 34, 0.96);
-                    border: 1px solid rgba(251, 191, 36, 0.55);
-                    color: #F1F5F9;
-                    padding: 6px 14px;
-                    border-radius: 8px;
-                    font-size: 0.8rem;
-                    font-weight: 500;
-                    white-space: nowrap;
-                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 16px rgba(251, 191, 36, 0.22);
-                    pointer-events: none;
-                    opacity: 0;
-                    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-                    z-index: 50;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 8px;
-                    backdrop-filter: blur(12px);
-                    -webkit-backdrop-filter: blur(12px);
-                }
-                .ieb-hero-badge:hover .ieb-tooltip,
-                .ieb-hero-badge:focus-visible .ieb-tooltip {
-                    opacity: 1;
-                    transform: translateX(-50%) translateY(0);
-                }
-                .ieb-tooltip-arrow {
-                    position: absolute;
-                    top: 100%;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    border-width: 5px;
-                    border-style: solid;
-                    border-color: rgba(251, 191, 36, 0.55) transparent transparent transparent;
-                }
-                .ieb-tooltip-badge {
-                    background: rgba(251, 191, 36, 0.18);
-                    color: #FBBF24;
-                    border: 1px solid rgba(251, 191, 36, 0.45);
-                    padding: 1px 6px;
-                    border-radius: 4px;
-                    font-size: 0.7rem;
-                    font-weight: 600;
-                    letter-spacing: 0.02em;
-                }
 
                 html.light-mode .ieb-hero-badge {
                     background: rgba(255, 255, 255, 0.94);
@@ -540,14 +484,9 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                 html.light-mode .ieb-bullet {
                     color: #d97706;
                 }
+
                 html.light-mode .ieb-status-dot {
                     background-color: #d97706;
-                }
-                html.light-mode .ieb-tooltip {
-                    background: rgba(255, 255, 255, 0.98);
-                    border-color: rgba(217, 119, 6, 0.4);
-                    color: #1e293b;
-                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
                 }
 
                 /* Audio widget integration */
@@ -790,8 +729,7 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                         text-align: center !important;
                         font-size: 0.72rem !important;
                         padding: 6px 10px !important;
-                    }
-                }
+                    }                }
                 @media (max-width: 380px) {
                     .hero-name-h1 {
                         font-size: clamp(1.05rem, 5.3vw, 1.2rem) !important;
