@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿import { useState, useEffect } from 'react';
+﻿﻿﻿﻿﻿﻿﻿﻿import { useState, useEffect } from 'react';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { Link } from 'react-router-dom';
 import { Moon, Sun } from 'lucide-react';
@@ -142,7 +142,15 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                             <span className="ieb-pipe" aria-hidden="true">|</span>
                             <span className="ieb-meta-group">
                                 <span className="ieb-id-wrap">
-                                    <span className="ieb-id-label">ID:</span>&nbsp;<strong className="ieb-id">A-31537</strong>
+                                    <span className="ieb-id-label">Membership No:</span>&nbsp;
+                                    <a
+                                        href="https://www.iebbd.org/member/search.jsp?searchToken=0774C58B4389C67C58A47EECCEBBE307&membershipId=A-31537&memberNameEmailMobile="
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="ieb-id ieb-id-link"
+                                        title="Verify IEB Membership — Institution of Engineers, Bangladesh"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >A-31537</a>
                                 </span>
                                 <span className="ieb-bullet" aria-hidden="true">&bull;</span>
                                 <span className="ieb-validity">Valid through 2028</span>
@@ -431,6 +439,30 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     color: #FBBF24;
                     font-weight: 700;
                     letter-spacing: 0.03em;
+                }
+                .ieb-id-link {
+                    color: #FBBF24;
+                    text-decoration: none;
+                    border-bottom: 1px dashed rgba(251, 191, 36, 0.55);
+                    padding-bottom: 1px;
+                    transition: color 0.2s ease, border-color 0.2s ease, text-shadow 0.2s ease;
+                    cursor: pointer;
+                }
+                .ieb-id-link:hover,
+                .ieb-id-link:focus-visible {
+                    color: #FDE68A;
+                    border-bottom-color: #FDE68A;
+                    text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+                    outline: none;
+                }
+                html.light-mode .ieb-id-link {
+                    color: #d97706;
+                    border-bottom-color: rgba(217, 119, 6, 0.5);
+                }
+                html.light-mode .ieb-id-link:hover {
+                    color: #b45309;
+                    border-bottom-color: #b45309;
+                    text-shadow: none;
                 }
                 .ieb-bullet {
                     color: #FBBF24;
