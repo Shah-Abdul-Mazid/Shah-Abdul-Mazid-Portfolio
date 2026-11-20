@@ -672,10 +672,9 @@ const defaultData: PortfolioData = {
             "Data Scientist",
             "AI Engineer",
             "ML Engineer",
-            "Software Engineer",
-            "IEB Registered Engineer (A-31537)"
+            "Software Engineer"
         ],
-        description: "A CSE graduate focused on Intelligent Systems & Data Science. IEB Registered Engineer (A-31537)."
+        description: "A CSE graduate focused on Intelligent Systems & Data Science"
     },
     about: {
         bio: "I am an AI Engineer at Neuroxyte and a Computer Science & Engineering graduate from East West University (majoring in Intelligent Systems & Data Science). I am a registered member of the **Institution of Engineers, Bangladesh (IEB)** (Membership No. **A-31537**). Driven by AI innovation, research, and hackathons, my work focuses on building explainable, data-driven systems that bridge the gap between academic research and production engineering.\n\n**Engineering Focus**\n- **Production AI Systems:** Architecting Multi-Agent RAG platforms, production LLM pipelines, and computer vision applications.\n- **System Deployment:** Scaling AI microservices and optimizing model latency for real-time inference.\n\n**Research Focus**\n- **Medical Imaging & Vision:** Diagnostics, interpretable machine learning using Grad-CAM, and Vision-Language Transformers.\n- **Academic Contribution:** Bridging production-grade engineering with explainable AI research.",
