@@ -1,4 +1,4 @@
-﻿﻿﻿import { useState, useEffect } from 'react';
+﻿﻿﻿﻿import { useState, useEffect } from 'react';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { Link } from 'react-router-dom';
 import { Moon, Sun } from 'lucide-react';
@@ -166,9 +166,19 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                             })()}
                         </span>
                     </p>
-                    <p className="fade-in hero-desc" ref={addToRefs}>
-                        {data.hero.description}
-                    </p>
+                    <div className="fade-in hero-desc-block" ref={addToRefs}>
+                        {(() => {
+                            const parts = (data.hero.description || '').split(/\.\s+/);
+                            const line1 = parts[0] ? parts[0].replace(/\.$/, '') : '';
+                            const line2 = parts.slice(1).join('. ').replace(/\.$/, '').trim();
+                            return (
+                                <>
+                                    <span className="hero-desc-line">{line1 || data.hero.description}</span>
+                                    {line2 && <span className="hero-desc-line hero-desc-line2">{line2}</span>}
+                                </>
+                            );
+                        })()}
+                    </div>
                     <div className="hero-btns fade-in" ref={addToRefs}>
                         <Link to="/projects" className="btn btn-primary btn-gradient">View My Work</Link>
                         <Link to="/resume" className="btn btn-secondary btn-outline">My Resume</Link>
@@ -316,27 +326,39 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     }
                     .ieb-hero-logo { width: 20px; height: 20px; }
                 }
-                /* Hero description */
-                .hero-desc {
-                    font-size: 1rem;
-                    color: var(--text-muted);
-                    max-width: 520px;
+                /* Hero description two-line block */
+                .hero-desc-block {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 2px;
+                    max-width: 600px;
                     margin: 0 auto 24px;
-                    line-height: 1.65;
                     text-align: center;
-                    text-wrap: balance;
                     text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85);
                 }
-                html.light-mode .hero-desc {
+                html.light-mode .hero-desc-block {
                     text-shadow: 0 1px 12px rgba(255, 255, 255, 0.9);
                 }
+                .hero-desc-line {
+                    display: block;
+                    font-size: 1rem;
+                    color: var(--text-muted);
+                    line-height: 1.7;
+                }
+                .hero-desc-line2 {
+                    font-size: 0.95rem;
+                    color: var(--text-secondary);
+                    font-style: italic;
+                    opacity: 0.85;
+                }
                 @media (max-width: 768px) {
-                    .hero-desc {
-                        font-size: 0.88rem !important;
-                        max-width: 88% !important;
-                        line-height: 1.6 !important;
+                    .hero-desc-block {
+                        max-width: 90% !important;
                         margin: 0 auto 16px !important;
                     }
+                    .hero-desc-line { font-size: 0.88rem !important; }
+                    .hero-desc-line2 { font-size: 0.84rem !important; }
                 }
                 .hero-btns { display: flex; gap: 14px; margin-top: 20px; justify-content: center; }
                 .image-wrapper { position: relative; width: 110px; height: 110px; margin: 0 auto; }
