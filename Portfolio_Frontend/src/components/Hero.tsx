@@ -281,19 +281,22 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     backdrop-filter: blur(12px); 
                 }
 
-                /* 1. Main Headline: Largest, boldest focal point in crisp white */
+                /* 1. Main Headline: Largest, boldest focal point in crisp white (single line guaranteed) */
                 .hero-name-h1 {
-                    font-size: clamp(2.3rem, 5.8vw, 4.2rem);
+                    font-size: clamp(1.75rem, 4.2vw, 3.4rem);
                     font-weight: 900;
                     color: #FFFFFF !important;
                     letter-spacing: -0.025em;
                     line-height: 1.15;
                     margin: 0;
+                    white-space: nowrap !important;
+                    text-align: center;
+                    max-width: 100%;
                     text-shadow: 0 4px 30px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.8);
                 }
                 .hero-name-highlight {
                     color: #FFFFFF !important;
-                    white-space: nowrap;
+                    white-space: nowrap !important;
                 }
                 html.light-mode .hero-name-h1,
                 html.light-mode .hero-name-highlight {
@@ -554,8 +557,9 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                         font-size: 0.72rem !important; 
                     }
                     .hero-name-h1 {
-                        font-size: clamp(1.75rem, 6.5vw, 2.6rem) !important;
+                        font-size: clamp(1.2rem, 4.6vw, 1.9rem) !important;
                         line-height: 1.2 !important;
+                        white-space: nowrap !important;
                     }
                     .ieb-hero-badge {
                         font-size: 0.85rem !important;
@@ -595,6 +599,12 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                         text-align: center !important; 
                         padding: 10px 18px !important;
                         font-size: 0.88rem !important;
+                    }
+                }
+                @media (max-width: 480px) {
+                    .hero-name-h1 {
+                        font-size: clamp(0.95rem, 5.2vw, 1.35rem) !important;
+                        white-space: nowrap !important;
                     }
                 }
                 @media (max-height: 720px) {
