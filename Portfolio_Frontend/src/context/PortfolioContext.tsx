@@ -672,6 +672,7 @@ const defaultData: PortfolioData = {
             "Data Scientist",
             "AI Engineer",
             "ML Engineer",
+            "Solutions Architect",
             "Software Engineer"
         ],
         description: "A CSE graduate focused on Intelligent Systems & Data Science"

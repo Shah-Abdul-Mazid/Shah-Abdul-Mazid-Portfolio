@@ -127,17 +127,33 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     <h1 className="fade-in hero-name-h1" ref={addToRefs}>
                         Hi, I'm <span className="hero-name-highlight">Engr. Shah Abdul Mazid</span>
                     </h1>
-                    {/* IEB Membership Badge */}
-                    <div className="ieb-hero-badge fade-in" ref={addToRefs}>
-                        <img src="/documents/ieb-logo.png" alt="IEB" className="ieb-hero-logo" />
+                    {/* Upgraded IEB Membership Badge: Recruiter & User Friendly */}
+                    <div 
+                        className="ieb-hero-badge fade-in" 
+                        ref={addToRefs}
+                        title="Accredited Professional Engineering Body in Bangladesh"
+                        tabIndex={0}
+                        aria-label="Associate Member, Institution of Engineers, Bangladesh (IEB) | ID: A-31537 • Valid through 2028. Accredited Professional Engineering Body in Bangladesh"
+                    >
+                        <img src="/documents/ieb-logo.png" alt="IEB Logo" className="ieb-hero-logo" />
                         <span className="ieb-status-dot" aria-hidden="true"></span>
-                        <span className="ieb-hero-text">
-                            <span className="ieb-title">IEB Associate Member</span>
-                            <span className="ieb-sep">&middot;</span>
-                            <span className="ieb-id">A-31537</span>
-                            <span className="ieb-sep">&middot;</span>
-                            <span className="ieb-validity">Valid till 2028</span>
-                        </span>
+                        <div className="ieb-hero-text">
+                            <span className="ieb-org-title">Associate Member, Institution of Engineers, Bangladesh (IEB)</span>
+                            <span className="ieb-pipe" aria-hidden="true">|</span>
+                            <span className="ieb-meta-group">
+                                <span className="ieb-id-wrap">
+                                    <span className="ieb-id-label">ID:</span>&nbsp;<strong className="ieb-id">A-31537</strong>
+                                </span>
+                                <span className="ieb-bullet" aria-hidden="true">&bull;</span>
+                                <span className="ieb-validity">Valid through 2028</span>
+                            </span>
+                        </div>
+                        {/* Recruiter Tooltip */}
+                        <div className="ieb-tooltip" role="tooltip">
+                            <span className="ieb-tooltip-badge">Accredited Body</span>
+                            <span>Accredited Professional Engineering Body in Bangladesh</span>
+                            <span className="ieb-tooltip-arrow"></span>
+                        </div>
                     </div>
                     <InlineAudioWaveform />
                     <p className="fade-in hero-roles-anim" ref={addToRefs}>
@@ -195,7 +211,8 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     flex-direction: column;
                     align-items: center;
                     gap: 1.25rem;
-                    max-width: 900px;
+                    max-width: 1100px;
+                    width: 100%;
                     margin: 0 auto;
                 }
                 .hero-content > * {
@@ -281,48 +298,64 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     backdrop-filter: blur(12px); 
                 }
 
-                /* 1. Main Headline: Largest, boldest focal point in crisp white (single line guaranteed) */
+                /* 1. Main Headline: Significantly larger & bolder focal point (text-5xl to text-7xl scale) with contrast backdrop */
                 .hero-name-h1 {
-                    font-size: clamp(1.75rem, 4.2vw, 3.4rem);
-                    font-weight: 900;
+                    font-size: clamp(2.75rem, 5vw, 4.5rem);
+                    font-weight: 800;
                     color: #FFFFFF !important;
-                    letter-spacing: -0.025em;
-                    line-height: 1.15;
+                    letter-spacing: -0.03em;
+                    line-height: 1.12;
                     margin: 0;
                     white-space: nowrap !important;
                     text-align: center;
-                    max-width: 100%;
-                    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.8);
+                    position: relative;
+                    display: inline-block;
+                    padding: 4px 28px;
+                    border-radius: 24px;
+                    background: radial-gradient(ellipse 95% 85% at 50% 50%, rgba(10, 17, 34, 0.72) 0%, rgba(10, 17, 34, 0) 78%);
+                    text-shadow: 
+                        0 4px 20px rgba(0, 0, 0, 0.95), 
+                        0 8px 35px rgba(0, 0, 0, 0.9), 
+                        0 0 50px rgba(10, 17, 34, 0.95);
+                    filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.75));
                 }
                 .hero-name-highlight {
                     color: #FFFFFF !important;
                     white-space: nowrap !important;
                 }
-                html.light-mode .hero-name-h1,
+                html.light-mode .hero-name-h1 {
+                    color: #0f172a !important;
+                    background: radial-gradient(ellipse 95% 85% at 50% 50%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 78%);
+                    text-shadow: 0 2px 20px rgba(255, 255, 255, 0.95);
+                    filter: none;
+                }
                 html.light-mode .hero-name-highlight {
                     color: #0f172a !important;
-                    text-shadow: 0 2px 24px rgba(255, 255, 255, 0.95), 0 1px 2px rgba(255, 255, 255, 0.8);
                 }
 
-                /* 2. IEB Membership Badge: Glassmorphic dark slate pill, gold border & ID, white text */
+                /* 2. Upgraded IEB Membership Badge: Recruiter & User Friendly */
                 .ieb-hero-badge {
+                    position: relative;
                     display: inline-flex;
                     align-items: center;
                     gap: 10px;
-                    padding: 9px 22px;
-                    background: rgba(15, 23, 42, 0.75);
-                    backdrop-filter: blur(8px);
-                    -webkit-backdrop-filter: blur(8px);
-                    border: 1px solid rgba(251, 191, 36, 0.4);
+                    padding: 9px 24px;
+                    background: rgba(15, 23, 42, 0.85);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
+                    border: 1px solid rgba(251, 191, 36, 0.45);
                     border-radius: 9999px;
-                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), 0 0 15px rgba(251, 191, 36, 0.12);
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 16px rgba(251, 191, 36, 0.15);
                     margin: 0;
-                    white-space: nowrap;
-                    transition: all 0.3s ease;
+                    cursor: default;
+                    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                    max-width: 95%;
                 }
-                .ieb-hero-badge:hover {
-                    border-color: rgba(251, 191, 36, 0.7);
-                    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45), 0 0 20px rgba(251, 191, 36, 0.25);
+                .ieb-hero-badge:hover,
+                .ieb-hero-badge:focus-visible {
+                    border-color: rgba(251, 191, 36, 0.8);
+                    background: rgba(15, 23, 42, 0.96);
+                    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.55), 0 0 22px rgba(251, 191, 36, 0.3);
                     transform: translateY(-1px);
                 }
                 .ieb-hero-logo {
@@ -333,8 +366,8 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     background: #ffffff;
                     padding: 2px;
                     flex-shrink: 0;
-                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-                    border: 1.5px solid rgba(251, 191, 36, 0.6);
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+                    border: 1.5px solid rgba(251, 191, 36, 0.65);
                 }
                 .ieb-status-dot {
                     width: 8px;
@@ -354,42 +387,123 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     display: inline-flex;
                     align-items: center;
                     gap: 8px;
-                    font-size: 1.0625rem;
-                    line-height: 1.4;
+                    font-size: 0.96rem;
+                    line-height: 1.45;
                     letter-spacing: 0.015em;
+                    flex-wrap: wrap;
+                    justify-content: center;
                 }
-                .ieb-title {
+                .ieb-org-title {
                     color: #FFFFFF;
                     font-weight: 600;
                 }
-                .ieb-sep {
-                    color: #FBBF24;
-                    font-weight: 700;
-                    opacity: 0.85;
+                .ieb-pipe {
+                    color: rgba(251, 191, 36, 0.6);
+                    font-weight: 300;
+                    margin: 0 2px;
+                    user-select: none;
+                }
+                .ieb-meta-group {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                .ieb-id-wrap {
+                    display: inline-flex;
+                    align-items: center;
+                    color: #F1F5F9;
+                }
+                .ieb-id-label {
+                    color: rgba(255, 255, 255, 0.85);
+                    font-weight: 500;
                 }
                 .ieb-id {
                     color: #FBBF24;
                     font-weight: 700;
-                    letter-spacing: 0.03em;
+                    letter-spacing: 0.025em;
+                }
+                .ieb-bullet {
+                    color: #FBBF24;
+                    font-size: 0.8rem;
+                    user-select: none;
                 }
                 .ieb-validity {
                     color: #FFFFFF;
                     font-weight: 500;
                 }
+
+                /* Recruiter Tooltip */
+                .ieb-tooltip {
+                    position: absolute;
+                    bottom: calc(100% + 10px);
+                    left: 50%;
+                    transform: translateX(-50%) translateY(4px);
+                    background: rgba(10, 17, 34, 0.96);
+                    border: 1px solid rgba(251, 191, 36, 0.55);
+                    color: #F1F5F9;
+                    padding: 6px 14px;
+                    border-radius: 8px;
+                    font-size: 0.82rem;
+                    font-weight: 500;
+                    white-space: nowrap;
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 16px rgba(251, 191, 36, 0.22);
+                    pointer-events: none;
+                    opacity: 0;
+                    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                    z-index: 50;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
+                }
+                .ieb-hero-badge:hover .ieb-tooltip,
+                .ieb-hero-badge:focus-visible .ieb-tooltip {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+                .ieb-tooltip-arrow {
+                    position: absolute;
+                    top: 100%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    border-width: 5px;
+                    border-style: solid;
+                    border-color: rgba(251, 191, 36, 0.55) transparent transparent transparent;
+                }
+                .ieb-tooltip-badge {
+                    background: rgba(251, 191, 36, 0.18);
+                    color: #FBBF24;
+                    border: 1px solid rgba(251, 191, 36, 0.45);
+                    padding: 1px 6px;
+                    border-radius: 4px;
+                    font-size: 0.72rem;
+                    font-weight: 600;
+                    letter-spacing: 0.02em;
+                }
+
                 html.light-mode .ieb-hero-badge {
-                    background: rgba(255, 255, 255, 0.9);
+                    background: rgba(255, 255, 255, 0.94);
                     border-color: rgba(217, 119, 6, 0.45);
                     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
                 }
-                html.light-mode .ieb-title,
+                html.light-mode .ieb-org-title,
+                html.light-mode .ieb-id-label,
                 html.light-mode .ieb-validity {
                     color: #0f172a;
                 }
                 html.light-mode .ieb-id,
-                html.light-mode .ieb-sep,
+                html.light-mode .ieb-pipe,
+                html.light-mode .ieb-bullet,
                 html.light-mode .ieb-status-dot {
                     color: #d97706;
                     background-color: #d97706;
+                }
+                html.light-mode .ieb-tooltip {
+                    background: rgba(255, 255, 255, 0.98);
+                    border-color: rgba(217, 119, 6, 0.4);
+                    color: #1e293b;
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
                 }
 
                 /* Audio widget integration */
@@ -528,6 +642,15 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2);
                 }
 
+                @media (max-width: 880px) {
+                    .ieb-hero-badge {
+                        border-radius: 20px !important;
+                        padding: 9px 18px !important;
+                    }
+                    .ieb-pipe {
+                        display: none !important;
+                    }
+                }
                 @media (max-width: 768px) {
                     #hero {
                         height: auto !important;
@@ -537,7 +660,7 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                         overflow: visible !important;
                     }
                     .hero-content {
-                        gap: 0.9rem !important;
+                        gap: 0.95rem !important;
                     }
                     .hero-image {
                         margin-bottom: 4px !important;
@@ -557,20 +680,18 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                         font-size: 0.72rem !important; 
                     }
                     .hero-name-h1 {
-                        font-size: clamp(1.2rem, 4.6vw, 1.9rem) !important;
-                        line-height: 1.2 !important;
+                        font-size: clamp(1.85rem, 6.2vw, 3rem) !important; /* text-5xl scale */
+                        line-height: 1.15 !important;
                         white-space: nowrap !important;
+                        padding: 4px 16px !important;
                     }
                     .ieb-hero-badge {
-                        font-size: 0.85rem !important;
-                        padding: 6px 14px !important;
-                        gap: 6px !important;
-                        white-space: normal !important;
-                        text-align: center !important;
-                        justify-content: center !important;
+                        font-size: 0.88rem !important;
+                        padding: 8px 16px !important;
+                        gap: 8px !important;
                     }
                     .ieb-hero-text {
-                        font-size: 0.85rem !important;
+                        font-size: 0.88rem !important;
                         gap: 6px !important;
                         flex-wrap: wrap !important;
                         justify-content: center !important;
@@ -601,9 +722,33 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                         font-size: 0.88rem !important;
                     }
                 }
-                @media (max-width: 480px) {
+                @media (max-width: 520px) {
                     .hero-name-h1 {
-                        font-size: clamp(0.95rem, 5.2vw, 1.35rem) !important;
+                        font-size: clamp(1.25rem, 5.8vw, 1.85rem) !important;
+                        white-space: nowrap !important;
+                        padding: 3px 10px !important;
+                    }
+                    .ieb-hero-badge {
+                        font-size: 0.8rem !important;
+                        padding: 7px 12px !important;
+                        border-radius: 16px !important;
+                    }
+                    .ieb-hero-text {
+                        font-size: 0.8rem !important;
+                        gap: 4px 6px !important;
+                    }
+                    .ieb-tooltip {
+                        white-space: normal !important;
+                        width: 250px !important;
+                        max-width: 90vw !important;
+                        text-align: center !important;
+                        font-size: 0.74rem !important;
+                        padding: 6px 10px !important;
+                    }
+                }
+                @media (max-width: 380px) {
+                    .hero-name-h1 {
+                        font-size: clamp(1.05rem, 5.5vw, 1.25rem) !important;
                         white-space: nowrap !important;
                     }
                 }
