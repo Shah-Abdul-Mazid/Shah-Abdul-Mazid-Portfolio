@@ -742,6 +742,8 @@ const ProfilePage = () => {
         }
         .bio-bullet-text {
           flex: 1;
+          text-align: justify;
+          text-justify: inter-word;
         }
         .bio-label {
           color: var(--text-color);
@@ -780,6 +782,8 @@ const ProfilePage = () => {
           line-height: 1.8;
           color: var(--text-secondary);
           margin-bottom: 16px;
+          text-align: justify;
+          text-justify: inter-word;
         }
         .bio-para:last-child {
           margin-bottom: 0;

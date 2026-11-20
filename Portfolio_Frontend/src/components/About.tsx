@@ -160,6 +160,11 @@ const About = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =
                     color: var(--text-secondary);
                 }
 
+                .about-text p {
+                    text-align: justify;
+                    text-justify: inter-word;
+                }
+
                 .about-text p.lead {
                     font-size: 1.1rem;
                     color: var(--text-color);
