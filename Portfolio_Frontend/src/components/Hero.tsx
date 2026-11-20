@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+﻿﻿import { useState, useEffect } from 'react';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { Link } from 'react-router-dom';
 import { Moon, Sun } from 'lucide-react';
@@ -130,7 +130,7 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     <div className="ieb-hero-badge fade-in" ref={addToRefs}>
                         <img src="/documents/ieb-logo.png" alt="IEB" className="ieb-hero-logo" />
                         <span className="ieb-hero-text">
-                            <strong>IEB Registered Engineer</strong>&nbsp;&middot;&nbsp;Membership No. A-31537&nbsp;&middot;&nbsp;Valid Till 2028
+                            <strong>IEB Member</strong>&nbsp;&middot;&nbsp;A-31537&nbsp;&middot;&nbsp;Valid till 2028
                         </span>
                     </div>
                     <InlineAudioWaveform />
@@ -166,7 +166,7 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                             })()}
                         </span>
                     </p>
-                    <p className="fade-in" ref={addToRefs} style={{ fontSize: '1rem', color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto 24px', lineHeight: 1.4 }}>
+                    <p className="fade-in hero-desc" ref={addToRefs}>
                         {data.hero.description}
                     </p>
                     <div className="hero-btns fade-in" ref={addToRefs}>
@@ -315,6 +315,28 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                         justify-content: center;
                     }
                     .ieb-hero-logo { width: 18px; height: 18px; }
+                }
+                /* Hero description */
+                .hero-desc {
+                    font-size: 1rem;
+                    color: var(--text-muted);
+                    max-width: 520px;
+                    margin: 0 auto 24px;
+                    line-height: 1.65;
+                    text-align: center;
+                    text-wrap: balance;
+                    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85);
+                }
+                html.light-mode .hero-desc {
+                    text-shadow: 0 1px 12px rgba(255, 255, 255, 0.9);
+                }
+                @media (max-width: 768px) {
+                    .hero-desc {
+                        font-size: 0.88rem !important;
+                        max-width: 88% !important;
+                        line-height: 1.6 !important;
+                        margin: 0 auto 16px !important;
+                    }
                 }
                 .hero-btns { display: flex; gap: 14px; margin-top: 20px; justify-content: center; }
                 .image-wrapper { position: relative; width: 110px; height: 110px; margin: 0 auto; }
