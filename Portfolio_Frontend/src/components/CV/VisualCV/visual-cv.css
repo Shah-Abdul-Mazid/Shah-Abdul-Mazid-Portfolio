@@ -316,24 +316,24 @@
 }
 
 /* ════════════════════════════════════════════════════════════
-   PAGE 2 SPECIFIC STYLES — Strict Single-Page A4 Fill
+   PAGE 2 SPECIFIC STYLES — Perfectly Balanced Full A4 Fill
    ════════════════════════════════════════════════════════════ */
 
 #cv-page-2 .v2-sec-heading {
-  font-size: 8.9pt;
-  margin: 0 0 1.1mm 0;
-  padding-bottom: 0.35mm;
+  font-size: 9.1pt;
+  margin: 0 0 1.3mm 0;
+  padding-bottom: 0.4mm;
 }
 
 #cv-page-2 .v2-sec-block:not(:first-child) {
-  margin-top: 2.6mm;
+  margin-top: 3.3mm;
 }
 
 /* Highlights */
 #cv-page-2 .v2-highlight-item {
-  font-size: 8pt;
-  margin-bottom: 1.4mm;
-  line-height: 1.26;
+  font-size: 8.3pt;
+  margin-bottom: 2mm;
+  line-height: 1.32;
   color: var(--v2-text);
 }
 
@@ -348,7 +348,7 @@
 
 /* Experience */
 #cv-page-2 .v2-exp-item {
-  margin-bottom: 2.2mm;
+  margin-bottom: 2.8mm;
 }
 
 #cv-page-2 .v2-exp-item:last-child {
@@ -363,35 +363,35 @@
 
 #cv-page-2 .v2-exp-role {
   font-weight: 700;
-  font-size: 8.4pt;
+  font-size: 8.7pt;
   color: var(--v2-dark);
 }
 
 #cv-page-2 .v2-exp-period {
   font-weight: 700;
-  font-size: 7.9pt;
+  font-size: 8.1pt;
   color: var(--v2-dark);
   white-space: nowrap;
 }
 
 #cv-page-2 .v2-exp-company {
-  font-size: 7.9pt;
+  font-size: 8.1pt;
   color: #444444;
   font-style: italic;
-  margin-bottom: 0.4mm;
-  line-height: 1.18;
+  margin-bottom: 0.6mm;
+  line-height: 1.2;
 }
 
 #cv-page-2 .v2-ul {
-  margin: 0.3mm 0 0 3.5mm;
+  margin: 0.4mm 0 0 4mm;
   padding: 0;
   list-style: disc;
 }
 
 #cv-page-2 .v2-ul li {
-  font-size: 7.9pt;
-  margin-bottom: 0.6mm;
-  line-height: 1.24;
+  font-size: 8.2pt;
+  margin-bottom: 0.9mm;
+  line-height: 1.28;
   color: var(--v2-text);
 }
 
@@ -401,7 +401,7 @@
 
 /* Projects */
 #cv-page-2 .v2-project-item {
-  margin-bottom: 1.8mm;
+  margin-bottom: 2.5mm;
 }
 
 #cv-page-2 .v2-project-item:last-child {
@@ -410,29 +410,29 @@
 
 #cv-page-2 .v2-project-title {
   font-weight: 700;
-  font-size: 8.3pt;
+  font-size: 8.6pt;
   color: var(--v2-dark);
-  line-height: 1.18;
+  line-height: 1.2;
 }
 
 #cv-page-2 .v2-project-subtitle {
-  font-size: 7.8pt;
+  font-size: 8pt;
   color: var(--v2-muted);
   font-style: italic;
-  line-height: 1.16;
+  line-height: 1.18;
 }
 
 #cv-page-2 .v2-project-desc {
-  font-size: 7.9pt;
+  font-size: 8.1pt;
   color: var(--v2-text);
-  margin-top: 0.3mm;
-  margin-bottom: 0.3mm;
-  line-height: 1.22;
+  margin-top: 0.4mm;
+  margin-bottom: 0.4mm;
+  line-height: 1.26;
 }
 
 /* Publications */
 #cv-page-2 .v2-pub-item {
-  margin-bottom: 1.8mm;
+  margin-bottom: 2.3mm;
 }
 
 #cv-page-2 .v2-pub-item:last-child {
@@ -441,30 +441,30 @@
 
 #cv-page-2 .v2-pub-title {
   font-weight: 700;
-  font-size: 8pt;
-  line-height: 1.22;
+  font-size: 8.3pt;
+  line-height: 1.24;
   color: var(--v2-dark);
-  margin-bottom: 0.3mm;
+  margin-bottom: 0.35mm;
 }
 
 #cv-page-2 .v2-pub-authors {
-  font-size: 7.7pt;
+  font-size: 7.9pt;
   color: #444444;
-  line-height: 1.2;
-  margin-bottom: 0.2mm;
+  line-height: 1.24;
+  margin-bottom: 0.25mm;
 }
 
 #cv-page-2 .v2-pub-venue {
-  font-size: 7.7pt;
+  font-size: 7.9pt;
   color: var(--v2-text);
   font-style: italic;
-  line-height: 1.18;
+  line-height: 1.22;
 }
 
 #cv-page-2 .v2-pub-doi {
-  font-size: 7.7pt;
+  font-size: 7.9pt;
   color: var(--v2-text);
-  line-height: 1.18;
+  line-height: 1.22;
 }
 
 #cv-page-2 .v2-link {
@@ -478,9 +478,9 @@
 
 /* Competitions */
 #cv-page-2 .v2-comp-item {
-  font-size: 7.9pt;
-  margin-bottom: 1.1mm;
-  line-height: 1.22;
+  font-size: 8.2pt;
+  margin-bottom: 1.4mm;
+  line-height: 1.24;
 }
 
 #cv-page-2 .v2-comp-item:last-child {
@@ -494,9 +494,9 @@
 
 /* Online Profiles */
 #cv-page-2 .v2-profile-item {
-  font-size: 7.9pt;
-  margin-bottom: 1.1mm;
-  line-height: 1.22;
+  font-size: 8.2pt;
+  margin-bottom: 1.4mm;
+  line-height: 1.24;
 }
 
 #cv-page-2 .v2-profile-item:last-child {
