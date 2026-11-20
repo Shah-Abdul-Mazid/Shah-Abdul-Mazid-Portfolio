@@ -1,4 +1,4 @@
-﻿﻿﻿﻿import { useState, useEffect } from 'react';
+﻿﻿﻿﻿﻿import { useState, useEffect } from 'react';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { Link } from 'react-router-dom';
 import { Moon, Sun } from 'lucide-react';
@@ -324,7 +324,7 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                         text-align: center;
                         justify-content: center;
                     }
-                    .ieb-hero-logo { width: 20px; height: 20px; }
+                    .ieb-hero-logo { width: 24px; height: 24px; }
                 }
                 /* Hero description two-line block */
                 .hero-desc-block {
