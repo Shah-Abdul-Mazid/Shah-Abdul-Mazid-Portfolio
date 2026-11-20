@@ -6,8 +6,8 @@ import IntelligenceMatrix from "../components/IntelligenceMatrix";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 import { usePortfolio, resolveUrl } from "../context/PortfolioContext";
 import { formatDateLabel, sortRecentFirst } from "../utils/dateUtils";
-import { Github, ExternalLink, GraduationCap, BookOpen, FileText, Award, X } from "lucide-react";
-import { isPdfUrl, isImageUrl, getPdfViewerUrl } from "../utils/filePreview";
+import { Github, ExternalLink, GraduationCap, BookOpen, FileText, X } from "lucide-react";
+import { isPdfUrl, getPdfViewerUrl } from "../utils/filePreview";
 import { CertificationSection } from "../components/CertificationSection";
 
 import {
