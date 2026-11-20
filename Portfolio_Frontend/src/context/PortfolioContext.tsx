@@ -665,18 +665,18 @@ const defaultData: PortfolioData = {
         contact: { navLabel: 'Contact', adminLabel: 'Contact Details', subtitle: 'Contact', title: 'Let\'s Start a Conversation' }
     },
     hero: {
-        name: "Shah Abdul Mazid",
-        title: "Data Scientist | AI Developer",
+        name: "Engr. Shah Abdul Mazid",
+        title: "Data Scientist | AI Engineer | IEB Member (A-31537)",
         roles: [
             "Data Scientist",
-            "AI Developer",
+            "AI Engineer",
             "ML Engineer",
             "Software Engineer"
         ],
-        description: "A CSE student focused on Intelligent Systems & Data Science."
+        description: "A CSE graduate focused on Intelligent Systems & Data Science. IEB Registered Engineer."
     },
     about: {
-        bio: "I am an AI Engineer at Neuroxyte and a Computer Science & Engineering graduate from East West University (majoring in Intelligent Systems & Data Science). Driven by AI innovation, research, and hackathons, my work focuses on building explainable, data-driven systems that bridge the gap between academic research and production engineering.\n\n**Engineering Focus**\n- **Production AI Systems:** Architecting Multi-Agent RAG platforms, production LLM pipelines, and computer vision applications.\n- **System Deployment:** Scaling AI microservices and optimizing model latency for real-time inference.\n\n**Research Focus**\n- **Medical Imaging & Vision:** Diagnostics, interpretable machine learning using Grad-CAM, and Vision-Language Transformers.\n- **Academic Contribution:** Bridging production-grade engineering with explainable AI research.",
+        bio: "I am an AI Engineer at Neuroxyte and a Computer Science & Engineering graduate from East West University (majoring in Intelligent Systems & Data Science). I am a registered member of the **Institution of Engineers, Bangladesh (IEB)** (Membership No. **A-31537**). Driven by AI innovation, research, and hackathons, my work focuses on building explainable, data-driven systems that bridge the gap between academic research and production engineering.\n\n**Engineering Focus**\n- **Production AI Systems:** Architecting Multi-Agent RAG platforms, production LLM pipelines, and computer vision applications.\n- **System Deployment:** Scaling AI microservices and optimizing model latency for real-time inference.\n\n**Research Focus**\n- **Medical Imaging & Vision:** Diagnostics, interpretable machine learning using Grad-CAM, and Vision-Language Transformers.\n- **Academic Contribution:** Bridging production-grade engineering with explainable AI research.",
         age: "24",
         projects: "15+",
         bioLinks: [
@@ -744,6 +744,7 @@ const defaultData: PortfolioData = {
                 'Developed Text-to-Speech and voice generation systems for interactive AI applications.',
                 'Automated business workflows using n8n and implemented Generative AI and RAG solutions.'
             ],
+            appointmentLetterUrl: '/documents/appointment-letter.pdf',
             logoUrl: 'https://res.cloudinary.com/dxjv3zwse/image/upload/v1776650708/portfolio_uploads/stream_jar9z5.png'
         },
         { 

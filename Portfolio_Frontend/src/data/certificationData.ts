@@ -32,7 +32,7 @@ export interface CredentialRecord {
   badgeUrl?: string;
   credlyUrl?: string;
   credlyBadgeId?: string;
-  sourcePlatform: 'Coursera' | 'Credly' | 'AWS' | 'Microsoft' | 'CertNexus' | 'Google' | 'IBM' | 'micro1' | 'EWU' | 'EWUCoPC';
+  sourcePlatform: 'Coursera' | 'Credly' | 'AWS' | 'Microsoft' | 'CertNexus' | 'Google' | 'IBM' | 'micro1' | 'EWU' | 'EWUCoPC' | 'IEB';
   status: VerificationStatus;
   skills?: string[];
   subCourses?: SubCourseItem[];
@@ -834,6 +834,21 @@ export const CANONICAL_CREDENTIALS: CredentialRecord[] = [
   },
 
   // ── 5. PERFORMANCE CERTIFICATES & PARTICIPATION AWARDS ──
+  {
+    id: "ieb-membership",
+    title: "Institution of Engineers, Bangladesh (IEB) – Registered Engineer",
+    issuer: "Institution of Engineers, Bangladesh",
+    category: "badge",
+    credentialType: "Course",
+    date: "2026",
+    credentialId: "A-31537",
+    badgeUrl: "/documents/ieb-identity-card.pdf",
+    verificationUrl: "/documents/ieb-identity-card.pdf",
+    sourcePlatform: "IEB",
+    status: "verified",
+    programNote: "Registered member of the Institution of Engineers, Bangladesh (IEB) — the apex body of professional engineers in Bangladesh. Membership No. A-31537. Recognized as Engr. Shah Abdul Mazid.",
+    skills: ["Professional Engineering", "Engineering Ethics", "Technical Standards", "IEB Registered"]
+  },
   {
     id: "micro1-ai-interview",
     title: "micro1 AI Interview – Outstanding Performance",
