@@ -339,8 +339,8 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     position: relative;
                     display: inline-flex;
                     align-items: center;
-                    gap: 10px;
-                    padding: 8px 20px;
+                    gap: 8px;
+                    padding: 7px 16px;
                     background: rgba(15, 23, 42, 0.85);
                     backdrop-filter: blur(12px);
                     -webkit-backdrop-filter: blur(12px);
@@ -350,7 +350,8 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     margin: 0;
                     cursor: default;
                     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-                    max-width: 95%;
+                    max-width: 100%;
+                    overflow: visible;
                 }
                 .ieb-hero-badge:hover,
                 .ieb-hero-badge:focus-visible {
@@ -392,8 +393,8 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                 .ieb-hero-text {
                     display: inline-flex;
                     align-items: center;
-                    gap: 8px;
-                    font-size: 0.82rem;
+                    gap: 6px;
+                    font-size: 0.775rem;
                     line-height: 1.4;
                     letter-spacing: 0.01em;
                     flex-wrap: nowrap;
