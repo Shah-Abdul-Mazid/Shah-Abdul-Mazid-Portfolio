@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { Link } from 'react-router-dom';
 import { Moon, Sun } from 'lucide-react';
@@ -123,9 +123,16 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     </div>
 
                     <div className="badge fade-in" ref={addToRefs}>Available for new opportunities</div>
-                    <h1 className="fade-in" ref={addToRefs} style={{ fontSize: 'clamp(2.2rem, 8vw, 5rem)', fontWeight: 900, margin: '10px 0' }}>
-                        Hi, I'm <span className="gradient-text">{data.hero.name}</span>
+                    <h1 className="fade-in hero-name-h1" ref={addToRefs} style={{ fontSize: 'clamp(1.9rem, 5.5vw, 4rem)', fontWeight: 900, margin: '10px 0 4px' }}>
+                        Hi, I'm <span className="gradient-text" style={{ whiteSpace: 'nowrap' }}>{data.hero.name}</span>
                     </h1>
+                    {/* IEB Membership Badge */}
+                    <div className="ieb-hero-badge fade-in" ref={addToRefs}>
+                        <img src="/documents/ieb-logo.png" alt="IEB" className="ieb-hero-logo" />
+                        <span className="ieb-hero-text">
+                            <strong>IEB Registered Engineer</strong>&nbsp;&middot;&nbsp;Membership No. A-31537&nbsp;&middot;&nbsp;Valid Till 2028
+                        </span>
+                    </div>
                     <InlineAudioWaveform />
                     <p className="fade-in" ref={addToRefs} style={{ fontSize: '1.3rem', color: 'var(--text-secondary)', maxWidth: '800px', margin: '0 auto 6px', lineHeight: 1.5, minHeight: '34px', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -257,6 +264,58 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                 }
 
                 .badge { display: inline-block; padding: 6px 20px; background: var(--primary-glow); border: 1px solid var(--border-color); border-radius: 100px; color: var(--primary); font-size: 0.8rem; font-weight: 600; margin-bottom: 12px; backdrop-filter: blur(12px); }
+
+                /* IEB Hero Badge */
+                .ieb-hero-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 5px 14px;
+                    background: rgba(251, 191, 36, 0.08);
+                    border: 1px solid rgba(251, 191, 36, 0.28);
+                    border-radius: 20px;
+                    margin: 6px auto 10px;
+                    font-size: 0.78rem;
+                    color: #fbbf24;
+                    backdrop-filter: blur(12px);
+                    text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+                    white-space: nowrap;
+                    flex-wrap: nowrap;
+                }
+                .ieb-hero-logo {
+                    width: 22px;
+                    height: 22px;
+                    object-fit: contain;
+                    border-radius: 50%;
+                    background: white;
+                    padding: 2px;
+                    flex-shrink: 0;
+                }
+                .ieb-hero-text {
+                    font-size: 0.78rem;
+                    font-weight: 500;
+                    letter-spacing: 0.01em;
+                }
+                .ieb-hero-text strong {
+                    font-weight: 700;
+                }
+                html.light-mode .ieb-hero-badge {
+                    color: #b45309;
+                    background: rgba(251, 191, 36, 0.12);
+                    border-color: rgba(180, 83, 9, 0.3);
+                    text-shadow: none;
+                }
+                @media (max-width: 480px) {
+                    .ieb-hero-badge {
+                        font-size: 0.68rem;
+                        padding: 4px 10px;
+                        gap: 5px;
+                        white-space: normal;
+                        text-align: center;
+                        justify-content: center;
+                    }
+                    .ieb-hero-logo { width: 18px; height: 18px; }
+                }
                 .hero-btns { display: flex; gap: 14px; margin-top: 20px; justify-content: center; }
                 .image-wrapper { position: relative; width: 110px; height: 110px; margin: 0 auto; }
                 .image-wrapper img { 

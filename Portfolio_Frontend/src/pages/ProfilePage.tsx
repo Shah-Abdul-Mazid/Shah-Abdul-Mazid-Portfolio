@@ -533,11 +533,19 @@ const ProfilePage = () => {
             </div>
             <div className="doc-modal-body">
               {isPdfUrl(resolveUrl(activeDoc.url)) ? (
-                <iframe
-                  src={getPdfViewerUrl(resolveUrl(activeDoc.url))}
-                  className="doc-modal-object"
-                  title={activeDoc.label}
-                />
+                (() => {
+                  const resolved = resolveUrl(activeDoc.url);
+                  // Local PDFs (starting with /) → direct iframe; external → Google Docs Viewer
+                  const isLocal = resolved.startsWith('/') || (typeof window !== 'undefined' && resolved.startsWith(window.location.origin));
+                  const iframeSrc = isLocal ? resolved : getPdfViewerUrl(resolved);
+                  return (
+                    <iframe
+                      src={iframeSrc}
+                      className="doc-modal-object"
+                      title={activeDoc.label}
+                    />
+                  );
+                })()
               ) : (
                 <img
                   src={resolveUrl(activeDoc.url)}
