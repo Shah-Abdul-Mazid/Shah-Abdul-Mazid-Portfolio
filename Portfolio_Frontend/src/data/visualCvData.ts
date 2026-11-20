@@ -181,11 +181,16 @@ export const visualCvData: VisualCvData = {
     ],
     experience: [
         {
-            role: "Registered Engineer Member",
+            role: "Associate Member (A-31537) • Valid through 2028",
             company: "Institution of Engineers, Bangladesh (IEB)",
             location: "Dhaka, Bangladesh",
             period: "2026 – Present",
-            points: ["Registered professional engineer member (IEB Membership No. A-31537). Recognized as Engr. Shah Abdul Mazid."],
+            points: [
+                "Accredited Associate Member of the apex national engineering body in Bangladesh (Membership No. A-31537, valid through 2028).",
+                "Entitled to use the professional title \"Engr. Shah Abdul Mazid\" in accordance with IEB bylaws and standards.",
+                "Committed to upholding engineering ethics, technical excellence, and professional conduct in Computer Science & Engineering.",
+                "Authorized to endorse and certify engineering documents and technical designs within accredited scope."
+            ],
         },
         {
             role: "AI Engineer",

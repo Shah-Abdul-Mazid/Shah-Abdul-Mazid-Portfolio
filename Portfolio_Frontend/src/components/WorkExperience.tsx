@@ -167,6 +167,9 @@ const WorkExperience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                             });
                         }
 
+                        const isIeb = (job.company && job.company.toLowerCase().includes('ieb')) ||
+                            (job.company && job.company.toLowerCase().includes('institution of engineers'));
+
                         return (
                             <div key={index} className="unified-card fade-in" ref={addToRefs}>
                                 <div className="card-header">
@@ -177,8 +180,21 @@ const WorkExperience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                                             </div>
                                         )}
                                         <div className="card-title-group">
-                                            <h3 className="card-title">{job.role}</h3>
-                                            <p className="card-subtitle">{job.company}</p>
+                                            {isIeb ? (
+                                                <>
+                                                    <h3 className="card-title">{job.company}</h3>
+                                                    <div style={{ marginTop: '4px' }}>
+                                                        <span className="ieb-credential-pill">
+                                                            Associate Member (A-31537) • Valid through 2028
+                                                        </span>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <h3 className="card-title">{job.role}</h3>
+                                                    <p className="card-subtitle">{job.company}</p>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="card-meta">
@@ -231,6 +247,24 @@ const WorkExperience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                 .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 20px; }
                 .card-title { font-size: 1.2rem; color: var(--text-color); margin: 0 0 4px 0; font-weight: 700; }
                 .card-subtitle { color: var(--primary); font-weight: 700; font-size: 0.95rem; margin: 0; }
+                .ieb-credential-pill {
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 3px 11px;
+                    border-radius: 9999px;
+                    font-size: 0.78rem;
+                    font-weight: 600;
+                    letter-spacing: 0.015em;
+                    color: #fbbf24;
+                    background: rgba(251, 191, 36, 0.12);
+                    border: 1px solid rgba(251, 191, 36, 0.4);
+                    box-shadow: 0 0 10px rgba(251, 191, 36, 0.08);
+                }
+                .light-mode .ieb-credential-pill {
+                    color: #b45309;
+                    background: rgba(245, 158, 11, 0.12);
+                    border-color: rgba(245, 158, 11, 0.4);
+                }
 
                 .card-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
                 .card-period { background: rgba(139,92,246,0.08); color: var(--primary); padding: 2px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(139,92,246,0.2); white-space: nowrap; }

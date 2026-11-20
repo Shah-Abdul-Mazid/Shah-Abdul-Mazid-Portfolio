@@ -723,15 +723,15 @@ const defaultData: PortfolioData = {
     ],
     work: [
         {
-            role: 'Registered Engineer Member',
+            role: 'Associate Member (A-31537) • Valid through 2028',
             company: 'Institution of Engineers, Bangladesh (IEB)',
             startDate: '2026-11-20',
             endDate: '',
             details: [
-                'Registered professional engineer under the apex engineering body of Bangladesh — Membership No. A-31537.',
-                'Recognized as Engr. Shah Abdul Mazid in accordance with IEB professional standards.',
-                'Upholds engineering ethics, technical excellence, and the professional code of conduct set by IEB.',
-                'Eligible to sign and certify engineering documents and designs as a licensed professional engineer.'
+                'Accredited Associate Member of the apex national engineering body in Bangladesh (Membership No. A-31537, valid through 2028).',
+                'Entitled to use the professional title "Engr. Shah Abdul Mazid" in accordance with IEB bylaws and standards.',
+                'Committed to upholding engineering ethics, technical excellence, and professional conduct in Computer Science & Engineering.',
+                'Authorized to endorse and certify engineering documents and technical designs within accredited scope.'
             ],
             logoUrl: '/documents/ieb-logo.png',
             certificateUrl: '/documents/ieb-front.jpg',

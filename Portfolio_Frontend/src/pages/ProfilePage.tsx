@@ -452,11 +452,21 @@ const ProfilePage = () => {
                           )}
                           <div style={{ flex: 1 }}>
                             <span className="timeline-year">{yearRange}</span>
-                            <h3 className="timeline-title">
-                              {item.role}
-                              {isIeb && <span className="ieb-registered-badge">IEB Member (A-31537)</span>}
-                            </h3>
-                            <p className="timeline-institution">{item.company}</p>
+                            {isIeb ? (
+                              <>
+                                <h3 className="timeline-title">{item.company}</h3>
+                                <div className="ieb-timeline-credential">
+                                  <span className="ieb-credential-pill">
+                                    Associate Member (A-31537) • Valid through 2028
+                                  </span>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <h3 className="timeline-title">{item.role}</h3>
+                                <p className="timeline-institution">{item.company}</p>
+                              </>
+                            )}
                           </div>
                         </div>
 
@@ -1005,17 +1015,31 @@ const ProfilePage = () => {
           object-fit: contain;
         }
 
-        .ieb-registered-badge {
-          display: inline-block;
-          padding: 2px 8px;
-          border-radius: 6px;
-          font-size: 0.7rem;
-          font-weight: 700;
+        .ieb-timeline-credential {
+          margin: 4px 0 8px 0;
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+
+        .ieb-credential-pill {
+          display: inline-flex;
+          align-items: center;
+          padding: 3px 11px;
+          border-radius: 9999px;
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0.015em;
           color: #fbbf24;
-          background: rgba(251, 191, 36, 0.14);
-          border: 1px solid rgba(251, 191, 36, 0.35);
-          margin-left: 8px;
-          vertical-align: middle;
+          background: rgba(251, 191, 36, 0.12);
+          border: 1px solid rgba(251, 191, 36, 0.4);
+          box-shadow: 0 0 10px rgba(251, 191, 36, 0.08);
+        }
+
+        .light-mode .ieb-credential-pill {
+          color: #b45309;
+          background: rgba(245, 158, 11, 0.12);
+          border-color: rgba(245, 158, 11, 0.4);
         }
 
         .timeline-docs-row {
