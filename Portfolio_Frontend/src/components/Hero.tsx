@@ -298,26 +298,25 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     backdrop-filter: blur(12px); 
                 }
 
-                /* 1. Main Headline: Significantly larger & bolder focal point (text-5xl to text-7xl scale) with contrast backdrop */
+                /* 1. Main Headline — balanced, professional, text-3xl→text-5xl scale (desktop ~2rem–2.6rem) */
                 .hero-name-h1 {
-                    font-size: clamp(2.75rem, 5vw, 4.5rem);
+                    font-size: clamp(1.6rem, 2.9vw, 2.6rem);
                     font-weight: 800;
                     color: #FFFFFF !important;
-                    letter-spacing: -0.03em;
-                    line-height: 1.12;
+                    letter-spacing: -0.025em;
+                    line-height: 1.18;
                     margin: 0;
                     white-space: nowrap !important;
                     text-align: center;
                     position: relative;
                     display: inline-block;
-                    padding: 4px 28px;
-                    border-radius: 24px;
-                    background: radial-gradient(ellipse 95% 85% at 50% 50%, rgba(10, 17, 34, 0.72) 0%, rgba(10, 17, 34, 0) 78%);
-                    text-shadow: 
-                        0 4px 20px rgba(0, 0, 0, 0.95), 
-                        0 8px 35px rgba(0, 0, 0, 0.9), 
-                        0 0 50px rgba(10, 17, 34, 0.95);
-                    filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.75));
+                    padding: 3px 22px;
+                    border-radius: 18px;
+                    background: radial-gradient(ellipse 95% 90% at 50% 50%, rgba(10, 17, 34, 0.68) 0%, rgba(10, 17, 34, 0) 80%);
+                    text-shadow:
+                        0 3px 14px rgba(0, 0, 0, 0.9),
+                        0 6px 28px rgba(0, 0, 0, 0.8);
+                    filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.6));
                 }
                 .hero-name-highlight {
                     color: #FFFFFF !important;
@@ -325,21 +324,21 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                 }
                 html.light-mode .hero-name-h1 {
                     color: #0f172a !important;
-                    background: radial-gradient(ellipse 95% 85% at 50% 50%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 78%);
-                    text-shadow: 0 2px 20px rgba(255, 255, 255, 0.95);
+                    background: radial-gradient(ellipse 95% 90% at 50% 50%, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0) 80%);
+                    text-shadow: 0 2px 16px rgba(255, 255, 255, 0.95);
                     filter: none;
                 }
                 html.light-mode .hero-name-highlight {
                     color: #0f172a !important;
                 }
 
-                /* 2. Upgraded IEB Membership Badge: Recruiter & User Friendly */
+                /* 2. IEB Membership Badge — responsive, never breaks mid-word */
                 .ieb-hero-badge {
                     position: relative;
                     display: inline-flex;
                     align-items: center;
                     gap: 10px;
-                    padding: 9px 24px;
+                    padding: 8px 20px;
                     background: rgba(15, 23, 42, 0.85);
                     backdrop-filter: blur(12px);
                     -webkit-backdrop-filter: blur(12px);
@@ -359,8 +358,8 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     transform: translateY(-1px);
                 }
                 .ieb-hero-logo {
-                    width: 26px;
-                    height: 26px;
+                    width: 24px;
+                    height: 24px;
                     object-fit: contain;
                     border-radius: 50%;
                     background: #ffffff;
@@ -370,11 +369,11 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     border: 1.5px solid rgba(251, 191, 36, 0.65);
                 }
                 .ieb-status-dot {
-                    width: 8px;
-                    height: 8px;
+                    width: 7px;
+                    height: 7px;
                     background-color: #FBBF24;
                     border-radius: 50%;
-                    box-shadow: 0 0 8px #FBBF24, 0 0 12px rgba(251, 191, 36, 0.7);
+                    box-shadow: 0 0 7px #FBBF24, 0 0 11px rgba(251, 191, 36, 0.65);
                     display: inline-block;
                     flex-shrink: 0;
                     animation: iebDotPulse 2.5s infinite ease-in-out;
@@ -383,53 +382,65 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     0%, 100% { opacity: 1; transform: scale(1); }
                     50% { opacity: 0.55; transform: scale(0.85); }
                 }
+                /* 
+                 * .ieb-hero-text is the flex container for all badge content.
+                 * Key strategy: flex-wrap is ON so segments can wrap onto 2 clean lines.
+                 * But each individual segment (.ieb-org-title, .ieb-meta-group) has
+                 * white-space: nowrap so they never break MID-phrase.
+                 */
                 .ieb-hero-text {
                     display: inline-flex;
                     align-items: center;
-                    gap: 8px;
-                    font-size: 0.96rem;
-                    line-height: 1.45;
-                    letter-spacing: 0.015em;
+                    gap: 6px 10px;
+                    font-size: 0.875rem;
+                    line-height: 1.5;
+                    letter-spacing: 0.012em;
                     flex-wrap: wrap;
                     justify-content: center;
                 }
                 .ieb-org-title {
                     color: #FFFFFF;
                     font-weight: 600;
+                    white-space: nowrap; /* never splits "Institution of Engineers, Bangladesh (IEB)" */
                 }
                 .ieb-pipe {
-                    color: rgba(251, 191, 36, 0.6);
+                    color: rgba(251, 191, 36, 0.55);
                     font-weight: 300;
-                    margin: 0 2px;
+                    margin: 0 1px;
                     user-select: none;
+                    white-space: nowrap;
                 }
                 .ieb-meta-group {
                     display: inline-flex;
                     align-items: center;
-                    gap: 8px;
+                    gap: 6px;
+                    white-space: nowrap; /* keeps "ID: A-31537 • Valid through 2028" on one line */
                 }
                 .ieb-id-wrap {
                     display: inline-flex;
                     align-items: center;
+                    gap: 3px;
                     color: #F1F5F9;
+                    white-space: nowrap;
                 }
                 .ieb-id-label {
-                    color: rgba(255, 255, 255, 0.85);
+                    color: rgba(255, 255, 255, 0.8);
                     font-weight: 500;
                 }
                 .ieb-id {
                     color: #FBBF24;
                     font-weight: 700;
-                    letter-spacing: 0.025em;
+                    letter-spacing: 0.03em;
                 }
                 .ieb-bullet {
                     color: #FBBF24;
-                    font-size: 0.8rem;
+                    font-size: 0.75rem;
                     user-select: none;
                 }
                 .ieb-validity {
                     color: #FFFFFF;
                     font-weight: 500;
+                    white-space: nowrap;
                 }
 
                 /* Recruiter Tooltip */
@@ -443,7 +454,7 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     color: #F1F5F9;
                     padding: 6px 14px;
                     border-radius: 8px;
-                    font-size: 0.82rem;
+                    font-size: 0.8rem;
                     font-weight: 500;
                     white-space: nowrap;
                     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 16px rgba(251, 191, 36, 0.22);
@@ -477,7 +488,7 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     border: 1px solid rgba(251, 191, 36, 0.45);
                     padding: 1px 6px;
                     border-radius: 4px;
-                    font-size: 0.72rem;
+                    font-size: 0.7rem;
                     font-weight: 600;
                     letter-spacing: 0.02em;
                 }
@@ -494,9 +505,10 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                 }
                 html.light-mode .ieb-id,
                 html.light-mode .ieb-pipe,
-                html.light-mode .ieb-bullet,
-                html.light-mode .ieb-status-dot {
+                html.light-mode .ieb-bullet {
                     color: #d97706;
+                }
+                html.light-mode .ieb-status-dot {
                     background-color: #d97706;
                 }
                 html.light-mode .ieb-tooltip {
@@ -642,13 +654,14 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2);
                 }
 
-                @media (max-width: 880px) {
-                    .ieb-hero-badge {
-                        border-radius: 20px !important;
-                        padding: 9px 18px !important;
-                    }
+                /* ── Badge: pipe hidden below md, stays pill shape */
+                @media (max-width: 860px) {
                     .ieb-pipe {
                         display: none !important;
+                    }
+                    .ieb-hero-badge {
+                        border-radius: 18px !important;
+                        padding: 8px 16px !important;
                     }
                 }
                 @media (max-width: 768px) {
@@ -660,7 +673,7 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                         overflow: visible !important;
                     }
                     .hero-content {
-                        gap: 0.95rem !important;
+                        gap: 0.9rem !important;
                     }
                     .hero-image {
                         margin-bottom: 4px !important;
@@ -679,24 +692,23 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                     .time-text { 
                         font-size: 0.72rem !important; 
                     }
+                    /* text-4xl equivalent (~2.25rem) on tablet */
                     .hero-name-h1 {
-                        font-size: clamp(1.85rem, 6.2vw, 3rem) !important; /* text-5xl scale */
-                        line-height: 1.15 !important;
+                        font-size: clamp(1.5rem, 5.5vw, 2.3rem) !important;
+                        line-height: 1.18 !important;
                         white-space: nowrap !important;
-                        padding: 4px 16px !important;
+                        padding: 3px 14px !important;
                     }
                     .ieb-hero-badge {
-                        font-size: 0.88rem !important;
-                        padding: 8px 16px !important;
-                        gap: 8px !important;
+                        padding: 7px 14px !important;
+                        gap: 7px !important;
+                        border-radius: 16px !important;
                     }
                     .ieb-hero-text {
-                        font-size: 0.88rem !important;
-                        gap: 6px !important;
-                        flex-wrap: wrap !important;
-                        justify-content: center !important;
+                        font-size: 0.82rem !important;
+                        gap: 4px 8px !important;
                     }
-                    .ieb-hero-logo { width: 22px !important; height: 22px !important; }
+                    .ieb-hero-logo { width: 20px !important; height: 20px !important; }
                     .ieb-status-dot { width: 6px !important; height: 6px !important; }
                     .hero-roles-anim {
                         font-size: 0.95rem !important;
@@ -722,34 +734,39 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                         font-size: 0.88rem !important;
                     }
                 }
+                /* text-3xl equivalent (~1.875rem) on mobile, still single line */
                 @media (max-width: 520px) {
                     .hero-name-h1 {
-                        font-size: clamp(1.25rem, 5.8vw, 1.85rem) !important;
+                        font-size: clamp(1.2rem, 5.2vw, 1.75rem) !important;
                         white-space: nowrap !important;
                         padding: 3px 10px !important;
                     }
                     .ieb-hero-badge {
-                        font-size: 0.8rem !important;
-                        padding: 7px 12px !important;
-                        border-radius: 16px !important;
+                        font-size: 0.75rem !important;
+                        padding: 6px 10px !important;
+                        border-radius: 12px !important;
+                        gap: 5px !important;
                     }
                     .ieb-hero-text {
-                        font-size: 0.8rem !important;
-                        gap: 4px 6px !important;
+                        font-size: 0.75rem !important;
+                        gap: 3px 6px !important;
                     }
                     .ieb-tooltip {
                         white-space: normal !important;
-                        width: 250px !important;
-                        max-width: 90vw !important;
+                        width: 240px !important;
+                        max-width: 88vw !important;
                         text-align: center !important;
-                        font-size: 0.74rem !important;
+                        font-size: 0.72rem !important;
                         padding: 6px 10px !important;
                     }
                 }
                 @media (max-width: 380px) {
                     .hero-name-h1 {
-                        font-size: clamp(1.05rem, 5.5vw, 1.25rem) !important;
+                        font-size: clamp(1.05rem, 5.3vw, 1.2rem) !important;
                         white-space: nowrap !important;
+                    }
+                    .ieb-hero-text {
+                        font-size: 0.7rem !important;
                     }
                 }
                 @media (max-height: 720px) {
