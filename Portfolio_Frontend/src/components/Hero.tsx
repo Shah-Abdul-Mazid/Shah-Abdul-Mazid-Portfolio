@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿import { useState, useEffect } from 'react';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿import { useState, useEffect } from 'react';
 import { usePortfolio, resolveUrl } from '../context/PortfolioContext';
 import { Link } from 'react-router-dom';
 import { Moon, Sun } from 'lucide-react';
@@ -279,53 +279,55 @@ const Hero = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => void }) =>
                 .ieb-hero-badge {
                     display: inline-flex;
                     align-items: center;
-                    gap: 12px;
-                    padding: 12px 28px;
-                    background: rgba(251, 191, 36, 0.08);
-                    border: 1px solid rgba(251, 191, 36, 0.28);
-                    border-radius: 24px;
-                    margin: 8px auto 12px;
-                    font-size: 1.3rem;
+                    gap: 9px;
+                    padding: 6px 16px;
+                    background: rgba(251, 191, 36, 0.09);
+                    border: 1px solid rgba(251, 191, 36, 0.32);
+                    border-radius: 100px;
+                    margin: 6px auto 10px;
+                    font-size: 0.92rem;
                     color: #fbbf24;
                     backdrop-filter: blur(12px);
                     text-shadow: 0 1px 8px rgba(0,0,0,0.6);
                     white-space: nowrap;
                     flex-wrap: nowrap;
+                    box-shadow: 0 2px 14px rgba(251, 191, 36, 0.12);
                 }
                 .ieb-hero-logo {
-                    width: 48px;
-                    height: 48px;
+                    width: 30px;
+                    height: 30px;
                     object-fit: contain;
                     border-radius: 50%;
-                    background: white;
-                    padding: 3px;
+                    background: #ffffff;
+                    padding: 2px;
                     flex-shrink: 0;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+                    border: 1.5px solid rgba(251, 191, 36, 0.6);
                 }
                 .ieb-hero-text {
-                    font-size: 1.3rem;
+                    font-size: 0.92rem;
                     font-weight: 500;
-                    letter-spacing: 0.01em;
+                    letter-spacing: 0.015em;
                 }
                 .ieb-hero-text strong {
                     font-weight: 700;
                 }
                 html.light-mode .ieb-hero-badge {
                     color: #b45309;
-                    background: rgba(251, 191, 36, 0.12);
-                    border-color: rgba(180, 83, 9, 0.3);
+                    background: rgba(251, 191, 36, 0.14);
+                    border-color: rgba(180, 83, 9, 0.35);
                     text-shadow: none;
                 }
                 @media (max-width: 480px) {
                     .ieb-hero-badge {
-                        font-size: 1rem;
-                        padding: 8px 14px;
-                        gap: 8px;
+                        font-size: 0.8rem;
+                        padding: 5px 12px;
+                        gap: 6px;
                         white-space: normal;
                         text-align: center;
                         justify-content: center;
                     }
-                    .ieb-hero-logo { width: 36px; height: 36px; }
+                    .ieb-hero-logo { width: 24px; height: 24px; padding: 1.5px; }
                 }
                 /* Hero description two-line block */
                 .hero-desc-block {
