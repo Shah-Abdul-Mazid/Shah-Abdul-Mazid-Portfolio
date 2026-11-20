@@ -129,18 +129,41 @@ const WorkExperience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                 <div className="card-stack">
                     {workHistory.map((job, index) => {
                         const docs: DocInfo[] = [];
-                        if (job.appointmentLetterUrl) {
+                        if (job.docs && job.docs.length > 0) {
+                            job.docs.forEach((d) => {
+                                docs.push({
+                                    url: d.url,
+                                    label: d.label,
+                                    type: (d.type as any) || 'generic'
+                                });
+                            });
+                        }
+                        if (job.appointmentLetterUrl && !docs.some(d => d.url === job.appointmentLetterUrl)) {
                             docs.push({
                                 url: job.appointmentLetterUrl,
                                 label: 'Appointment Letter',
                                 type: 'appointment'
                             });
                         }
-                        if (job.experienceLetterUrl) {
+                        if (job.experienceLetterUrl && !docs.some(d => d.url === job.experienceLetterUrl)) {
                             docs.push({
                                 url: job.experienceLetterUrl,
                                 label: 'Experience Letter',
                                 type: 'experience'
+                            });
+                        }
+                        if (job.certificateUrl && !docs.some(d => d.url === job.certificateUrl)) {
+                            docs.push({
+                                url: job.certificateUrl,
+                                label: job.attachmentLabel || 'Identity Card',
+                                type: 'generic'
+                            });
+                        }
+                        if (job.attachmentUrl && !docs.some(d => d.url === job.attachmentUrl)) {
+                            docs.push({
+                                url: job.attachmentUrl,
+                                label: job.attachmentLabel ? `${job.attachmentLabel}` : 'Attachment',
+                                type: 'generic'
                             });
                         }
 

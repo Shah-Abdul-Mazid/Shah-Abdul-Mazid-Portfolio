@@ -1908,6 +1908,24 @@ const AdminDashboard = () => {
                                             onUpload={(url) => updateListItem('work', i, 'experienceLetterUrl', url)} 
                                         />
                                     </div>
+                                    <div className="form-row">
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Certificate / ID (Front)" 
+                                                value={job.certificateUrl || ''} 
+                                                id={`work-cert-${i}`}
+                                                onUpload={(url) => updateListItem('work', i, 'certificateUrl', url)} 
+                                            />
+                                        </div>
+                                        <div className="form-group w-50">
+                                            <FileUploadInput 
+                                                label="Attachment / ID (Back)" 
+                                                value={job.attachmentUrl || ''} 
+                                                id={`work-attach-${i}`}
+                                                onUpload={(url) => updateListItem('work', i, 'attachmentUrl', url)} 
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                             <button type="button" className="add-btn" onClick={() => addListItem('work', { role: '', company: '', startDate: '', endDate: '', details: [''], appointmentLetterUrl: '', experienceLetterUrl: '', logoUrl: '' })}>

@@ -61,8 +61,8 @@
 
 export const atsCvData: ATSCvData = {
     personal: {
-        name: "SHAH ABDUL MAZID",
-        title: "AI/ML Engineer | Generative AI | LLMs | RAG | Computer Vision",
+        name: "ENGR. SHAH ABDUL MAZID",
+        title: "AI/ML Engineer | IEB Member (A-31537) | Generative AI | LLMs | RAG",
         location: "Dhaka, Bangladesh",
         email: "shahabdulmazid.ezan@yahoo.com",
         phone: "+880 1531329222",
@@ -123,6 +123,16 @@ export const atsCvData: ATSCvData = {
         },
     ],
     experience: [
+        {
+            role: "Registered Engineer Member (A-31537)",
+            company: "Institution of Engineers, Bangladesh (IEB)",
+            location: "Ramna, Dhaka, Bangladesh",
+            period: "2026 -- Present",
+            points: [
+                "Registered professional engineer member under the Institution of Engineers, Bangladesh (IEB) — Membership No. A-31537.",
+                "Authorized and recognized as Engr. Shah Abdul Mazid in adherence to national engineering standards and ethics.",
+            ],
+        },
         {
             role: "AI Engineer",
             company: "Neuroxyte",

@@ -36,7 +36,7 @@ const Footer = () => {
                 <div className="footer-divider" />
                 <div className="footer-bottom">
                     <p className="footer-copy">
-                        &copy; Shah Abdul Mazid {currentYear}.&nbsp; All rights reserved.
+                        &copy; Engr. Shah Abdul Mazid {currentYear}.&nbsp; All rights reserved.
                     </p>
                     <div className="footer-socials">
                         {socials.map((s) => (

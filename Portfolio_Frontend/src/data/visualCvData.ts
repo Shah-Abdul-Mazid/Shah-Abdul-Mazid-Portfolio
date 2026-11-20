@@ -105,8 +105,8 @@ export interface VisualCvData {
 
 export const visualCvData: VisualCvData = {
     personal: {
-        name: "SHAH ABDUL MAZID",
-        title: "AI/ML Engineer & Researcher",
+        name: "ENGR. SHAH ABDUL MAZID",
+        title: "AI/ML Engineer & Researcher | IEB Member (A-31537)",
         tags: ["Generative AI", "LLMs & RAG", "Computer Vision", "NLP", "Deep Learning"],
         location: "Dhaka, Bangladesh",
         phone: "+880 1531329222",
@@ -180,6 +180,13 @@ export const visualCvData: VisualCvData = {
         { title: "AI Automation", description: "Built n8n-based workflows integrating AI models, APIs, and external" },
     ],
     experience: [
+        {
+            role: "Registered Engineer Member (A-31537)",
+            company: "Institution of Engineers, Bangladesh (IEB)",
+            location: "Ramna, Dhaka, Bangladesh",
+            period: "2026 – Present",
+            points: ["Registered professional engineer member under the Institution of Engineers, Bangladesh (IEB) — Membership No. A-31537.", "Authorized and recognized as Engr. Shah Abdul Mazid in adherence to national engineering standards and ethics."],
+        },
         {
             role: "AI Engineer",
             company: "Neuroxyte",

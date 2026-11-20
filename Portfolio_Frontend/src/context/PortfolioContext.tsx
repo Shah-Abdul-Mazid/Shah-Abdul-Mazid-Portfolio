@@ -44,6 +44,7 @@ export interface WorkItem {
     appointmentLetterUrl?: string;
     experienceLetterUrl?: string;
     logoUrl?: string;
+    docs?: Array<{ url: string; label: string; type?: 'appointment' | 'experience' | 'generic' }>;
 }
 
 export interface ProjectItem {
@@ -671,9 +672,10 @@ const defaultData: PortfolioData = {
             "Data Scientist",
             "AI Engineer",
             "ML Engineer",
-            "Software Engineer"
+            "Software Engineer",
+            "IEB Registered Engineer (A-31537)"
         ],
-        description: "A CSE graduate focused on Intelligent Systems & Data Science. IEB Registered Engineer."
+        description: "A CSE graduate focused on Intelligent Systems & Data Science. IEB Registered Engineer (A-31537)."
     },
     about: {
         bio: "I am an AI Engineer at Neuroxyte and a Computer Science & Engineering graduate from East West University (majoring in Intelligent Systems & Data Science). I am a registered member of the **Institution of Engineers, Bangladesh (IEB)** (Membership No. **A-31537**). Driven by AI innovation, research, and hackathons, my work focuses on building explainable, data-driven systems that bridge the gap between academic research and production engineering.\n\n**Engineering Focus**\n- **Production AI Systems:** Architecting Multi-Agent RAG platforms, production LLM pipelines, and computer vision applications.\n- **System Deployment:** Scaling AI microservices and optimizing model latency for real-time inference.\n\n**Research Focus**\n- **Medical Imaging & Vision:** Diagnostics, interpretable machine learning using Grad-CAM, and Vision-Language Transformers.\n- **Academic Contribution:** Bridging production-grade engineering with explainable AI research.",
@@ -720,6 +722,39 @@ const defaultData: PortfolioData = {
         { role: 'In House Programming Battle', company: 'EWUCoPC', period: '2022', desc: 'Certificate of Participation for successfully taking part in In House Programming Battle 2022. Recognized for logical and creative problem-solving skills.', certificateUrl: '/certificates/ewucopc-programming-battle-2022.jpg' }
     ],
     work: [
+        {
+            role: 'Registered Engineer Member',
+            company: 'Institution of Engineers, Bangladesh (IEB)',
+            startDate: '2026-01-01',
+            endDate: '',
+            details: [
+                'Registered professional engineer under the apex engineering body of Bangladesh — Membership No. A-31537.',
+                'Recognized as Engr. Shah Abdul Mazid in accordance with IEB professional standards.',
+                'Upholds engineering ethics, technical excellence, and the professional code of conduct set by IEB.',
+                'Eligible to sign and certify engineering documents and designs as a licensed professional engineer.'
+            ],
+            logoUrl: '/documents/ieb-logo.png',
+            certificateUrl: '/documents/ieb-front.jpg',
+            attachmentUrl: '/documents/ieb-back.jpg',
+            attachmentLabel: 'IEB ID Card (Back)',
+            docs: [
+                {
+                    url: '/documents/ieb-front.jpg',
+                    label: 'IEB ID Card (Front)',
+                    type: 'generic'
+                },
+                {
+                    url: '/documents/ieb-back.jpg',
+                    label: 'IEB ID Card (Back)',
+                    type: 'generic'
+                },
+                {
+                    url: '/documents/ieb-identity-card.pdf',
+                    label: 'Official PDF Document',
+                    type: 'generic'
+                }
+            ]
+        },
         { 
             role: 'AI Engineer', 
             company: 'Neuroxyte', 

@@ -97,7 +97,7 @@ const Header = () => {
                                 border: '2px solid var(--bg-color)'
                             }} />
                         </div>
-                        <span className="logo-name-text">Shah Abdul Mazid</span>
+                        <span className="logo-name-text">Engr. Shah Abdul Mazid</span>
                     </Link>
 
                     {/* Desktop Nav - Compact */}
@@ -153,7 +153,7 @@ const Header = () => {
                 <div className="mobile-drawer-header">
                     <Link to="/" className="logo-link" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }} onClick={closeMenu}>
                         <img src={avtarImg} alt="Logo" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
-                        <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-color)' }}>Shah Abdul Mazid</span>
+                        <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-color)' }}>Engr. Shah Abdul Mazid</span>
                     </Link>
                     <button className="drawer-close" onClick={closeMenu} aria-label="Close menu">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
