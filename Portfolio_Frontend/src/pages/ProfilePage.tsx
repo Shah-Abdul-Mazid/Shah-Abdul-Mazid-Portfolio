@@ -1,12 +1,13 @@
-﻿import { useMemo } from "react";
+﻿import { useMemo, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import FloatingContactForm from "../components/FloatingContactForm";
 import IntelligenceMatrix from "../components/IntelligenceMatrix";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
-import { usePortfolio } from "../context/PortfolioContext";
+import { usePortfolio, resolveUrl } from "../context/PortfolioContext";
 import { formatDateLabel, sortRecentFirst } from "../utils/dateUtils";
-import { Github, ExternalLink, GraduationCap, BookOpen } from "lucide-react";
+import { Github, ExternalLink, GraduationCap, BookOpen, FileText, Award, X } from "lucide-react";
+import { isPdfUrl, isImageUrl, getPdfViewerUrl } from "../utils/filePreview";
 import { CertificationSection } from "../components/CertificationSection";
 
 import {
@@ -30,6 +31,7 @@ const ProfilePage = () => {
   const education = data.education || [];
   const workExperience = sortRecentFirst(data.work || []);
   const certifications = data.certifications || [];
+  const [activeDoc, setActiveDoc] = useState<{ url: string; label: string } | null>(null);
 
   const allBioLinks = useMemo(() => {
     const customLinks = data.about.bioLinks || [];
@@ -417,13 +419,47 @@ const ProfilePage = () => {
                     : "PRESENT";
                   const yearRange = `${startLabel} – ${endLabel}`.toUpperCase();
 
+                  const docs: Array<{ url: string; label: string }> = [];
+                  if (item.docs && item.docs.length > 0) {
+                    item.docs.forEach((d) => docs.push({ url: d.url, label: d.label }));
+                  }
+                  if (item.appointmentLetterUrl && !docs.some(d => d.url === item.appointmentLetterUrl)) {
+                    docs.push({ url: item.appointmentLetterUrl, label: "Appointment Letter" });
+                  }
+                  if (item.experienceLetterUrl && !docs.some(d => d.url === item.experienceLetterUrl)) {
+                    docs.push({ url: item.experienceLetterUrl, label: "Experience Letter" });
+                  }
+                  if (item.certificateUrl && !docs.some(d => d.url === item.certificateUrl)) {
+                    docs.push({ url: item.certificateUrl, label: item.attachmentLabel || "ID Card (Front)" });
+                  }
+                  if (item.attachmentUrl && !docs.some(d => d.url === item.attachmentUrl)) {
+                    docs.push({ url: item.attachmentUrl, label: "ID Card (Back)" });
+                  }
+
+                  const isIeb = (item.company && item.company.toLowerCase().includes('ieb')) ||
+                    (item.company && item.company.toLowerCase().includes('institution of engineers')) ||
+                    (item.role && item.role.toLowerCase().includes('registered engineer'));
+
                   return (
                     <div key={index} className="timeline-item">
                       <div className="timeline-dot purple"></div>
                       <div className="timeline-content">
-                        <span className="timeline-year">{yearRange}</span>
-                        <h3 className="timeline-title">{item.role}</h3>
-                        <p className="timeline-institution">{item.company}</p>
+                        <div className="timeline-header-row">
+                          {item.logoUrl && (
+                            <div className="timeline-logo-wrap">
+                              <img src={resolveUrl(item.logoUrl)} alt={item.company} className="timeline-logo-img" />
+                            </div>
+                          )}
+                          <div style={{ flex: 1 }}>
+                            <span className="timeline-year">{yearRange}</span>
+                            <h3 className="timeline-title">
+                              {item.role}
+                              {isIeb && <span className="ieb-registered-badge">IEB Member (A-31537)</span>}
+                            </h3>
+                            <p className="timeline-institution">{item.company}</p>
+                          </div>
+                        </div>
+
                         {item.details && item.details.length > 0 && (
                           <ul className="timeline-details-list">
                             {item.details.map((detail, idx) => (
@@ -432,6 +468,24 @@ const ProfilePage = () => {
                               </li>
                             ))}
                           </ul>
+                        )}
+
+                        {docs.length > 0 && (
+                          <div className="timeline-docs-row">
+                            {docs.map(doc => (
+                              <button
+                                key={doc.url}
+                                type="button"
+                                className="timeline-doc-btn"
+                                onClick={() => setActiveDoc(doc)}
+                                title={`View ${doc.label}`}
+                              >
+                                <FileText size={13} />
+                                <span>{doc.label}</span>
+                                <ExternalLink size={11} style={{ opacity: 0.7 }} />
+                              </button>
+                            ))}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -451,6 +505,51 @@ const ProfilePage = () => {
 
         </div>
       </main>
+
+      {/* Document Preview Modal */}
+      {activeDoc && (
+        <div className="doc-modal-overlay" onClick={() => setActiveDoc(null)}>
+          <div className="doc-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="doc-modal-header">
+              <span className="doc-modal-title">{activeDoc.label}</span>
+              <div style={{ display: "flex", gap: 8 }}>
+                <a
+                  href={resolveUrl(activeDoc.url)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="doc-modal-open-btn"
+                  title="Open in new tab"
+                >
+                  <ExternalLink size={14} /> Open in Tab
+                </a>
+                <button
+                  className="doc-modal-close-btn"
+                  onClick={() => setActiveDoc(null)}
+                  aria-label="Close"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+            <div className="doc-modal-body">
+              {isPdfUrl(resolveUrl(activeDoc.url)) ? (
+                <iframe
+                  src={getPdfViewerUrl(resolveUrl(activeDoc.url))}
+                  className="doc-modal-object"
+                  title={activeDoc.label}
+                />
+              ) : (
+                <img
+                  src={resolveUrl(activeDoc.url)}
+                  alt={activeDoc.label}
+                  className="doc-modal-img"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
       <FloatingContactForm />
 
@@ -869,6 +968,180 @@ const ProfilePage = () => {
           color: var(--text-secondary);
           font-weight: 500;
           margin-bottom: 8px;
+        }
+
+        .timeline-header-row {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          margin-bottom: 4px;
+        }
+
+        .timeline-logo-wrap {
+          width: 44px;
+          height: 44px;
+          border-radius: 10px;
+          overflow: hidden;
+          background: #ffffff;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          padding: 2px;
+        }
+
+        .timeline-logo-img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+
+        .ieb-registered-badge {
+          display: inline-block;
+          padding: 2px 8px;
+          border-radius: 6px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          color: #fbbf24;
+          background: rgba(251, 191, 36, 0.14);
+          border: 1px solid rgba(251, 191, 36, 0.35);
+          margin-left: 8px;
+          vertical-align: middle;
+        }
+
+        .timeline-docs-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 12px;
+        }
+
+        .timeline-doc-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border-radius: 8px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #38bdf8;
+          background: rgba(56, 189, 248, 0.08);
+          border: 1px solid rgba(56, 189, 248, 0.25);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .timeline-doc-btn:hover {
+          background: rgba(56, 189, 248, 0.18);
+          border-color: #38bdf8;
+          color: #ffffff;
+          transform: translateY(-1px);
+        }
+
+        /* Doc Preview Modal */
+        .doc-modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.75);
+          backdrop-filter: blur(8px);
+          z-index: 9999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+        }
+
+        .doc-modal-box {
+          background: #0f172a;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 16px;
+          max-width: 900px;
+          width: 100%;
+          max-height: 90vh;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        .doc-modal-header {
+          padding: 14px 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(15, 23, 42, 0.95);
+        }
+
+        .doc-modal-title {
+          font-weight: 700;
+          font-size: 0.95rem;
+          color: #f8fafc;
+        }
+
+        .doc-modal-open-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border-radius: 8px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #38bdf8;
+          background: rgba(56, 189, 248, 0.1);
+          border: 1px solid rgba(56, 189, 248, 0.3);
+          text-decoration: none;
+          transition: background 0.2s;
+        }
+
+        .doc-modal-open-btn:hover {
+          background: rgba(56, 189, 248, 0.2);
+          color: #fff;
+        }
+
+        .doc-modal-close-btn {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 8px;
+          color: #94a3b8;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: color 0.2s, background 0.2s;
+        }
+
+        .doc-modal-close-btn:hover {
+          color: #fff;
+          background: rgba(255, 255, 255, 0.16);
+        }
+
+        .doc-modal-body {
+          flex: 1;
+          overflow: auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 16px;
+          background: #020617;
+          min-height: 400px;
+        }
+
+        .doc-modal-img {
+          max-width: 100%;
+          max-height: 75vh;
+          object-fit: contain;
+          border-radius: 8px;
+        }
+
+        .doc-modal-object {
+          width: 100%;
+          height: 75vh;
+          border: none;
+          border-radius: 8px;
         }
 
         .timeline-desc {

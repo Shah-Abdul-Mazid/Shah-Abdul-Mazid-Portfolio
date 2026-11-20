@@ -725,7 +725,7 @@ const defaultData: PortfolioData = {
         {
             role: 'Registered Engineer Member',
             company: 'Institution of Engineers, Bangladesh (IEB)',
-            startDate: '2026-01-01',
+            startDate: '2026-11-20',
             endDate: '',
             details: [
                 'Registered professional engineer under the apex engineering body of Bangladesh — Membership No. A-31537.',
@@ -880,6 +880,52 @@ const defaultData: PortfolioData = {
     }
 };
 
+export const mergeWorkWithCanonical = (apiWork?: any[]): WorkItem[] => {
+    const defaultWorkList = defaultData.work || [];
+    if (!apiWork || apiWork.length === 0) return defaultWorkList;
+
+    const defaultIeb = defaultWorkList.find(dw => 
+        dw.company.toLowerCase().includes('institution of engineers') ||
+        dw.company.toLowerCase().includes('ieb')
+    ) || defaultWorkList[0];
+
+    // Check if IEB exists in apiWork
+    const hasIeb = apiWork.some(w => 
+        (w.company && w.company.toLowerCase().includes('institution of engineers')) ||
+        (w.company && w.company.toLowerCase().includes('ieb')) ||
+        (w.role && w.role.toLowerCase().includes('registered engineer'))
+    );
+
+    const merged = apiWork.map(w => {
+        const companyLower = (w.company || '').toLowerCase();
+        // If Softvence, ensure appointmentLetterUrl is present
+        if (companyLower.includes('softvence') && !w.appointmentLetterUrl) {
+            return {
+                ...w,
+                appointmentLetterUrl: '/documents/appointment-letter.pdf'
+            };
+        }
+        // If IEB, ensure docs, logoUrl, certificateUrl, attachmentUrl are present
+        if (companyLower.includes('institution of engineers') || companyLower.includes('ieb') || (w.role && w.role.toLowerCase().includes('registered engineer'))) {
+            return {
+                ...defaultIeb,
+                ...w,
+                logoUrl: w.logoUrl || defaultIeb.logoUrl,
+                certificateUrl: w.certificateUrl || defaultIeb.certificateUrl,
+                attachmentUrl: w.attachmentUrl || defaultIeb.attachmentUrl,
+                docs: (w.docs && w.docs.length > 0) ? w.docs : defaultIeb.docs
+            };
+        }
+        return w;
+    });
+
+    if (!hasIeb && defaultIeb) {
+        merged.unshift(defaultIeb);
+    }
+
+    return merged;
+};
+
 interface PortfolioContextType {
     data: PortfolioData;
     updateData: (newData: PortfolioData) => Promise<boolean>;
@@ -938,6 +984,17 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
                         ...parsed,
                         sections: { ...defaultData.sections, ...(parsed.sections || {}) },
                         contact: { ...defaultData.contact, ...(parsed.contact || {}) },
+                        hero: {
+                            ...defaultData.hero,
+                            ...(parsed.hero || {}),
+                            name: (parsed.hero?.name && !parsed.hero.name.startsWith('Engr.')) 
+                                ? `Engr. ${parsed.hero.name}` 
+                                : (parsed.hero?.name || defaultData.hero.name),
+                            title: (parsed.hero?.title && !parsed.hero.title.includes('IEB'))
+                                ? `${parsed.hero.title} | IEB Member (A-31537)`
+                                : (parsed.hero?.title || defaultData.hero.title),
+                        },
+                        work: mergeWorkWithCanonical(parsed.work),
                         skills: (parsed.skills && parsed.skills.length > 0) ? parsed.skills : defaultData.skills,
                         papers: (parsed.papers && parsed.papers.length > 0) ? parsed.papers : defaultData.papers,
                         certifications: mergeCertificationsWithCanonical(parsed.certifications)
@@ -968,6 +1025,17 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
                             ...apiData,
                             sections: { ...defaultData.sections, ...(apiData.sections || {}) },
                             contact: { ...defaultData.contact, ...(apiData.contact || {}) },
+                            hero: {
+                                ...defaultData.hero,
+                                ...(apiData.hero || {}),
+                                name: (apiData.hero?.name && !apiData.hero.name.startsWith('Engr.')) 
+                                    ? `Engr. ${apiData.hero.name}` 
+                                    : (apiData.hero?.name || defaultData.hero.name),
+                                title: (apiData.hero?.title && !apiData.hero.title.includes('IEB'))
+                                    ? `${apiData.hero.title} | IEB Member (A-31537)`
+                                    : (apiData.hero?.title || defaultData.hero.title),
+                            },
+                            work: mergeWorkWithCanonical(apiData.work),
                             skills: (apiData.skills && apiData.skills.length > 0) ? apiData.skills : defaultData.skills,
                             papers: (apiData.papers && apiData.papers.length > 0) ? apiData.papers : defaultData.papers,
                             certifications: mergeCertificationsWithCanonical(apiData.certifications)
