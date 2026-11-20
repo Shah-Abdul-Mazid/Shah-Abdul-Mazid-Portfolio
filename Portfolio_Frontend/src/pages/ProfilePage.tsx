@@ -450,11 +450,11 @@ const ProfilePage = () => {
                               <img src={resolveUrl(item.logoUrl)} alt={item.company} className="timeline-logo-img" />
                             </div>
                           )}
-                          <div style={{ flex: 1 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
                             <span className="timeline-year">{yearRange}</span>
                             {isIeb ? (
                               <>
-                                <h3 className="timeline-title">{item.company}</h3>
+                                <h3 className="timeline-title ieb-timeline-title">{item.company}</h3>
                                 <div className="ieb-timeline-credential">
                                   <span className="ieb-credential-pill">
                                     Associate Member (A-31537) • Valid through 2028
@@ -979,6 +979,12 @@ const ProfilePage = () => {
           color: var(--text-color);
           margin-bottom: 4px;
           line-height: 1.3;
+        }
+
+        .ieb-timeline-title {
+          font-size: clamp(0.85rem, 1.35vw, 1.1rem);
+          white-space: nowrap;
+          letter-spacing: -0.015em;
         }
 
         .timeline-institution {
@@ -1742,6 +1748,13 @@ const ProfilePage = () => {
           .credly-single-badge-img-wrap {
             width: 58px;
             height: 58px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .ieb-timeline-title {
+            font-size: 0.76rem !important;
+            letter-spacing: -0.025em !important;
           }
         }
 

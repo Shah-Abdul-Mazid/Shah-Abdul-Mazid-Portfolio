@@ -179,10 +179,10 @@ const WorkExperience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
                                                 <img src={resolveUrl(job.logoUrl)} alt={job.company} className="company-logo-img" />
                                             </div>
                                         )}
-                                        <div className="card-title-group">
+                                        <div className="card-title-group" style={{ minWidth: 0 }}>
                                             {isIeb ? (
                                                 <>
-                                                    <h3 className="card-title">{job.company}</h3>
+                                                    <h3 className="card-title ieb-card-title">{job.company}</h3>
                                                     <div style={{ marginTop: '4px' }}>
                                                         <span className="ieb-credential-pill">
                                                             Associate Member (A-31537) • Valid through 2028
@@ -246,6 +246,11 @@ const WorkExperience = ({ addToRefs }: { addToRefs: (el: HTMLElement | null) => 
 
                 .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 20px; }
                 .card-title { font-size: 1.2rem; color: var(--text-color); margin: 0 0 4px 0; font-weight: 700; }
+                .ieb-card-title {
+                    white-space: nowrap;
+                    font-size: clamp(0.92rem, 1.5vw, 1.2rem);
+                    letter-spacing: -0.015em;
+                }
                 .card-subtitle { color: var(--primary); font-weight: 700; font-size: 0.95rem; margin: 0; }
                 .ieb-credential-pill {
                     display: inline-flex;
