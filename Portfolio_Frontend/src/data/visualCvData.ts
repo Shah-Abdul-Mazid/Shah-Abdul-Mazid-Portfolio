@@ -174,18 +174,18 @@ export const visualCvData: VisualCvData = {
     ],
     achievements: ["Published 2 research papers in agricultural AI and medical imaging (ICCIT 2025, Springer ICIDA 2026)", "Built enterprise RAG platform processing 10,000+ documents with 95%+ accuracy", "Developed traffic detection system for real-world Bangladesh traffic conditions", "Designed multi-agent AI system handling complex enterprise workflows", "17+ IBM and AWS certifications in AI/ML specializations"],
     highlights: [
-        { title: "Published Research", description: "2 publications in agricultural AI and medical imaging, including IEEE ICCIT 2025 and Springer ICIDA 2026.\nservices." },
+        { title: "Published Research", description: "2 publications in agricultural AI and medical imaging, including IEEE ICCIT 2025 and Springer ICIDA 2026." },
         { title: "Generative AI & RAG", description: "Built enterprise document Q&A, retrieval-augmented, and multi-agent AI systems." },
         { title: "End-to-End AI", description: "Developed ML systems spanning model development, backend integration, and production deployment." },
-        { title: "AI Automation", description: "Built n8n-based workflows integrating AI models, APIs, and external" },
+        { title: "AI Automation", description: "Built n8n-based workflows integrating AI models, APIs, and external services." },
     ],
     experience: [
         {
-            role: "Registered Engineer Member (A-31537)",
+            role: "Registered Engineer Member",
             company: "Institution of Engineers, Bangladesh (IEB)",
-            location: "Ramna, Dhaka, Bangladesh",
+            location: "Dhaka, Bangladesh",
             period: "2026 – Present",
-            points: ["Registered professional engineer member under the Institution of Engineers, Bangladesh (IEB) — Membership No. A-31537.", "Authorized and recognized as Engr. Shah Abdul Mazid in adherence to national engineering standards and ethics."],
+            points: ["Registered professional engineer member (IEB Membership No. A-31537). Recognized as Engr. Shah Abdul Mazid."],
         },
         {
             role: "AI Engineer",
